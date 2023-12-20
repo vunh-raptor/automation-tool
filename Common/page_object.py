@@ -1,0 +1,107 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from time import sleep
+import logging
+from Common.web_element import web_element
+
+
+class page_object:
+    def __init__(
+        self,
+        path: str = "chromedriver.exe",
+    ):
+        """This is the init function for the base page_object. Please be reminded that we only use ChromeDriver.
+
+        Args:
+            path (str, optional): Path to the ChromeDriver execution file. Defaults to "chromedriver.exe".
+        """
+
+        self.default_delay = 0.2
+        self.default_timeout = 5
+
+        self.path = path
+        self.profile = webdriver.ChromeService(executable_path=self.path)
+        self.driver = webdriver.Chrome(service=self.profile)
+
+    def headless(self) -> None:
+        """This is to generate headless session for chromedriver"""
+        service = webdriver.ChromeService(executable_path=self.path)
+        op = webdriver.ChromeOptions()
+        op.add_argument("--headless")
+        op.add_argument("--window-size=1920,1080")
+        self.driver = webdriver.Chrome(service=service, options=op)
+
+    def search_by_xpath(
+        self, xpath: str, timeout: int = 5, delay: float = 0.2
+    ) -> web_element:
+        """Search an object by XPATH, return a web_element object.
+
+        Args:
+            xpath (str): The XPATH to the desired element.
+            timeout (int, optional): How much time should the script retry before concluding that there exists no such object. Defaults to 5.
+            delay (float, optional): How long should the script wait between each check, measured in second. Defaults to 0.2.
+
+        Returns:
+            web_element: The wrapped web_element object contains web_element.flag and web_element.value.
+        """
+        for count in range(timeout):
+            found = False
+            try:
+                result = self.driver.find_element(By.XPATH, xpath)
+                found = True
+                break
+            except:  # noqa: E722
+                warning = (
+                    "Cannot find element "
+                    + str(xpath)
+                    + ", retry "
+                    + str(count)
+                    + " time."
+                )
+                logging.warning(warning)
+                sleep(delay)
+                continue
+
+        if not found:
+            return web_element(flag=found)
+        else:
+            return web_element(found, result)
+
+    def click_by_xpath(self, xpath: str, timeout: int = 5, delay: float = 0.2) -> bool:
+        """Search an object by XPATH, and click it.
+
+        Args:
+            xpath (str): the XPATH to the desired element
+            timeout (int, optional): How much time should the script retry before concluding that there exists no such object. Defaults to 5.
+            delay (float, optional): How long should the script wait between each check, measured in second. Defaults to 0.2.
+
+        Returns:
+            bool: True if the element is clicked, and False if there's no such element found.
+        """
+        element = self.search_by_xpath(xpath=xpath, timeout=timeout, delay=delay)
+        return element.click()
+
+    def send_keys_by_xpath(
+        self, xpath: str, keys: str, timeout: int = 5, delay: float = 0.2
+    ) -> bool:
+        """Search an object by XPATH, and send the desired keys to it.
+
+        Args:
+            xpath (str): The XPATH to the desired element.
+            keys (str): The string of keys that should be sent.
+            timeout (int, optional): How much time should the script retry before concluding that there exists no such object. Defaults to 5.
+            delay (float, optional): How long should the script wait between each check, measured in second. Defaults to 0.2.
+
+        Returns:
+            bool: True if the keys are sent, and False if there's no such element found.
+        """
+        element = self.search_by_xpath(xpath=xpath, timeout=timeout, delay=delay)
+        return element.send_keys(keys=keys)
+
+    def get(self, url: str):
+        """Go to a specific URL
+
+        Args:
+            url (str): the desired URL.
+        """
+        self.driver.get(url=url)
