@@ -102,3 +102,43 @@ def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> boo
 
         # Remove Successful or not. Return TRUE if Updated Successfully
         return umc_page.verify_updated_role
+
+
+def reactivate_user(umc_page: umc, hr_code: str) -> bool:
+    """This is a funciton to clear user of all roles and add in only the dismissal role.
+
+    Args:
+        umc_page (umc): an object represnet the UMC page in Selenium
+        hr_code (str): the HR Code we want to process
+        reason (str): the dismissal roles of users
+
+    Returns:
+        bool: whether this run correctly or not
+    """
+    umc_page.search_hrid(hrid=hr_code)
+
+    # Get account status beore running
+    umc_page.get_search_account_status()
+
+    # Check if account is Inactive
+    if umc_page.get_search_account_status() != "Inactive":
+        umc_page.click_details_button()
+        umc_page.click_edit()
+
+        # Check for existing dismissal roles
+
+        for dismissal in roles_table:
+            if umc_page.select_owned_role(role=dismissal):
+                umc_page.click_remove_role()
+
+        #Add Homesis and HOMESIS_USER role
+        umc_page.select_role("HOMESIS")
+        umc_page.click_add_role()
+        umc_page.select_role("HOMESIS_USER")
+        umc_page.click_add_role()
+
+        # Clicking Save
+        umc_page.click_save()
+
+        # Remove Successful or not. Return TRUE if Updated Successfully
+        return umc_page.verify_updated_role

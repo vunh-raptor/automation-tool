@@ -43,6 +43,9 @@ deact_reason = st.radio(
 # Deactivate Button
 remove_roles_button = st.button("Deactivate Accounts with The Chosen Reason")
 
+# Reactivate Button
+reactivate_account_button = st.button("Reactivate Accounts")
+
 
 # Read CSV Data
 if csv_upload is not None:
@@ -74,3 +77,13 @@ if remove_roles_button:
         umc_page.get_umc_url()
 
 # Reactivate Account
+if reactivate_account_button:
+     # Start Selenium
+    umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+
+    # Loop through CSV & Search for HR Code
+    for index, row in csv_data.iterrows():
+        hr_code = row["HR Code"]
+        reason = roles_table[options.index(deact_reason)]
+        reactivate_user(umc_page=umc_page, hr_code=hr_code)
+        umc_page.get_umc_url()
