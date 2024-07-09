@@ -142,3 +142,40 @@ def reactivate_user(umc_page: umc, hr_code: str) -> bool:
 
         # Remove Successful or not. Return TRUE if Updated Successfully
         return umc_page.verify_updated_role
+
+def remove_role(umc_page: umc, hr_code:str, role:str) -> bool:
+    """
+    Removes a specified role from a user in the UMC page.
+
+    This function searches for a user by their HR code, checks if the account is active,
+    and if so, removes the specified role from the user. The function then saves the changes
+    and verifies if the role has been successfully removed.
+
+    Args:
+        umc_page (umc): The UMC page object where the operations are performed.
+        hr_code (str): The HR code of the user.
+        role (str): The role to be removed from the user.
+
+    Returns:
+        bool: True if the role was successfully removed, False otherwise.
+    """
+    
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    umc_page.get_search_account_status()
+
+    # Check if account is Inactive
+    if umc_page.get_search_account_status() != "Inactive":
+        umc_page.click_details_button()
+        umc_page.click_edit()
+
+        # Add HOMESIS and HOMESIS_USER role
+        umc_page.select_role(role=role)
+        umc_page.click_remove_role()
+
+        # Clicking Save
+        umc_page.click_save()
+
+        # Check if Update sucessfully
+        umc_page.verify_updated_role()
+    return umc_page.verify_updated_role()
