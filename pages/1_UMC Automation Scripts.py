@@ -5,6 +5,8 @@ from Activity.umc_actions import (
     add_homesis_homesis_user,
     deactivate_user_with_reason,
     reactivate_user,
+    remove_role,
+    roles_table
 )
 
 
@@ -69,6 +71,11 @@ def main():
     remove_roles_button = button_col.button(
         "Deactivate Accounts", key="deactivate_button"
     )
+    
+    # Deactivate Button in the right column
+    remove_dismissal_button = button_col.button(
+        "Remove Dismissal Role", key="remove_dismissal_button"
+    )
 
     # Read CSV Data
     if csv_upload is not None:
@@ -94,7 +101,7 @@ def main():
         # Loop through CSV & Search for HR Code
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
-            reason = options[options.index(deact_reason)]
+            reason = roles_table[options.index(deact_reason)]
             deactivate_user_with_reason(
                 umc_page=umc_page, hr_code=hr_code, reason=reason
             )
@@ -112,6 +119,17 @@ def main():
             reactivate_user(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
 
+
+    if remove_dismissal_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+
+        # Loop through CSV & Search for HR Code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            role = roles_table[options.index(deact_reason)]
+            remove_role(umc_page=umc_page, hr_code=hr_code, role=role)
+            umc_page.get_umc_url()
 
 if __name__ == "__main__":
     main()
