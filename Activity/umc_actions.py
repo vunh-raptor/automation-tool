@@ -105,7 +105,7 @@ def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> boo
 
 
 def reactivate_user(umc_page: umc, hr_code: str) -> bool:
-    """This is a funciton to clear user of all roles and add in only the dismissal role.
+    """This is a funciton to clear user of all dismissal roles and add in HOMESIS and HOMESIS_USER.
 
     Args:
         umc_page (umc): an object represnet the UMC page in Selenium
