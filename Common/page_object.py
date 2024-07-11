@@ -1,9 +1,10 @@
+import logging
+from time import sleep
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from Common.web_element import web_element
-from time import sleep
 
-import logging
 
 
 class page_object:
@@ -51,7 +52,7 @@ class page_object:
                 result = self.driver.find_element(By.XPATH, xpath)
                 found = True
                 break
-            except:  # noqa: E722
+            except Exception:
                 warning = (
                     "Cannot find element "
                     + str(xpath)
