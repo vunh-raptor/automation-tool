@@ -88,7 +88,7 @@ def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> boo
                 break
 
         # If user is not dismissed already, remove all roles
-        if dismissed:
+        if not dismissed:
             while umc_page.search_first_owned_role():
                 umc_page.select_first_role()
                 umc_page.click_remove_role()
