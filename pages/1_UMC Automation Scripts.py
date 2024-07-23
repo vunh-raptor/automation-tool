@@ -130,6 +130,7 @@ def main():
             role = roles_table[options.index(deact_reason)]
             remove_role(umc_page=umc_page, hr_code=hr_code, role=role)
             umc_page.get_umc_url()
+            
 
 if __name__ == "__main__":
     main()
