@@ -62,6 +62,7 @@ class web_element:
         Returns:
             int: Number of the child element. Return 0 if there's no element found
         """
-    def clearText(self, webElement: web_element):
-        webElement.send_keys(Keys.CONTROL + "a")
-        webElement.send_keys(Keys.DELETE)
+    def clearText(self) -> bool:
+        self.send_keys(Keys.CONTROL + "a")
+        self.send_keys(Keys.DELETE)
+        return self.value.text == ''

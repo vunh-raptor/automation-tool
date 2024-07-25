@@ -49,7 +49,6 @@ def main():
             supervisor = row["Supervisor code"]
             role = row["Role in Bank"]
             create_sa_account (homesis_page = homesis_page, hr_code = hr_code, id_number = id_number, note = note, supervisor_code= supervisor, role = role)
-            print
             homesis_page.get_homesis_url()
             homesis_page.access_user_managerment()
 
