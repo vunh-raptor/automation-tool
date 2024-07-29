@@ -1,4 +1,5 @@
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.keys import Keys
 import logging
 
 
@@ -61,4 +62,7 @@ class web_element:
         Returns:
             int: Number of the child element. Return 0 if there's no element found
         """
-
+    def clearText(self) -> bool:
+        self.send_keys(Keys.CONTROL + "a")
+        self.send_keys(Keys.DELETE)
+        return self.value.text == ''

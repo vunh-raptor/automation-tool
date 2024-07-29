@@ -107,3 +107,5 @@ class page_object:
             url (str): the desired URL.
         """
         self.driver.get(url=url)
+    
+
