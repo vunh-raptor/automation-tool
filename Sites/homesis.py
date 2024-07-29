@@ -1,0 +1,138 @@
+import logging
+from Common.page_object import page_object as Page
+
+
+# Element Path
+class homesis(Page):
+    """This is a wrapper for homesis Page, based on the customed Page Object, which is also a wrapper of Selenium driver
+
+    Args:
+        Page (_type_): This is a wrapper for Selenium driver
+
+    Returns:
+        _type_: A customed HomeSis 
+    """
+    # Base URL
+    homesis_url = "https://homesis.homecredit.vn/homesis/"
+
+    # Log in/Log out Path
+    ldap_user_input = '//*[@id="username"]'
+    ldap_pw_input = '//*[@id="password"]'
+    login_button = '//*[@id="kc-login"]'
+
+
+    #Homesis tab path
+    homesis_tab_sale_admin = '//table[@onmouseover = "showTooltip(\'Sales administration\');"]//a[@class = "abtn"]'
+    homesis_tab_people_management = '//table[@onmouseover = "showTooltip(\'People management\');"]//a[@class = "abtn"]'
+    homesis_tab_application_support = '//table[@onmouseover = "showTooltip(\'Application support\');"]//a[@class = "abtn"]'
+    homesis_tab_user_management = '//*[@id="user"]//tbody//nobr'
+    
+
+    # Elements in Searchs
+    hrid_input = '//*[@id="code"]'
+    hrid_search_button = '//table[@onmouseover = "showTooltip(\'Search users\');"]//a[@class = "abtn"]'
+    detail_button = '//a[@onmouseover = "showSisTooltip(\'User information\');"]'
+    search_result_status = '/html/body/table/tbody/tr[3]/td[2]/table/tbody/tr/td/div[6]/table/tbody/tr/td[10]'
+
+    # Elements in edit user information page
+    homesis_role_bank_selector = '//*[@id="userRole"]'
+    homesis_id_number_text = '//*[@id="idCardNumber"]'
+    homesis_note_text_field = '//*[@id="note"]'
+    homesis_supervisors_tab = '//table[@onmouseover = "showTooltip(\'Supervisors\');"]//a[@class = "abtn"]'
+    homesis_supervisor_choose_button = '//table[@onmouseover = "showTooltip(\'Attach supervisor\');"]//a[@class = "abtn"]'
+    homesis_supervisors_code_text = '//*[@id="code"]'
+    homesis_supervisors_search_btn = '//table[@onmouseover = "showTooltip(\'Search users\');"]//a[@class = "abtn"]'
+    homesis_supervisors_checkbox = '//table[@id= "septaTable"]//input[@name ="usersToAttach"]'
+    homesis_supervisors_attached_button = '//table[@onmouseover = "showTooltip(\'TT_USER_ATTACH_SELECTED\');"]//a[@class = "abtn"]'
+    homesis_save_button = '//table[@onmouseover = "showTooltip(\'Update user\');"]//a[@class = "abtn"]'
+
+
+
+
+
+    def get_homesis_url(self) -> None:
+        """
+        This method navigates to the UMC URL.
+        """
+        self.get(self.homesis_url)
+
+    def login_with_data(self, ldap_user: str, ldap_pw: str) -> bool:
+        """
+        This method logs in with the provided LDAP user and password.
+
+        Args:
+            ldap_user (str): The LDAP username.
+            ldap_pw (str): The LDAP password.
+
+        Returns:
+            bool: True if login is successful, False otherwise.
+        """
+        if (ldap_user is not None) & (ldap_pw is not None):
+            self.search_by_xpath(self.ldap_user_input, delay=0.5).send_keys(ldap_user)
+            self.search_by_xpath(self.ldap_pw_input, delay=0.5).send_keys(ldap_pw)
+            return self.search_by_xpath(self.login_button, delay=0.5).click()
+        else:
+            logging.critical("Missing Username or Password.")
+            return False
+        
+    def access_user_managerment(self) -> bool:
+        self.search_by_xpath(self.homesis_tab_people_management, delay=0.5).click()
+        return self.search_by_xpath(self.homesis_tab_user_management,delay =0.5).click()
+
+
+    def get_search_account_status(self) -> str:
+        """
+        This method gets the search account status.
+
+        Returns:
+            str: The text of the status element.
+        """
+        status = self.search_by_xpath(self.search_result_status, delay=0.5)
+        if status.flag:
+            element = status.return_element()
+            return element.text
+
+    def click_details_button(self) -> bool:
+        """
+        This method clicks the details button.
+        """
+        return self.search_by_xpath(self.detail_button).click()
+
+    def search_hrid(self, hrid: str) -> None:
+        """
+        This method searches for a given HRID.
+
+        Args:
+            hrid (str): The HRID to search for.
+        """
+        self.search_by_xpath(self.hrid_input).clearText()
+        self.search_by_xpath(self.hrid_input).send_keys(hrid)
+        self.search_by_xpath(self.hrid_search_button).click()
+
+    def fill_id_number(self, id_number) -> bool:
+        return self.search_by_xpath(self.homesis_id_number_text).send_keys(id_number)
+        
+
+    def fill_note(self, note) -> bool:
+        return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)
+    
+    def fill_role_in_bank(self, role) -> bool:
+        return self.search_by_xpath(self.homesis_role_bank_selector).send_keys(role)
+    
+    def chose_supervisor(self, supervisor_code ) -> None:
+        self.search_by_xpath(self.homesis_supervisors_tab).click()
+        self.search_by_xpath(self.homesis_supervisor_choose_button).click()
+        self.search_by_xpath(self.homesis_supervisors_attached_button).click()
+        self.search_by_xpath(self.homesis_supervisors_code_text).send_keys(supervisor_code)
+        self.search_by_xpath(self.homesis_supervisors_search_btn).click()
+        self.search_by_xpath(self.homesis_supervisors_checkbox).click()
+        self.search_by_xpath(self.homesis_supervisors_attached_button).click()
+        
+
+    def click_save_button(self) -> bool:
+        return self.search_by_xpath(self.homesis_save_button).click()
+
+       
+        
+
+
