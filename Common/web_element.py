@@ -1,7 +1,7 @@
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.keys import Keys
 import logging
-
+from Common.db_connection import DBConnection as db
 
 class web_element:
     def __init__(self, flag: bool, value: any = None) -> None:
@@ -11,6 +11,7 @@ class web_element:
             flag (bool): True if this object hold any WebElement object inside, and vice versa
             value (any): This is intend to contain the WebElement object
         """
+        
         self.flag = flag
         if flag:
             self.value = value
