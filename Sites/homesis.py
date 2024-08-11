@@ -45,9 +45,9 @@ class homesis(Page):
     homesis_supervisors_checkbox = '//table[@id= "septaTable"]//input[@name ="usersToAttach"]'
     homesis_supervisors_attached_button = '//table[@onmouseover = "showTooltip(\'TT_USER_ATTACH_SELECTED\');"]//a[@class = "abtn"]'
     homesis_save_button = '//table[@onmouseover = "showTooltip(\'Update user\');"]//a[@class = "abtn"]'
-
-
-
+    location_palette = '//*[@id="regdistricts"]'
+    location_palette_suffix = '//option[@title="replaced_text"]'
+    add_location_button = '//div[@id="#userSalesDistricts"]//a[text()="Add"]'
 
 
     def get_homesis_url(self) -> None:
@@ -119,6 +119,9 @@ class homesis(Page):
     def fill_role_in_bank(self, role) -> bool:
         return self.search_by_xpath(self.homesis_role_bank_selector).send_keys(role)
     
+    def click_add_location(self) -> bool:
+        return self.search_by_xpath(self.add_location_button).click()
+    
     def chose_supervisor(self, supervisor_code ) -> None:
         self.search_by_xpath(self.homesis_supervisors_tab).click()
         self.search_by_xpath(self.homesis_supervisor_choose_button).click()
@@ -127,6 +130,22 @@ class homesis(Page):
         self.search_by_xpath(self.homesis_supervisors_search_btn).click()
         self.search_by_xpath(self.homesis_supervisors_checkbox).click()
         self.search_by_xpath(self.homesis_supervisors_attached_button).click()
+
+    def select_location(self, location: str) -> bool:
+        """
+        This method selects a location of SA.
+
+        Args:
+            location (str): The location to select.
+
+        Returns:
+            bool: True if the location is selected, False otherwise.
+        """
+        suffix = self.location_palette_suffix.replace("replaced_text",location)
+        xpath = self.location_palette + suffix       
+        return self.search_by_xpath(xpath=xpath).click()
+        print
+        
         
 
     def click_save_button(self) -> bool:
