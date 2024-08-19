@@ -10,13 +10,16 @@ class DBConnection:
         self.cursor = self.connection.cursor()
 
     def create_table_schema(self):
-        self.cursor.execute("CREATE TABLE log(timestamp, id, message, status)")
+        self.cursor.execute("CREATE TABLE log(timestamp, hrcode, message, status, account)")
         self.connection.commit()
 
-    def insert_log(self, id, message, status):
+    def insert_log(self, hrcode, message, status, account):
         timestamp = time()
-        self.cursor.execute(f"INSERT INTO log VALUES({timestamp}, {id}, {message}, {status})")
+        self.cursor.execute(f"INSERT INTO log VALUES({timestamp}, {hrcode}, {message}, {status}, {account})")
         self.connection.commit()
+
+    def read_log(self, table_name):
+        self.cursor.execute("SELECT * from log")       
 
     def close(self):
         self.connection.close()
