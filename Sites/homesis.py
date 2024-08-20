@@ -13,8 +13,9 @@ class homesis(Page):
         _type_: A customed HomeSis 
     """
     # Base URL
-    # homesis_url = "https://homesis.homecredit.vn/homesis/"
-    homesis_url = "https://homesis.vn01p.vn.nonprod/homesis/"
+    homesis_url = "https://homesis.homecredit.vn/homesis/"
+    # Non-prod link
+    # homesis_url = "https://homesis.vn01p.vn.nonprod/homesis/"
 
 
     # Log in/Log out Path
