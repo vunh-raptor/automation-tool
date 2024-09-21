@@ -10,49 +10,58 @@ class homesis(Page):
         Page (_type_): This is a wrapper for Selenium driver
 
     Returns:
-        _type_: A customed HomeSis 
+        _type_: A customed HomeSis
     """
+
     # Base URL
     homesis_url = "https://homesis.homecredit.vn/homesis/"
     # Non-prod link
     # homesis_url = "https://homesis.vn01p.vn.nonprod/homesis/"
-
 
     # Log in/Log out Path
     ldap_user_input = '//*[@id="username"]'
     ldap_pw_input = '//*[@id="password"]'
     login_button = '//*[@id="kc-login"]'
 
-
-    #Homesis tab path
+    # Homesis tab path
     homesis_tab_sale_admin = '//table[@onmouseover = "showTooltip(\'Sales administration\');"]//a[@class = "abtn"]'
     homesis_tab_people_management = '//table[@onmouseover = "showTooltip(\'People management\');"]//a[@class = "abtn"]'
     homesis_tab_application_support = '//table[@onmouseover = "showTooltip(\'Application support\');"]//a[@class = "abtn"]'
     homesis_tab_user_management = '//*[@id="user"]//tbody//nobr'
-    
 
     # Elements in Searchs
     hrid_input = '//*[@id="code"]'
-    hrid_search_button = '//table[@onmouseover = "showTooltip(\'Search users\');"]//a[@class = "abtn"]'
-    detail_button = '//a[@onmouseover = "showSisTooltip(\'User information\');"]'
-    search_result_status = '/html/body/table/tbody/tr[3]/td[2]/table/tbody/tr/td/div[6]/table/tbody/tr/td[10]'
+    hrid_search_button = (
+        '//table[@onmouseover = "showTooltip(\'Search users\');"]//a[@class = "abtn"]'
+    )
+    detail_button = "//a[@onmouseover = \"showSisTooltip('User information');\"]"
+    search_result_status = "/html/body/table/tbody/tr[3]/td[2]/table/tbody/tr/td/div[6]/table/tbody/tr/td[10]"
 
     # Elements in edit user information page
     homesis_role_bank_selector = '//*[@id="userRole"]'
     homesis_id_number_text = '//*[@id="idCardNumber"]'
     homesis_note_text_field = '//*[@id="note"]'
-    homesis_supervisors_tab = '//table[@onmouseover = "showTooltip(\'Supervisors\');"]//a[@class = "abtn"]'
+    homesis_supervisors_tab = (
+        '//table[@onmouseover = "showTooltip(\'Supervisors\');"]//a[@class = "abtn"]'
+    )
     homesis_supervisor_choose_button = '//table[@onmouseover = "showTooltip(\'Attach supervisor\');"]//a[@class = "abtn"]'
     homesis_supervisors_code_text = '//*[@id="code"]'
-    homesis_supervisors_search_btn = '//table[@onmouseover = "showTooltip(\'Search users\');"]//a[@class = "abtn"]'
-    homesis_supervisors_checkbox = '//table[@id= "septaTable"]//input[@name ="usersToAttach"]'
+    homesis_supervisors_search_btn = (
+        '//table[@onmouseover = "showTooltip(\'Search users\');"]//a[@class = "abtn"]'
+    )
+    homesis_supervisors_checkbox = (
+        '//table[@id= "septaTable"]//input[@name ="usersToAttach"]'
+    )
     homesis_supervisors_attached_button = '//table[@onmouseover = "showTooltip(\'TT_USER_ATTACH_SELECTED\');"]//a[@class = "abtn"]'
-    homesis_save_button = '//table[@onmouseover = "showTooltip(\'Update user\');"]//a[@class = "abtn"]'
+    homesis_save_button = (
+        '//table[@onmouseover = "showTooltip(\'Update user\');"]//a[@class = "abtn"]'
+    )
     location_palette = '//*[@id="regdistricts"]'
     location_palette_suffix = '//option[@title="replaced_text"]'
     add_location_button = '//div[@id="#userSalesDistricts"]//a[text()="Add"]'
-    assign_district_button = '//div[@id="#userSalesDistricts"]//a[text()="Assign districts"]'
-
+    assign_district_button = (
+        '//div[@id="#userSalesDistricts"]//a[text()="Assign districts"]'
+    )
 
     def get_homesis_url(self) -> None:
         """
@@ -78,11 +87,16 @@ class homesis(Page):
         else:
             logging.critical("Missing Username or Password.")
             return False
-        
-    def access_user_managerment(self) -> bool:
-        self.search_by_xpath(self.homesis_tab_people_management, delay=0.5).click()
-        return self.search_by_xpath(self.homesis_tab_user_management,delay =0.5).click()
 
+    def access_user_managerment(self) -> bool:
+        """
+        This method accesses the user management section of the application.
+
+        Returns:
+            bool: True if access is successful, False otherwise.
+        """
+        self.search_by_xpath(self.homesis_tab_people_management, delay=0.5).click()
+        return self.search_by_xpath(self.homesis_tab_user_management, delay=0.5).click()
 
     def get_search_account_status(self) -> str:
         """
@@ -109,39 +123,101 @@ class homesis(Page):
         Args:
             hrid (str): The HRID to search for.
         """
-        self.search_by_xpath(self.hrid_input, delay= 0.5).clearText()
-        self.search_by_xpath(self.hrid_input, delay= 0.5).send_keys(hrid)
-        self.search_by_xpath(self.hrid_search_button, delay= 0.5).click()
+        self.search_by_xpath(self.hrid_input, delay=0.5).clearText()
+        self.search_by_xpath(self.hrid_input, delay=0.5).send_keys(hrid)
+        self.search_by_xpath(self.hrid_search_button, delay=0.5).click()
 
     def fill_id_number(self, id_number) -> bool:
+        """
+        This method fills the ID number field.
+
+        Args:
+            id_number (str): The ID number to fill in.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
         return self.search_by_xpath(self.homesis_id_number_text).send_keys(id_number)
-        
 
     def fill_note(self, note) -> bool:
+        """
+        This method fills the note field.
+
+        Args:
+            note (str): The note to fill in.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
+
         return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)
 
     def update_note(self, note) -> bool:
+        """
+        This method updates the note field.
+
+        Args:
+            note (str): The note to update.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
         self.search_by_xpath(self.homesis_note_text_field).clearText()
-        return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)   
-    
+        return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)
+
     def fill_role_in_bank(self, role) -> bool:
+        """
+        This method fills the role in bank field.
+
+        Args:
+            role (str): The role to fill in.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
         return self.search_by_xpath(self.homesis_role_bank_selector).send_keys(role)
-    
+
     def click_add_location(self) -> bool:
-        return self.search_by_xpath(self.add_location_button, delay = 1).click()
-    
+        """
+        This method clicks the add location button.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
+        return self.search_by_xpath(self.add_location_button, delay=1).click()
+
     def click_add_assign_district(self) -> bool:
-        return self.search_by_xpath(self.assign_district_button).click()    
-    
-    def chose_supervisor(self, supervisor_code ) -> bool:
-        self.search_by_xpath(self.homesis_supervisors_tab, delay= 0.5).click()
-        self.search_by_xpath(self.homesis_supervisor_choose_button, delay= 0.5).click()
-        self.search_by_xpath(self.homesis_supervisors_attached_button, delay= 0.5).click()
-        self.search_by_xpath(self.homesis_supervisors_code_text, delay= 0.5 ).send_keys(supervisor_code)
-        self.search_by_xpath(self.homesis_supervisors_search_btn, delay= 0.5).click()
-        self.search_by_xpath(self.homesis_supervisors_checkbox, delay= 0.5).click()
-        return self.search_by_xpath(self.homesis_supervisors_attached_button, delay= 0.5).click()
-        
+        """
+        This method clicks the add assign district button.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
+        return self.search_by_xpath(self.assign_district_button).click()
+
+    def chose_supervisor(self, supervisor_code) -> bool:
+        """
+        This method chooses a supervisor.
+
+        Args:
+            supervisor_code (str): The supervisor code to choose.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
+        self.search_by_xpath(self.homesis_supervisors_tab, delay=0.5).click()
+        self.search_by_xpath(self.homesis_supervisor_choose_button, delay=0.5).click()
+        self.search_by_xpath(
+            self.homesis_supervisors_attached_button, delay=0.5
+        ).click()
+        self.search_by_xpath(self.homesis_supervisors_code_text, delay=0.5).send_keys(
+            supervisor_code
+        )
+        self.search_by_xpath(self.homesis_supervisors_search_btn, delay=0.5).click()
+        self.search_by_xpath(self.homesis_supervisors_checkbox, delay=0.5).click()
+        return self.search_by_xpath(
+            self.homesis_supervisors_attached_button, delay=0.5
+        ).click()
 
     def select_location(self, location: str) -> bool:
         """
@@ -153,16 +229,15 @@ class homesis(Page):
         Returns:
             bool: True if the location is selected, False otherwise.
         """
-        suffix = self.location_palette_suffix.replace("replaced_text",location)
-        xpath = self.location_palette + suffix       
-        return self.search_by_xpath(xpath=xpath, delay= 0.5).click()
-        
-        
+        suffix = self.location_palette_suffix.replace("replaced_text", location)
+        xpath = self.location_palette + suffix
+        return self.search_by_xpath(xpath=xpath, delay=0.5).click()
 
     def click_save_button(self) -> bool:
+        """
+        This method clicks the save button.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
         return self.search_by_xpath(self.homesis_save_button).click()
-
-       
-        
-
-
