@@ -123,10 +123,18 @@ def add_sup_code(homesis_page: homesis, hr_code: str, supervisor_code: str) -> l
         list_of_error.append(hr_code + "-" + ErrorMessage.homesis_message.CAN_NOT_FIND_USER)
     return list_of_error
 
-#This funtion is to add sup code
+#This funtion is to update note
 def update_note(homesis_page: homesis, hr_code: str, note: str) -> bool:
     homesis_page.search_hrid(hrid=hr_code)
     
     if homesis_page.click_details_button():
         homesis_page.update_note(note)
+        return homesis_page.click_save_button()
+    
+#This funtion is to update ID number
+def update_id_number(homesis_page: homesis, hr_code: str, id_number: str) -> bool:
+    homesis_page.search_hrid(hrid=hr_code)
+    
+    if homesis_page.click_details_button():
+        homesis_page.update_id_number(id_number)
         return homesis_page.click_save_button()

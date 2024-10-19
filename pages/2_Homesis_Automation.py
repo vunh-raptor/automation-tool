@@ -10,7 +10,8 @@ from Activity.homesis_actions import (
     add_role_in_bank_RA_New_Segment,
     change_role_in_bank,
     add_sup_code,
-    update_note
+    update_note,
+    update_id_number
 )
 
 def main():
@@ -139,7 +140,7 @@ def main():
            
     section_divided_caption_other_action = st.subheader("Update Homesis information", divider= "red")
 
-    Change_role_in_bank, Add_sup_code, Update_note, other = st.tabs(["Change Role-in-bank","Add sup code","Update Note", "Other"])
+    Change_role_in_bank, Add_sup_code, Update_note, Update_id_number ,other = st.tabs(["Change Role-in-bank","Add sup code","Update Note","Update ID number", "Other"])
 
     with Change_role_in_bank:
         left, rigth = st.columns(2, vertical_alignment="bottom")
@@ -239,6 +240,34 @@ def main():
                 hr_code = row["HR Code"]
                 note = row["Notes"]               
                 update_note(homesis_page = homesis_page, hr_code = hr_code, note= note)
+                homesis_page.get_homesis_url()
+                homesis_page.access_user_managerment()
+   
+    with  Update_id_number:
+        #Insert excel file for create Homesis account
+        csv_upload_homesis_update_id_number = st.file_uploader(
+            label="Please input list user and their ID number update",
+            type=["csv", "txt"],
+            accept_multiple_files=False,
+        )
+        
+        # Read CSV Data
+        if csv_upload_homesis_update_id_number is not None:
+            csv_data_update_id_number = pd.read_csv(csv_upload_homesis_update_id_number, converters={"HR Code": str, "ID number" : str})
+            result_table = st.write(csv_data_update_id_number)
+            
+        # function to update ID number
+        update_id_number_btn = st.button("Update ID number", type= "primary")
+        if update_id_number_btn:
+            # Start Selenium
+            homesis_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            homesis_page.access_user_managerment()
+        
+            # Loop through CSV & Search for HR Code and take data from CSV
+            for index, row in csv_data_update_id_number.iterrows():
+                hr_code = row["HR Code"]
+                id_number = row["ID number"]               
+                update_id_number(homesis_page = homesis_page, hr_code = hr_code, id_number = id_number)
                 homesis_page.get_homesis_url()
                 homesis_page.access_user_managerment()
 
