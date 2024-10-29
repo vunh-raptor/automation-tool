@@ -4,13 +4,7 @@ import pandas as pd
 import streamlit.components.v1 as components
 from streamlit_quill import st_quill
 from streamlit_ace import st_ace
-from Common.template.email_automation_hub_template import (
-    external_maintenance_notification_html,
-    internal_maintenance_notification_html,
-    incident_notification_template_html
-    
 
-)
 from Activity.send_email_actions import(
     send_email_automation
 )
@@ -45,13 +39,17 @@ def main():
         start_datetime_eng = start_datetime.strftime("%B %d, %Y, %X")
         end_datetime_eng = start_datetime.strftime("%B %d, %Y, %X")
         date_start_and_end = { 'start': start_datetime, 'end': end_datetime, 'start_eng':start_datetime_eng, 'end_eng':end_datetime_eng }
-          
+        st.divider()
+        to = st.text_input("To")
+        cc = st.text_input("CC")
+        HTMLFile = open(r"C:\Users\nhu.huynhny\automation_project\automation_LAP_nhuhuynh\sd-automation-hub\Common\template\external_mail_maintenance_template.html", "r", encoding="utf8")
+        external_maintenance_notification_html = HTMLFile.read()          
         external_mail_maintenance_content = st_ace(value = external_maintenance_notification_html.format(**date_start_and_end), auto_update= True)
         st.markdown(external_mail_maintenance_content, unsafe_allow_html=True)
         left,middle, rigth = st.columns(3, vertical_alignment="bottom")
         send_email_btn = middle.button("Send External Maintenance Notification email", type= "primary")
         if send_email_btn:
-            send_email_automation("External Maintenance Notification",external_mail_maintenance_content)
+            send_email_automation(to,cc,"External Maintenance Notification",external_mail_maintenance_content)
    
     #Send Internal Maintenance Notification email
    if option == "Internal Maintenance Notification":
@@ -67,13 +65,18 @@ def main():
         start_datetime_eng = start_datetime.strftime("%B %d, %Y, %X")
         end_datetime_eng = end_datetime.strftime("%B %d, %Y, %X")
         impacted_service = st.text_input("Impacted service")
+        st.divider()
+        to = st.text_input("To")
+        cc = st.text_input("CC")
         filled_value = { 'description': description, 'start':start_datetime_eng, 'end':end_datetime_eng, 'impactedService':impacted_service }
+        HTMLFile = open(r"C:\Users\nhu.huynhny\automation_project\automation_LAP_nhuhuynh\sd-automation-hub\Common\template\internal_mail_maintenance_template.html", "r", encoding="utf8")
+        internal_maintenance_notification_html = HTMLFile.read()
         internal_mail_maintenance_content = st_ace(value = internal_maintenance_notification_html.format(**filled_value), auto_update= True)
         st.markdown(internal_mail_maintenance_content, unsafe_allow_html=True)
         left,middle, rigth = st.columns(3, vertical_alignment="bottom")
         send_email_btn = middle.button("Send Internal Maintenance Notification email", type= "primary")
         if send_email_btn:
-            send_email_automation("[MAINTENANCE NOTIFICATION] " + subject, internal_mail_maintenance_content)
+            send_email_automation(to, cc,"[MAINTENANCE NOTIFICATION] " + subject, internal_mail_maintenance_content)
 
     #Send Incident Notification email
    if option == "Incident Notification":
@@ -81,13 +84,18 @@ def main():
        incident_description = st.text_input("Email Description")
        bussiness_impacted = st.text_input("Business Impacted")
        current_status = st.text_input("Current Status")
+       st.divider()
+       to = st.text_input("To")
+       cc = st.text_input("CC")
        incident_email_filled_value = { 'ticketNumber': incident_ticket_number, 'description':incident_description, 'businessImpact':bussiness_impacted, 'currentStatus':current_status }
+       HTMLFile = open(r"C:\Users\nhu.huynhny\automation_project\automation_LAP_nhuhuynh\sd-automation-hub\Common\template\incident_notification_template.html", "r", encoding="utf8")
+       incident_notification_template_html = HTMLFile.read()
        incident_notification_content = st_ace(value = incident_notification_template_html.format(**incident_email_filled_value), auto_update= True)
        st.markdown(incident_notification_content, unsafe_allow_html=True)
        left,middle, rigth = st.columns(3, vertical_alignment="bottom")
-       send_email_btn = middle.button("Send Incident Notification email", type= "primary")
+       send_email_btn = middle.button("Send Incident Notification email", )
        if send_email_btn:
-        send_email_automation("[INCIDENT NOTIFICATION]-" + "[" + incident_ticket_number + "-" + incident_description + "]" , incident_notification_content)       
+        send_email_automation(to,cc,"[INCIDENT NOTIFICATION]-" + "[" + incident_ticket_number + "-" + incident_description + "]" , incident_notification_content)       
 
        
 
