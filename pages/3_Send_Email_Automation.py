@@ -40,8 +40,9 @@ def main():
         #Format date and time for English version
         start_datetime_eng = start_datetime.strftime("%B %d, %Y, %X")
         end_datetime_eng = start_datetime.strftime("%B %d, %Y, %X")
+                  
         #Array contain value fill in email
-        date_start_and_end = { 'start': start_datetime, 'end': end_datetime, 'start_eng':start_datetime_eng, 'end_eng':end_datetime_eng }
+        date_start_and_end = {'start': start_datetime, 'end': end_datetime, 'start_eng':start_datetime_eng, 'end_eng':end_datetime_eng }
         
         st.divider()
 
@@ -50,9 +51,12 @@ def main():
         cc = st.text_input("CC")
 
         #Define email html template
-        HTMLFile = open(r"C:\Users\nhu.huynhny\automation_project\automation_LAP_nhuhuynh\sd-automation-hub\Common\template\external_mail_maintenance_template.html", "r", encoding="utf8")
+        HTMLFile = open(r"Common\template\external_mail_maintenance_template.html", "r", encoding="utf8")
         #Load html template
         external_maintenance_notification_html = HTMLFile.read()
+
+
+
         #Fill the input value to the email template and show it in a editor section
         external_mail_maintenance_content = st_ace(value = external_maintenance_notification_html.format(**date_start_and_end), auto_update= True)
         
@@ -88,11 +92,13 @@ def main():
         #Receiver and cc fields
         to = st.text_input("To")
         cc = st.text_input("CC")
+
+
         #Array contain value fill in email
         filled_value = { 'description': description, 'start':start_datetime_eng, 'end':end_datetime_eng, 'impactedService':impacted_service }
         
         #Define email html template
-        HTMLFile = open(r"C:\Users\nhu.huynhny\automation_project\automation_LAP_nhuhuynh\sd-automation-hub\Common\template\internal_mail_maintenance_template.html", "r", encoding="utf8")
+        HTMLFile = open(r"Common\template\internal_mail_maintenance_template.html", "r", encoding="utf8")
         #Load html template
         internal_maintenance_notification_html = HTMLFile.read()
         #Fill the input value to the email template and show it in editor section
@@ -125,7 +131,7 @@ def main():
       
        incident_email_filled_value = { 'ticketNumber': incident_ticket_number, 'description':incident_description, 'businessImpact':bussiness_impacted, 'currentStatus':current_status }
         #Define email html template
-       HTMLFile = open(r"C:\Users\nhu.huynhny\automation_project\automation_LAP_nhuhuynh\sd-automation-hub\Common\template\incident_notification_template.html", "r", encoding="utf8")
+       HTMLFile = open(r"Common\template\incident_notification_template.html", "r", encoding="utf8")
        #Load html template
        incident_notification_template_html = HTMLFile.read()
        #Fill the input value to the email template and show it in editor section

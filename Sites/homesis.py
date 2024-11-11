@@ -167,10 +167,10 @@ class homesis(Page):
     
     def update_id_number(self, id_number) -> bool:
         """
-        This method updates the note field.
+        This method updates the Id number field field.
 
         Args:
-            note (str): The note to update.
+            id_number (str): The Id number to update.
 
         Returns:
             bool: True if the operation is successful, False otherwise.

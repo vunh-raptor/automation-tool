@@ -1,9 +1,10 @@
 import win32com.client as win32
 import pythoncom
 import streamlit.components.v1 as components
+import os
 
 
-def send_email_automation (receiver,cc,emailSubject, bodyTemplate):
+def send_email_automation (receiver: str ,cc : str, emailSubject : str, bodyTemplate : str):
     """This funtion is will execute step by step sending an email using python
 
     Args:
@@ -21,8 +22,13 @@ def send_email_automation (receiver,cc,emailSubject, bodyTemplate):
     email.CC = cc
     email.Subject = emailSubject
     email.HTMLBody = bodyTemplate
+    #Get the path of the file on local device
+    current_directory = os.path.dirname(__file__)
+    relative_path = os.path.join(current_directory, '..','Common', 'template', 'maintenace_images.jpg')
     #This code is for sending by specific email
     # The e-mail needs to be part of your outlook account.
+    attachment = email.Attachments.Add(relative_path) 
+    attachment.PropertyAccessor.SetProperty("http://schemas.microsoft.com/mapi/proptag/0x3712001F", "image_id")
     From = None
     for myEmailAddress in outlook.Session.Accounts:
         if "_IT_SD@homecredit.vn" in str(myEmailAddress):
@@ -33,5 +39,6 @@ def send_email_automation (receiver,cc,emailSubject, bodyTemplate):
         # This line basically calls the "mail.SendUsingAccount = specific account" outlook VBA command
         email._oleobj_.Invoke(*(64209, 0, 8, 0, From))
     
+    email.Display(False)
     email.Send()
 

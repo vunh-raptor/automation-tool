@@ -119,7 +119,7 @@ def add_role_in_bank_RA_FPT(homesis_page: homesis, hr_code: str, note: str, id_n
 
 #This funtion is to add role in bank for RA New Segment
 def add_role_in_bank_RA_New_Segment(homesis_page: homesis, hr_code: str, note: str, id_number: str, role: str, supervisor_code: str) -> list:
-    """_summary_
+    """This function will add role in bank RA Newsegment for users based on the given list
 
     Args:
         homesis_page (homesis): the object represent the Homesis Page in Selenium
@@ -225,7 +225,7 @@ def update_id_number(homesis_page: homesis, hr_code: str, id_number: str) -> boo
         id_number (str): id number of user, take from given excel file
 
     Returns:
-        bool: _description_
+        bool: true mean is has click save buton successfully
     """
     homesis_page.search_hrid(hrid=hr_code)
     
