@@ -179,3 +179,23 @@ def remove_role(umc_page: umc, hr_code:str, role:str) -> bool:
         # Check if Update sucessfully
         umc_page.verify_updated_role()
     return umc_page.verify_updated_role()
+
+def deactivate_ra(umc_page: umc, hr_code:str) -> bool:
+    """_Deactive a specific RA account in UMC page
+
+    Args:
+        umc_page (umc): The UMC page object where the operations are performed.
+        hr_code (str): The HR code of the user.
+
+    Returns:
+        bool: True if successfully click the deactive button
+    """
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    umc_page.get_search_account_status()
+
+    # Check if account is Inactive
+    if umc_page.get_search_account_status() != "Inactive":
+        umc_page.click_details_button()
+    # Click deactive button
+    return umc_page.click_deactivate()

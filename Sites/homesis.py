@@ -65,7 +65,7 @@ class homesis(Page):
 
     def get_homesis_url(self) -> None:
         """
-        This method navigates to the UMC URL.
+        This method navigates to the Homesis URL.
         """
         self.get(self.homesis_url)
 
@@ -164,6 +164,19 @@ class homesis(Page):
         """
         self.search_by_xpath(self.homesis_note_text_field).clearText()
         return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)
+    
+    def update_id_number(self, id_number) -> bool:
+        """
+        This method updates the Id number field field.
+
+        Args:
+            id_number (str): The Id number to update.
+
+        Returns:
+            bool: True if the operation is successful, False otherwise.
+        """
+        self.search_by_xpath(self.homesis_id_number_text).clearText()
+        return self.search_by_xpath(self.homesis_id_number_text).send_keys(id_number)    
 
     def fill_role_in_bank(self, role) -> bool:
         """

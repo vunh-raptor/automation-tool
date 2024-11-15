@@ -6,7 +6,8 @@ from Activity.umc_actions import (
     deactivate_user_with_reason,
     reactivate_user,
     remove_role,
-    roles_table
+    roles_table,
+    deactivate_ra
 )
 
 
@@ -130,7 +131,21 @@ def main():
             role = roles_table[options.index(deact_reason)]
             remove_role(umc_page=umc_page, hr_code=hr_code, role=role)
             umc_page.get_umc_url()
-            
+
+    st.divider()
+    st.text("Deactive RA")
+    deactive_ra_button = st.button("Deactive RA", type= "primary")
+
+    #deactive account
+    if deactive_ra_button:
+         # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+
+        # Loop through CSV & Search for HR Code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            deactivate_ra(umc_page=umc_page, hr_code=hr_code)
+            umc_page.get_umc_url()
 
 if __name__ == "__main__":
     main()
