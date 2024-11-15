@@ -16,8 +16,8 @@ class umc(Page):
     umc_url = "https://um.pdcvn1.vn.prod/user-management/spa/account/search?0"
 
     # Log in/Log out Path
-    ldap_user_input = '//*[@id="IDToken1"]'
-    ldap_pw_input = '//*[@id="IDToken2"]'
+    ldap_user_input = '//*[@id="username"]'
+    ldap_pw_input = '//*[@id="password"]'
     login_button = '//*[@id="kc-login"]'
     logout_button = '//*[contains(text(),"Logout")]'
 
