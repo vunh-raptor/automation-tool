@@ -15,6 +15,9 @@ class homesis(Page):
 
     # Base URL
     homesis_url = "https://homesis.homecredit.vn/homesis/"
+    
+    # Swagger URL
+    swagger_url = "https://homesis.vn.prod/homesis/restful/swagger-ui.html"
     # Non-prod link
     # homesis_url = "https://homesis.vn01p.vn.nonprod/homesis/"
 
@@ -65,9 +68,15 @@ class homesis(Page):
 
     def get_homesis_url(self) -> None:
         """
-        This method navigates to the Homesis URL.
+        This method navigates to the UMC URL.
         """
         self.get(self.homesis_url)
+        
+    def get_homesis_swagger(self) -> None:
+        """
+        This method navigates to the swaggerUI API URL
+        """
+        self.get(self.swagger_url)
 
     def login_with_data(self, ldap_user: str, ldap_pw: str) -> bool:
         """
