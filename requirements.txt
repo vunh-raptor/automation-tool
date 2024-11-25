@@ -2,3 +2,6 @@ selenium>=4.16.0
 streamlit>=1.29.0
 jira
 jira-insight
+streamlit_quill
+streamlit_ace
+pywin32
