@@ -36,15 +36,7 @@ def send_email_automation(
     attachment.PropertyAccessor.SetProperty(
         "http://schemas.microsoft.com/mapi/proptag/0x3712001F", "image_id"
     )
-    From = None
-    for myEmailAddress in outlook.Session.Accounts:
-        if "_IT_SD@homecredit.vn" in str(myEmailAddress):
-            From = myEmailAddress
-            break
-
-    if From != None:
-        # This line basically calls the "mail.SendUsingAccount = specific account" outlook VBA command
-        email._oleobj_.Invoke(*(64209, 0, 8, 0, From))
-
+   
+    email.SentOnBehalfOfName = "SERVICEDESK (VN)"
     email.Display(False)
     email.Send()
