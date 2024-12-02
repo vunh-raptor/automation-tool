@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
-from Common.constant.css_file import homesis_css
+
+
+
 
 from Activity.homesis_actions import (
     login_to_site,
@@ -167,7 +169,7 @@ def main():
         )
         
         #Input css for upload file in change role in bank section
-        st.markdown(homesis_css.css, unsafe_allow_html=True)
+        st.markdown(css.css, unsafe_allow_html=True)
 
         #Change role in bank button
         change_role_in_bank_btn = st.button("Change Role-in-Bank", type= "primary")
