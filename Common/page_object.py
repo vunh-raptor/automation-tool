@@ -3,6 +3,7 @@ from time import sleep
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 from Common.web_element import web_element
 
 
@@ -108,4 +109,13 @@ class page_object:
         """
         self.driver.get(url=url)
     
+    def select_dropdown(self, xpath: str, value: str) -> None:
+        """Select a dropdown value
 
+        Args:
+            xpath (str): The dropdown element
+            value (str): The intended value needed to be selected
+        """
+        select = Select(self.search_by_xpath(xpath=xpath))
+        select.select_by_visible_text(text=value)
+        
