@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import time
 
 from Common.supporting import (
     bsl_bank_name_crosscheck
@@ -8,8 +7,7 @@ from Common.supporting import (
 
 from Activity.bsl_actions import (
     login_to_site,
-    create_bank_branch_single,
-    get_ticketing_ID
+    create_bank_branch_single
 )
 
 def main():
