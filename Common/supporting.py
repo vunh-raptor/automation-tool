@@ -3,7 +3,6 @@ from jira_insight import Insight
 from pandas import DataFrame, read_excel
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 import logging
-import pandas as pd
 
 
 
@@ -109,4 +108,26 @@ def support_Excel_read(read_path: str, sheet_name: str = "Sheet1") -> DataFrame:
 def push_error_to_MSTeams(webhook: str) -> None:
     pass
 
+def bsl_bank_name_crosscheck(bank_name_list: list, bank_name:str) -> bool:
+    """This function to support Bank name crosschecking to verify if the data is valid, if not then it will return False to BSL_Automation Scripts take action
 
+    Args:
+        read_path (str): text file of bank data
+        bank_name (str): string value of bank name to compare
+
+    Returns:
+        bool: result of the bank name lookup - If true is found, if False is not found
+    """
+    try:
+        for name in bank_name_list:
+            print(name.strip())
+            print(bank_name.strip())
+            if bank_name.strip() == name.strip():
+                return True
+            continue
+        return False
+    except ValueError:
+        logging.critical("Cannot write or read file")
+    except:  # noqa: E722
+        logging.critical("File Error, file not found!")
+        return False

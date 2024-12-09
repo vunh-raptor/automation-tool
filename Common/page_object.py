@@ -3,6 +3,7 @@ from time import sleep
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from Common.web_element import web_element
 
 
@@ -107,5 +108,91 @@ class page_object:
             url (str): the desired URL.
         """
         self.driver.get(url=url)
-    
+            
+    def select_dropdown_value(
+        self, xpath: str, value: str, timeout: int = 5, delay: float = 0.2
+    ) -> None:
+        """Select a desired element by value
 
+        Args:
+            xpath (str): XPATH for dropdown box
+            value (str): value to select - by value that set in the back-end of the website
+            timeout (int, optional): _description_. Defaults to 5.
+            delay (float, optional): _description_. Defaults to 0.2.
+        """
+        for count in range(timeout):
+            try:
+                select = Select(self.driver.find_element(By.XPATH, xpath))
+                select.select_by_value(value=value)
+                break
+            except Exception as e:
+                warning = (
+                    "Cannot find drop down box "
+                    + str(xpath)
+                    + ", retry "
+                    + str(count)
+                    + " time."
+                    + ", " + str(e)
+                )
+                logging.warning(warning)
+                sleep(delay)
+                continue
+            
+    def select_dropdown_by_visible_text(
+        self, xpath: str, value: str, timeout: int = 5, delay: float = 0.2
+    ) -> None:
+        """Select a desired element by visible text
+
+        Args:
+            xpath (str): XPATH for dropdown box
+            value (str): value to select - by visible text shown on GUI
+            timeout (int, optional): _description_. Defaults to 5.
+            delay (float, optional): _description_. Defaults to 0.2.
+        """
+        for count in range(timeout):
+            try:
+                select = Select(self.driver.find_element(By.XPATH, xpath))
+                select.select_by_visible_text(text=value)
+                break
+            except Exception as e:
+                warning = (
+                    "Cannot find drop down box "
+                    + str(xpath)
+                    + ", retry "
+                    + str(count)
+                    + " time."
+                    + ", " + str(e)
+                )
+                logging.warning(warning)
+                sleep(delay)
+                continue
+            
+    def select_dropdown_by_contains_text(
+        self, xpath: str, value: str, timeout: int = 5, delay: float = 0.2
+    ) -> None:
+        """Another type of select dropdown, for a variable that contains needed value
+
+        Args:
+            xpath (str): XPATH for dropdown box
+            value (str): value to select, in this function the value is only a partial string of the correct value
+            timeout (int, optional): Defaults to 5.
+            delay (float, optional): Defaults to 0.2.
+        """
+        xpath = xpath + "/option[contains(text(), '" + value + "')]"
+        print(xpath)
+        for count in range(timeout):
+            try:
+                self.driver.find_element(By.XPATH, xpath).click()
+                break
+            except Exception as e:
+                warning = (
+                    "Cannot find value "
+                    + str(xpath)
+                    + ", retry "
+                    + str(count)
+                    + " time."
+                    + ", " + str(e)
+                )
+                logging.warning(warning)
+                sleep(delay)
+                continue

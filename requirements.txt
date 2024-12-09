@@ -1,5 +1,6 @@
 selenium>=4.16.0
 streamlit>=1.29.0
+pyautogui>=0.9.54
 jira
 jira-insight
 streamlit_quill
