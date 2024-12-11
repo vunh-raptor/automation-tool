@@ -1,6 +1,7 @@
 from Sites.umc import umc
 from Common.constant.error_message import ErrorMessage
 import pandas as pd
+import time
 
 roles_table = [
     "NON_HOSEL_USER",
@@ -59,6 +60,57 @@ def add_homesis_homesis_user(umc_page: umc, hr_code: str) -> bool:
         umc_page.verify_updated_role()
     return umc_page.verify_updated_role()
 
+def add_role_umc(umc_page: umc, login_name: str, role_list:list) -> bool:
+
+    umc_page.search_hrid(hrid=login_name)
+    # Get account Status before running
+    umc_page.get_search_account_status()
+
+    # Check if account is Inactive
+    if umc_page.get_search_account_status() != "Inactive":
+        umc_page.click_details_button()
+        umc_page.click_edit()
+
+        for index in range(len(role_list)):
+            time.sleep(0.5)
+            role = role_list[index]
+            time.sleep(0.5)
+            umc_page.select_role(role=role)
+            time.sleep(0.5)
+            umc_page.click_add_role()
+
+        # Clicking Save
+        umc_page.click_save()
+
+        # Check if Update sucessfully
+        umc_page.verify_updated_role()
+    return umc_page.verify_updated_role()
+
+def remove_role_umc(umc_page: umc, login_name: str, role_list:list) -> bool:
+
+    umc_page.search_hrid(hrid=login_name)
+    # Get account Status before running
+    umc_page.get_search_account_status()
+
+    # Check if account is Inactive
+    if umc_page.get_search_account_status() != "Inactive":
+        umc_page.click_details_button()
+        umc_page.click_edit()
+
+        for index in range(len(role_list)):
+            time.sleep(0.5)
+            role = role_list[index]
+            time.sleep(0.5)
+            umc_page.select_role(role=role)
+            time.sleep(0.5)
+            umc_page.click_remove_role()
+
+        # Clicking Save
+        umc_page.click_save()
+
+        # Check if Update sucessfully
+        umc_page.verify_updated_role()
+    return umc_page.verify_updated_role()
 
 def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> bool:
     """This is a funciton to clear user of all roles and add in only the dismissal role.
