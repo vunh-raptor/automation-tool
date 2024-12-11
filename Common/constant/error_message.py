@@ -8,3 +8,6 @@ class ErrorMessage:
         CAN_NOT_FILL_ROLE = "Can't fill role"
         CAN_NOT_FILL_NOTE = "Can't fill note"
         CLICK_SAVE_BUTTON = "Click Save button successfully"
+
+    class umc_message:
+        USER_INACTIVE = "is inactive"

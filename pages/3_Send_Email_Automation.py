@@ -4,13 +4,15 @@ import pandas as pd
 import streamlit.components.v1 as components
 from streamlit_quill import st_quill
 from streamlit_ace import st_ace
+from Common.constant.css_file import css
 
 from Activity.send_email_actions import send_email_automation
 
 
 def main():
     # This function is to working with sending email task
-
+    # implement css for file upload element
+    st.markdown(css.css_send_email_automation_hub, unsafe_allow_html=True)
     # Title of the page
     st.title("Email Automation Hub")
 
@@ -49,11 +51,67 @@ def main():
 
         st.divider()
 
-        # Receiver and cc fields
-        to = st.text_input("To")
-        cc = st.text_input("CC")
-        bcc = st.text_input("BCC")
+        # Receiver and cc section
 
+        # To section
+        list_to_email = ""
+        list_to_email_upload = st.file_uploader(
+            "List To emails",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_to_email_upload)):
+            to_email_data = pd.read_csv(list_to_email_upload[i], converters={"Email": str})
+            for index, row in to_email_data.iterrows():
+                # read each email from csv file
+                to_emails = row["Email"]
+                # return a list of emails in a type a string
+                list_to_email = list_to_email + to_emails + "; "
+
+        to = st.text_area("To", list_to_email)
+
+        st.divider()
+
+        # CC sesion
+        list_cc_email = ""
+        list_cc_email_upload = st.file_uploader(
+            "List CC emails",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_cc_email_upload)):
+            cc_email_data = pd.read_csv(list_cc_email_upload[i], converters={"Email": str})
+            for index, row in cc_email_data.iterrows():
+                # read each email from csv file
+                cc_emails = row["Email"]
+                # return a list of emails in a type a string
+                list_cc_email = list_cc_email + cc_emails + "; "
+        cc = st.text_area("CC", list_cc_email)
+
+        st.divider()
+
+        # BCC section
+        list_bcc_email = ""
+        list_bcc_email_upload = st.file_uploader(
+            "List BCC emails",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_bcc_email_upload)):
+            bcc_email_data = pd.read_csv(list_bcc_email_upload[i], converters={"Email": str})
+            for index, row in bcc_email_data.iterrows():
+                # read each email from csv file
+                bcc_emails = row["Email"]
+                # return a list of emails in a type a string
+                list_bcc_email = list_bcc_email + bcc_emails + "; "
+        bcc = st.text_area("BCC", list_bcc_email)
+        st.divider()
         # Define email html template
         HTMLFile = open(
             r"Common\template\external_mail_maintenance_template.html",
@@ -99,7 +157,7 @@ def main():
         end_time = rigth.time_input(label="Thời gian kết thúc")
         start_datetime = datetime.datetime.combine(start_date, start_time)
         end_datetime = datetime.datetime.combine(end_date, end_time)
-        
+
         # Format date and time for English version
         start_datetime_eng = start_datetime.strftime("%B %d, %Y, %X")
         end_datetime_eng = end_datetime.strftime("%B %d, %Y, %X")
@@ -108,9 +166,67 @@ def main():
         st.divider()
 
         # Receiver and cc fields
-        to = st.text_input("To")
-        cc = st.text_input("CC")
-        bcc = st.text_input("BCC")
+        # To section
+        list_to_email_internal = ""
+        list_to_email_upload_internal = st.file_uploader(
+            "List To emails of Internal Maitainance",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # implement css for file upload element
+        st.markdown(css.css_send_email_automation_hub, unsafe_allow_html=True)
+        # Read CSV Data
+        for i in range(len(list_to_email_upload_internal)):
+            to_email_internal_data = pd.read_csv(list_to_email_upload_internal[i], converters={"Email": str})
+            for index, row in to_email_internal_data.iterrows():
+                # read each email from csv file
+                to_emails_internal = row["Email"]
+                # return a list of emails in a type a string
+                list_to_email_internal = list_to_email_internal + to_emails_internal + "; "
+
+        to = st.text_area("To", list_to_email_internal)
+
+        st.divider()
+
+        # CC sesion
+        list_cc_email_internal = ""
+        list_cc_email_internal_upload = st.file_uploader(
+            "List CC emails of Internal Maitainance",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_cc_email_internal_upload)):
+            cc_email_internal_data = pd.read_csv(list_cc_email_internal_upload[i], converters={"Email": str})
+            for index, row in cc_email_internal_data.iterrows():
+                # read each email from csv file
+                cc_emails_internal = row["Email"]
+                # return a list of emails in a type a string
+                list_cc_email_internal = list_cc_email_internal + cc_emails_internal + "; "
+        cc = st.text_area("CC", list_cc_email_internal)
+
+        st.divider()
+
+        # BCC section
+        list_bcc_internal_email = ""
+        list_bcc_email_internal_upload = st.file_uploader(
+            "List BCC emails",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_bcc_email_internal_upload)):
+            bcc_email_internal_data = pd.read_csv(list_bcc_email_internal_upload[i], converters={"Email": str})
+            for index, row in bcc_email_internal_data.iterrows():
+                # read each email from csv file
+                bcc_internal_emails = row["Email"]
+                # return a list of emails in a type a string
+                list_bcc_internal_email = list_bcc_internal_email + bcc_internal_emails + "; "
+        bcc = st.text_area("BCC", list_bcc_internal_email)
+        st.divider()
 
         # Array contain value fill in email
         filled_value = {
@@ -165,9 +281,66 @@ def main():
         st.divider()
 
         # Receiver and cc fields
-        to = st.text_input("To")
-        cc = st.text_input("CC")
-        bcc = st.text_input("BCC")
+        # To section
+        list_to_email_incident = ""
+        list_to_email_upload_incident = st.file_uploader(
+            "List To emails of Internal Maitainance",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # implement css for file upload element
+        st.markdown(css.css_send_email_automation_hub, unsafe_allow_html=True)
+        # Read CSV Data
+        for i in range(len(list_to_email_upload_incident)):
+            to_email_incident_data = pd.read_csv(list_to_email_upload_incident[i], converters={"Email": str})
+            for index, row in to_email_incident_data.iterrows():
+                # read each email from csv file
+                to_emails_incident = row["Email"]
+                # return a list of emails in a type a string
+                list_to_email_incident = list_to_email_incident + to_emails_incident + "; "
+
+        to = st.text_area("To", list_to_email_incident)
+
+        st.divider()
+
+        # CC sesion
+        list_cc_email_incident = ""
+        list_cc_email_incident_upload = st.file_uploader(
+            "List CC emails of Internal Maitainance",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_cc_email_incident_upload)):
+            cc_email_incident_data = pd.read_csv(list_cc_email_incident_upload[i], converters={"Email": str})
+            for index, row in cc_email_incident_data.iterrows():
+                # read each email from csv file
+                cc_emails_incident = row["Email"]
+                # return a list of emails in a type a string
+                list_cc_email_incident = list_cc_email_incident + cc_emails_incident + "; "
+        cc = st.text_area("CC", list_cc_email_incident)
+
+        st.divider()
+        # BCC section
+        list_bcc_incident_email = ""
+        list_bcc_email_incident_upload = st.file_uploader(
+            "List BCC emails",
+            accept_multiple_files=True,
+            type=["csv"],
+        )
+
+        # Read CSV Data
+        for i in range(len(list_bcc_email_incident_upload)):
+            bcc_email_incident_data = pd.read_csv(list_bcc_email_incident_upload[i], converters={"Email": str})
+            for index, row in bcc_email_incident_data.iterrows():
+                # read each email from csv file
+                bcc_incident_emails = row["Email"]
+                # return a list of emails in a type a string
+                list_bcc_incident_email = list_bcc_incident_email + bcc_incident_emails + "; "
+        bcc = st.text_area("BCC", list_bcc_incident_email)
+        st.divider()
 
         incident_email_filled_value = {
             "ticketNumber": incident_ticket_number,

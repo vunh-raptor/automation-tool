@@ -36,7 +36,7 @@ def send_email_automation(
     attachment.PropertyAccessor.SetProperty(
         "http://schemas.microsoft.com/mapi/proptag/0x3712001F", "image_id"
     )
-   
+
     email.SentOnBehalfOfName = "SERVICEDESK (VN)"
     email.Display(False)
     email.Send()

@@ -7,7 +7,10 @@ from Activity.umc_actions import (
     reactivate_user,
     remove_role,
     roles_table,
-    deactivate_ra
+    deactivate_ra,
+    check_inactive,
+    add_role_umc,
+    remove_role_umc
 )
 
 
@@ -72,7 +75,7 @@ def main():
     remove_roles_button = button_col.button(
         "Deactivate Accounts", key="deactivate_button"
     )
-    
+
     # Deactivate Button in the right column
     remove_dismissal_button = button_col.button(
         "Remove Dismissal Role", key="remove_dismissal_button"
@@ -120,7 +123,6 @@ def main():
             reactivate_user(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
 
-
     if remove_dismissal_button:
         # Start Selenium
         umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -134,11 +136,11 @@ def main():
 
     st.divider()
     st.text("Deactive RA")
-    deactive_ra_button = st.button("Deactive RA", type= "primary")
+    deactive_ra_button = st.button("Deactive RA", type="primary")
 
-    #deactive account
+    # deactive account
     if deactive_ra_button:
-         # Start Selenium
+        # Start Selenium
         umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
         # Loop through CSV & Search for HR Code
@@ -146,6 +148,93 @@ def main():
             hr_code = row["HR Code"]
             deactivate_ra(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
+
+    # check active account UMC
+    st.divider()
+    st.text("Check status account UMC")
+    hr_code_input_area = st.text_area("Input Hr code here")
+    hr_code_input_area_lines = hr_code_input_area.split(
+        "\n"
+    )  # This return a list of text area value
+    check_status_btn = st.button("Check status account", type="primary")
+
+    if check_status_btn:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        # Initial dataframe saving user status
+        data_user_status = pd.DataFrame(columns=["Hr Code", "Status"])
+
+        # Loop through list of user input in text area
+        for index in range(len(hr_code_input_area_lines)):
+            hr_code = hr_code_input_area_lines[index]
+            # check if user is inactive
+            if check_inactive(umc_page=umc_page, hr_code=hr_code) == False:
+                data_user_status = data_user_status._append(
+                    {"Hr Code": hr_code, "Status": "Inactive"}, ignore_index=True
+                )
+            else:
+                data_user_status = data_user_status._append(
+                    {"Hr Code": hr_code, "Status": "Active"}, ignore_index=True
+                )
+            umc_page.get_umc_url()
+
+        # display result
+        left, rigth = st.columns(2, vertical_alignment="top")
+        left.subheader(":red[Total result]")
+        left.text("Successfully run " + str(len(hr_code_input_area_lines)) + " users")
+        left.write(data_user_status)
+        data_user_status_inactive = data_user_status[
+            data_user_status["Status"] == "Inactive"
+        ]
+        rigth.subheader(":red[Inactive user]")
+        rigth.write(data_user_status_inactive)
+
+    st.divider()
+    st.subheader("Add role for multiple user")
+    left, rigth = st.columns(2, vertical_alignment="top")
+    login_name_input_area = left.text_area("Input login name here")
+    login_name_input_area_list = login_name_input_area.split("\n")  # This return a list
+    role_umc_input_area = rigth.text_area("Input roles here")
+    role_umc_input_area_list = role_umc_input_area.split("\n")  # This return a list
+    add_role_umc_btn = st.button("Add roles UMC", type="primary")
+
+    if add_role_umc_btn:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+
+        for index in range(len(login_name_input_area_list)):
+            login_name = login_name_input_area_list[index]
+            add_role_umc(
+                umc_page=umc_page,
+                login_name=login_name,
+                role_list=role_umc_input_area_list,
+            )
+            
+            umc_page.get_umc_url()
+    
+    st.divider()
+    st.subheader("Remove role for multiple user")
+    left, rigth = st.columns(2, vertical_alignment="top")
+    login_name_input_area = left.text_area("Input login name to remove here")
+    login_name_input_area_list = login_name_input_area.split("\n")  # This return a list
+    role_umc_input_area = rigth.text_area("Input remove roles here")
+    role_umc_input_area_list = role_umc_input_area.split("\n")  # This return a list
+    remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
+
+    if remove_role_umc_btn:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+
+        for index in range(len(login_name_input_area_list)):
+            login_name = login_name_input_area_list[index]
+            remove_role_umc(
+                umc_page=umc_page,
+                login_name=login_name,
+                role_list=role_umc_input_area_list,
+            )
+            
+            umc_page.get_umc_url()
+
 
 if __name__ == "__main__":
     main()
