@@ -87,10 +87,8 @@ def main():
                 )
                 left.write(list_error)
                 for i in range(len(list_error)):
-                    table_of_error = table_of_error._append(
-                        {"Hr Code": hr_code, "Steps": list_error[i].split("-", 1)[1]},
-                        ignore_index=True,
-                    )
+                    table_of_error.loc[len(table_of_error)]= [hr_code,list_error[i].split("-", 1)[1]]
+                    
                 homesis_page.get_homesis_url()
                 homesis_page.access_user_managerment()
             rigth.write("Run through " + str(csv_data.__len__()) + " users")
