@@ -39,9 +39,7 @@ def bsl_bank_name_crosscheck(bank_name_list: list, bank_name: str) -> bool:
     """
     try:
         for name in bank_name_list:
-            print(name.strip())
-            print(bank_name.strip())
-            if bank_name.strip() == name.strip():
+            if bank_name.strip().lower() == name.strip().lower():
                 return True
             continue
         return False

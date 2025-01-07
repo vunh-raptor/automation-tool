@@ -121,7 +121,7 @@ class bsl(Page):
         Returns:
             bool: _description_
         """
-        return self.search_by_xpath(self.bank_branch_name).send_keys(branch_name)
+        return self.search_by_xpath(self.bank_branch_name, delay=0.5).send_keys(branch_name)
     
     def select_branch_status(self, value: str) -> bool:
         """This is select branch staus in create screen

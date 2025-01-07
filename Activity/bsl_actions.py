@@ -1,3 +1,4 @@
+import time
 from Sites.bsl import bsl
 from Common.constant.error_message import ErrorMessage
 
@@ -47,6 +48,7 @@ def create_bank_branch_single(bsl_page: bsl, bank_name: str, bank_branch_name: s
                 error_message = "Fill bank branch code error"
             if bsl_page.click_OK_create_button() is False:
                 error_message = "OK button error!"
+            time.sleep(1.5)
         else:
             error_message = "Error when clicking create new branch!"
     else:

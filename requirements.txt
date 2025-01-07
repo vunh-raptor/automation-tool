@@ -3,6 +3,10 @@ streamlit>=1.29.0
 pyautogui>=0.9.54
 jira
 jira-insight
+<<<<<<< HEAD
 streamlit_quill
 streamlit_ace
 pywin32
+=======
+openpyxl
+>>>>>>> 7b633c7 (minor fix)
