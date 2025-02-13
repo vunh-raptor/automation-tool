@@ -11,7 +11,6 @@ from Activity.umc_actions import (
     check_inactive,
     add_role_umc,
     remove_role_umc,
-    reactivate_ra
 )
 
 
@@ -148,21 +147,6 @@ def main():
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
             deactivate_ra(umc_page=umc_page, hr_code=hr_code)
-            umc_page.get_umc_url()
-
-    st.divider()
-    st.text("Reactive RA")
-    reactive_ra_button = st.button("Reactive RA", type="primary")
-
-    # deactive account
-    if reactive_ra_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            reactivate_ra(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
 
     # check active account UMC

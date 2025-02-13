@@ -127,22 +127,7 @@ class umc(Page):
         else:
             self.get_umc_url()
             return True
-        
-    def click_reactivate(self) -> bool:
-        """
-        This method clicks the deactivate button.
-
-        Returns:
-            bool: False if the button is clicked, True otherwise.
-        """
-        button = self.search_by_xpath(self.reactivate_button)
-        if button.flag:
-            button.click()
-            return False
-        else:
-            self.get_umc_url()
-            return True    
-
+       
     def click_edit(self) -> None:
         """
         This method clicks the edit button.
