@@ -1,35 +1,26 @@
 import streamlit as st
 from Common.Jira.jira_session import JiraSession
+from Common.constant.jira_constant import JiraConst
 
-one_ticket_button = st.button('Debugging button')
 
-"""
-This script handles JIRA ticket handling using the Streamlit framework.
+st.write("This page simply for testing Jira Bot, will be designed later")
+jql_get_new_ticket_button = st.button('Get new ticket on queue', type='primary')
 
-The script imports the necessary modules and defines a debugging button using Streamlit.
-When the debugging button is clicked, it creates a JIRA session and browses a specific ticket.
-The ticket key is then retrieved using the `get_key()` method.
+# Function to reset the state
+def reset_state():
+    st.session_state.counter = 0
 
-Note: Make sure to replace 'INCVN-23838' with the actual ticket key you want to browse.
-"""
+# Button to reset the counter
+if st.button("Reset"):
+    reset_state()
 
-jql_search_bar = st.text_input('Enter SQL search query')
-jql_search_button = st.button('Search')
-
-transition_search_bar = st.text_input('Enter ticket for transition lookup')
-transition_search_button = st.button('Transition lookup')
-
-if one_ticket_button:
+if jql_get_new_ticket_button:
+    """Get all new ticket belong to SD and print it on the screen
+    """
     session = JiraSession()
-    
-    ticket = session.browse_ticket('INCVN-23838')
-    ticket.get_key()
-    ticket.get_impact()
+    response = session.search_jql(JiraConst.JqlSearch.GET_NEW_TICKET)
+    st.write("Total ticket is", response._total_tickets)
+    for i in response._issues_list:
+        st.write(response._json_issues)
 
-if jql_search_button:
-    session = JiraSession()
-    session.search_jql(jql_search_bar)
-    
-if transition_search_button:
-    session = JiraSession()
-    session.get_available_transition_id(transition_search_bar)
+

@@ -963,3 +963,7 @@ class JiraConst:
     class JiraRequestTypeId:
         # SERVICE REQUESTS
         SR_GENERAL_REQUEST = "srvn/4c563352-ec41-45e6-8ea9-3700e2ee73bb"
+
+    class JqlSearch:
+        #All JQL constant that use in project
+        GET_NEW_TICKET = 'project in ("Access Requests VN","Service Requests VN") AND status = New AND "Responsible Team" = "Service Desk (VN) (ORGMD-27919)"'
