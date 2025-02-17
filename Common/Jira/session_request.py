@@ -36,7 +36,7 @@ class Session:
     # _POC3_TOKEN = "NzgxMTcyMjA5NjA4OhnMqkkjUL4yQJeZimk3LSppxCPB"
     # poc3_url = "https://jira-servicedesk-poc3.cz.infra/rest/api/2/"  
     # This DEFAULT_TOKEN is for the HCVN Service Desk account.
-    _DEFAULT_TOKEN = "MTMyODE5MDQwOTU3Oll0EllG1zqe+Qr+UU6w9xZe3n+m"
+    _DEFAULT_TOKEN = "OTU2NTI5MjM5MDI0Oh/Oz8O8FWVHDH7soBDKRhdWKni8"
     authen_token = BearerAuth(_DEFAULT_TOKEN)
     url = ""
 

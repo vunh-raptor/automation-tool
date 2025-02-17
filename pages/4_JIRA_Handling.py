@@ -22,5 +22,3 @@ if jql_get_new_ticket_button:
     st.write("Total ticket is", response._total_tickets)
     for i in response._issues_list:
         st.write(response._json_issues)
-
-
