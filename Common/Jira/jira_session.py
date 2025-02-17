@@ -5,6 +5,7 @@ from Common.Jira.jira_ticket import JiraTicket
 from Common.Jira.jira_ticket_list import JiraTicketList
 from Common.Jira.session_request import Session
 from Common.Jira.session_request import get_id_from_response
+from Common.constant import jira_constant
 
 
 class JiraSession(Session):
@@ -35,16 +36,32 @@ class JiraSession(Session):
         "transition":{
          "id":"${transition_id}"
         }
+        ${optional_message}
     }
     """)
-
+    
     _COMMENT_BODY = Template(
         """{
             "body":"${message}"
         }
+        ${optional_message}
         """
     )
     
+    _INTERNAL_COMMENT_BODY = Template(
+        """{
+        "body": "${message}",
+        "properties": [
+            {
+            "key": "sd.public.comment",
+            "value":{
+                "internal": true
+            }
+            }
+        ]
+        }
+        """
+    )
     # This might range from browsing ticket, searching ticket to commit various workflow.
 
     def browse_ticket(self, ticket_key: str) -> JiraTicket:
@@ -97,7 +114,7 @@ class JiraSession(Session):
         result = self.get_request(endpoint=endpoint)
         return get_id_from_response(result)
     
-    def send_transition(self, ticket_key: str, transition_id: str):
+    def send_transition(self, ticket_key: str, transition_id: str) -> Response:
         """
         Sends a transition request to the JIRA server.
 
@@ -118,21 +135,25 @@ class JiraSession(Session):
         result = self.post_request(endpoint=endpoint, payload=payload)
         return result
 
-    def add_comment(self, ticket_key: str, message: str):
+    def add_comment(self, ticket_key: str, message: str, internal: bool = False) -> Response:
         """
         Input a comment to the designated ticket
         
         Params:
             ticket_key (str): the key of the ticket that need to input comment
             message (str): Message that needed to be input
+            internal (bool): Value define if whether the comment is Internal or not. True mean Internal
         
         Returns:
             result: The result of add comment request
         """
         endpoint = self._COMMENT.format(ticket_key=ticket_key)
-        
-        # Using json loads parse the text string into a valid JSON object that Jira Server can understand, avoid having response 400 
-        payload = json.loads(self._COMMENT_BODY.substitute(message=message))
+        payload = ""
+        if internal:
+             # Using json loads parse the text string into a valid JSON object that Jira Server can understand, avoid having response 400 
+            payload = json.loads(self._INTERNAL_COMMENT_BODY.substitute(message=message))
+        else:
+            payload = json.loads(self._COMMENT_BODY.substitute(message=message))
         
         result = self.post_request(endpoint=endpoint, payload=payload)
         return result
@@ -144,3 +165,64 @@ class JiraSession(Session):
         Args:
             ticket_key (str): _description_
         """
+        
+    def send_classify(self, ticket_key: str) -> Response:
+        """This action to send classification action to the ticket
+
+        Args:
+            ticket_key (str): the ticket ID
+
+        Returns:
+            Response: response from request call
+        """
+        
+        endpoint = self._TRANSITION.format(ticket_key=ticket_key)
+
+        #payload = self._TRANSITION_BODY.format(transition_id=transition_id, fields_info=fields_info)
+        payload = json.loads(self._TRANSITION_BODY.substitute(transition_id="911"))
+
+        result = self.post_request(endpoint=endpoint, payload=payload)
+        return result
+    
+    def send_progress(self, ticket_key:str) -> Response:
+        """This action to send Start Progress action to the ticket
+
+        Args:
+            ticket_key (str): the ticket ID
+
+        Returns:
+            Response: Response from request call
+        """
+        
+        endpoint = self._TRANSITION.format(ticket_key=ticket_key)
+        
+        payload = json.loads(self._TRANSITION_BODY.substitute(transition_id="21"))
+
+        result = self.post_request(endpoint=endpoint, payload=payload)
+        return result
+    
+    def send_resolution(self, ticket_key:str, solution:str) -> Response:
+        """This action to send Resolve action to the ticket
+
+        Args:
+            ticket_key (str): the ticket ID
+            solution (str): Brief describe of the ticket solution
+
+        Returns:
+            Response: Response from request call
+        """       
+         
+        endpoint = self._TRANSITION.format(ticket_key=ticket_key)
+
+        # Solution payload in the Rest request, append to the _TRANSITION_BODY
+        payload = self._TRANSITION_BODY.substitute(transition_id="721", optional_message=""",
+        "fields":
+            {""" +
+            f'\"{jira_constant.JiraConst.customfield.SOLUTION}\":' + f'\"{solution}\"' + """
+            }
+        """)
+        
+        print(payload)
+        payload = json.loads(payload)
+        result = self.post_request(endpoint=endpoint, payload=payload)
+        return result

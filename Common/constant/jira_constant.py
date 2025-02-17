@@ -36,7 +36,7 @@ class JiraConst:
         TIME_TO_CALL_BACK = "customfield_12919"
         JIRA_SOFTWARE_LINK_TBD = "customfield_11940"
         APPROVAL_HIERARCHY = "customfield_11931"
-        SOLUTION = "customfield_10600"
+        SOLUTION = "customfield_10213"
         SOLVED_BY_CHANGES = "customfield_11930"
         PURPOSE = "customfield_12901"
         REOPEN_COUNT = "customfield_10601"

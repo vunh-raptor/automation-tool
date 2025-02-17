@@ -5,8 +5,6 @@ from Common.constant.jira_constant import JiraConst
 
 st.write("This page simply for testing Jira Bot, will be designed later")
 jql_get_new_ticket_button = st.button('Get new ticket on queue', type='primary')
-jql_add_comment = st.button('Add Comment')
-jql_transition_inprogress = st.button('In Progress')
 
 # Function to reset the state
 def reset_state():
@@ -24,15 +22,3 @@ if jql_get_new_ticket_button:
     st.write("Total ticket is", response._total_tickets)
     for i in response._issues_list:
         st.write(response._json_issues)
-
-if jql_add_comment:
-    """Add comment
-    """
-    session = JiraSession()
-    response = session.add_comment("SRVN-70849", "Nhu la con suc vat 2")
-    
-if jql_transition_inprogress:
-    """In Progress ticket
-    """
-    session = JiraSession()
-    response = session.send_transition("SRVN-70849", "21")
