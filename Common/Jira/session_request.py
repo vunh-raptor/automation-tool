@@ -95,7 +95,7 @@ class Session:
         
         
 
-def get_id_from_response(response: Response) -> dict:
+def filter_id_from_response(response: Response) -> dict:
     """This function is to support getting the ID from the response of the API
 
     Args:
@@ -116,5 +116,22 @@ def get_id_from_response(response: Response) -> dict:
         print(e)
         return {}  # Return an empty dictionary if an exception occurs
     
+def filter_linked_tickets_from_response(response: Response) -> dict:
+    """This function is to support getting the linked ticket ID & it's summary from the response of the API
 
-    
+    Args:
+        response (Response): Response from the API
+
+    Returns:
+        dict: {ID - Summary} - Example: {APPROVALVN-12313 - Approval for SRVN}
+    """
+    return_dict = {}
+    try:
+        json_obj = json.loads(response.text)
+        for fields in json_obj['fields']['issuelinks']:
+            return_dict[fields['outwardIssue']['key']] = fields['outwardIssue']['fields']['summary']
+            #return_dict[json_obj[fields]['issuelinks']] = json_obj['summary']
+        return return_dict
+    except Exception as e:  # noqa: E722
+        print(e)
+        return {}

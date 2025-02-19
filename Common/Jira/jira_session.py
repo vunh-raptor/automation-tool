@@ -1,10 +1,9 @@
 from requests import Response
 from string import Template
 import json
-from Common.Jira.jira_ticket import JiraTicket
-from Common.Jira.jira_ticket_list import JiraTicketList
 from Common.Jira.session_request import Session
-from Common.Jira.session_request import get_id_from_response
+from Common.Jira.session_request import filter_id_from_response
+from Common.Jira.session_request import filter_linked_tickets_from_response
 from Common.constant.jira_constant import JiraConst
 
 
@@ -25,10 +24,14 @@ class JiraSession(Session):
 
     # DEFAULT cURL for JIRA API
     _DEFAULT_URL = "https://sd.homecredit.net/rest/api/2/"
-    _BROWSE_TICKET = "issue/"
+    _BROWSE_TICKET = "issue/{ticket_key}"
     _JQL_SEARCH = "search?jql="
     _TRANSITION = "issue/{ticket_key}/transitions"
     _COMMENT = "issue/{ticket_key}/comment"
+    
+    # PARAM append for JIRA API
+    _ISSUELINKS = "?fields=issuelinks"
+    _APPROVAL_SUMMARY_RESOLUTION = "?fields=resolution&fields=summary"
 
     # BODY TEMPLATE FOR JIRA API
     _TRANSITION_BODY = Template("""
@@ -64,7 +67,7 @@ class JiraSession(Session):
     )
     # This might range from browsing ticket, searching ticket to commit various workflow.
 
-    def browse_ticket(self, ticket_key: str) -> JiraTicket:
+    def browse_ticket(self, ticket_key: str):
         """
         Retrieves and parses a specific ticket.
 
@@ -75,32 +78,32 @@ class JiraSession(Session):
         - JIRATicket: The parsed JIRA ticket object.
         """
 
-        endpoint = self._BROWSE_TICKET + ticket_key
+        endpoint = self._BROWSE_TICKET.format(ticket_key=ticket_key)
 
         result = self.get_request(endpoint=endpoint)
         return JiraTicket(result.text)
 
-    def search_jql(self, jql: str) -> JiraTicketList:
-        """
-        Retrieves and parses a specific ticket.
+    # def search_jql(self, jql: str) -> JiraTicketList:
+    #     """
+    #     Retrieves and parses a specific ticket.
 
-        Parameters:
-        - ticket_key (str): The key of the ticket to retrieve.
+    #     Parameters:
+    #     - ticket_key (str): The key of the ticket to retrieve.
 
-        Returns:
-        - JIRATicket: The parsed JIRA ticket object.
-        """
+    #     Returns:
+    #     - JIRATicket: The parsed JIRA ticket object.
+    #     """
 
-        endpoint = self._JQL_SEARCH + jql
+    #     endpoint = self._JQL_SEARCH + jql
 
-        result = self.get_request(endpoint=endpoint)
+    #     result = self.get_request(endpoint=endpoint)
 
-        return JiraTicketList(rawdata=result.text)
+    #     return JiraTicketList(rawdata=result.text)
 
 
     def get_available_transition_id(self, ticket_key: str):
         """
-        Retrieves and parses a specific ticket.
+        Retrieves all transitions the specified issue can perform.
 
         Parameters:
         - ticket_key (str): The key of the ticket to retrieve.
@@ -112,7 +115,28 @@ class JiraSession(Session):
         endpoint = self._TRANSITION.format(ticket_key=ticket_key)
 
         result = self.get_request(endpoint=endpoint)
-        return get_id_from_response(result)
+        return filter_id_from_response(result)
+    
+    def get_linked_ticket_id(self, ticket_key: str) -> list[str]:
+        """
+        Retrieves all ID of linked tickets to the specified issue - 
+        Args:
+            ticket_key (str): key/ID of the ticket
+
+        Returns:
+            list[str]: an ID list of related tickets
+        """
+        approval_id_list = []
+        
+        endpoint = self._BROWSE_TICKET.format(ticket_key=ticket_key) + self._ISSUELINKS
+        
+        response = self.get_request(endpoint=endpoint)
+        
+        result = filter_linked_tickets_from_response(response)
+        
+        for key in result.keys():
+            approval_id_list.append(str(key))
+        return approval_id_list
     
     def send_transition(self, ticket_key: str, transition_id: str) -> Response:
         """
@@ -287,3 +311,16 @@ class JiraTicket:
         Retrieves the impact of the ticket.
         """
         return self.get_fields(JiraConst.customfield.IMPACT)
+    
+    def get_summary(self) -> str:
+        """
+        Retrieves the title/summary of the ticket
+        """
+        return self.get_fields(JiraConst.customfield.SUMMARY)
+    
+    def get_resolution(self) -> str:
+        """
+        Retrieves the resolution of the ticket
+        """
+        return self.get_fields(JiraConst.customfield.RESOLUTION)
+    
