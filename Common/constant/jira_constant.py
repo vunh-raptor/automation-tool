@@ -324,7 +324,7 @@ class JiraConst:
         FILE_SYSTEM_BACKUP_TEMPLATE = "customfield_13411"
         GENERATE_SSL_CERTIFICATE = "customfield_12201"
         CONTACT_NUMBER = "customfield_12204"
-        EDIT_ACCOUNT_OPTION = "customfield_13414"
+        EDIT_ACCOUNT_OPTION = "customfield_11814"
         CONTRACT_NUMBER = "customfield_12203"
         FILE_SYSTEM_TEMPLATE_INITATIOR = "customfield_13413"
         TIME_TO_TEAM = "customfield_12445"

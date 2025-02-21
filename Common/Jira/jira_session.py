@@ -153,7 +153,7 @@ class JiraSession(Session):
             str: account username
         """
         response = self.browse_ticket(ticket_key=ticket_key, params=JiraConst.customfield.AFFECTED_ACCOUNT)
-        username = str(response.get_affected_account()[0]).split("(")[0]
+        username = response.get_affected_account_username()
         return username
         
     def send_transition(self, ticket_key: str, transition_id: str) -> Response:
@@ -350,3 +350,20 @@ class JiraTicket:
         Retrieves the affected account of the ticket
         """
         return self.get_fields(JiraConst.customfield.AFFECTED_ACCOUNT)
+    
+    def get_affected_account_username(self) -> str:
+        return str(self.get_affected_account()[0]).split("(")[0]
+    
+    def get_edit_account_option(self) -> str:
+        """_summary_
+
+        Returns:
+            str: _description_
+        """
+        return self.ticket_data[""]
+    
+    def get_linked_ticket_id(self) -> list[str]:
+        return_list = []
+        for fields in self.ticket_data['fields']['issuelinks']:
+            return_list.append(fields['outwardIssue']['key'])
+        return return_list
