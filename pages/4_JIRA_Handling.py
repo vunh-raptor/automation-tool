@@ -1,6 +1,6 @@
 import streamlit as st
 from Common.Jira.jira_session import JiraSession
-from Common.constant.jira_constant import JiraConst
+from Activity.jira_action import general_request_reqdata_SINGLE
 
 
 st.write("This page simply for testing Jira Bot, will be designed later")
@@ -26,5 +26,7 @@ if st.button("Reset"):
 
 if jql_get_approval_ticket_button:
     session = JiraSession()
-    response = session.get_linked_ticket_id("ACCVN-4000")
-    st.write("Total tickets are: ", response)
+    # response = session.get_linked_ticket_id("ACCVN-4000")
+    # st.write("Total tickets are: ", response)
+    approval_list = general_request_reqdata_SINGLE(session, "ACCVN-4000")
+    st.write("Approval List are:", approval_list)
