@@ -1,5 +1,7 @@
 from pandas import DataFrame, read_excel
+import json
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+from requests import Response
 import logging
 
 
@@ -26,7 +28,7 @@ def support_Excel_read(read_path: str, sheet_name: str = "Sheet1") -> DataFrame:
 def push_error_to_MSTeams(webhook: str) -> None:
     pass
 
-
+# BSL Section
 def bsl_bank_name_crosscheck(bank_name_list: list, bank_name: str) -> bool:
     """This function to support Bank name crosschecking to verify if the data is valid, if not then it will return False to BSL_Automation Scripts take action
 
@@ -48,3 +50,44 @@ def bsl_bank_name_crosscheck(bank_name_list: list, bank_name: str) -> bool:
     except:  # noqa: E722
         logging.critical("File Error, file not found!")
         return False
+
+# JIRA Response Section
+def filter_id_from_response(response: Response) -> dict:
+    """This function is to support getting the ID from the response of the API
+
+    Args:
+        response (Response): Response from the API
+
+    Returns:
+        dict: ID from the response
+    """
+    return_dict = {}
+
+    try:
+        json_obj = json.loads(response.text)
+        for fields in json_obj['transitions']:
+            return_dict[fields['name']] = fields['id']
+        return return_dict
+    except Exception as e:  # noqa: E722
+        print("File Error, file not found!\n")
+        print(e)
+        return {}  # Return an empty dictionary if an exception occurs
+    
+# def filter_linked_tickets_from_response(response: Response) -> dict:
+#     """This function is to support getting the linked ticket ID & it's summary from the response of the API
+
+#     Args:
+#         response (Response): Response from the API
+
+#     Returns:
+#         dict: {ID - Summary} - Example: {APPROVALVN-12313 - Approval for SRVN}
+#     """
+#     return_dict = {}
+#     try:
+#         json_obj = json.loads(response.text)
+#         for fields in json_obj['fields']['issuelinks']:
+#             return_dict[fields['outwardIssue']['key']] = fields['outwardIssue']['fields']['summary']
+#         return return_dict
+#     except Exception as e:  # noqa: E722
+#         print(e)
+#         return {}

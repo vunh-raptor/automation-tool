@@ -94,27 +94,3 @@ class Session:
         return result
         
         
-
-def get_id_from_response(response: Response) -> dict:
-    """This function is to support getting the ID from the response of the API
-
-    Args:
-        response (Response): Response from the API
-
-    Returns:
-        dict: ID from the response
-    """
-    return_dict = {}
-
-    try:
-        json_obj = json.loads(response.text)
-        for fields in json_obj['transitions']:
-            return_dict[fields['name']] = fields['id']
-        return return_dict
-    except Exception as e:  # noqa: E722
-        print("File Error, file not found!\n")
-        print(e)
-        return {}  # Return an empty dictionary if an exception occurs
-    
-
-    
