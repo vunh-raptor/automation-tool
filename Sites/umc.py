@@ -39,6 +39,8 @@ class umc(Page):
     account_status_field = '//div[@data-better-uid="status"]'
     detail_phone = '//*[@data-better-uid="detail.phone"]'
     detail_mobile = '//*[@data-better-uid="detail.mobile"]'
+    first_name = '//*[@data-better-uid="detail.name"]'
+    last_name = '//*[@data-better-uid="detail.surname"]'
 
     role_palette = '//*[@data-better-uid="role-palette"]'
     first_owned_role = '//*[@data-better-uid="role-palette:selected-field"]/option'
@@ -298,3 +300,18 @@ class umc(Page):
         mobile_number_field.clearText()
         mobile_number_field.send_keys(phone_number)
 
+    def update_name(self, first_name: str, last_name: str) -> bool:
+        """
+        This method select first name and last name
+        Clear old first name/last name and add new first name/last name
+        """
+        # Chose detail name and input new value
+        detail_name_field = self.search_by_xpath(xpath=self.first_name)
+        detail_name_field.click()
+        detail_name_field.clearText()
+        detail_name_field.send_keys(first_name)
+        # Chose detail surname and input new value
+        detail_surname_field = self.search_by_xpath(xpath=self.last_name)
+        detail_surname_field.click()
+        detail_surname_field.clearText()
+        detail_surname_field.send_keys(last_name)

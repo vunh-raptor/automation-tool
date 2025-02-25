@@ -11,7 +11,7 @@ from Activity.umc_actions import (
     check_inactive,
     add_role_umc,
     remove_role_umc,
-    update_phone_number
+    update_phone_number, update_name
 )
 
 
@@ -278,16 +278,18 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
         result_table = st.write(csv_data)
 
     # Create columns for update UMC info
-    active_col, _, reactive_col = st.columns(3)
+    update_phone_col, _, update_name_button_col = st.columns(3)
 
     # Phone Button on the left Column
-    update_phone_button = active_col.button("Update phone")
+    update_phone_button = update_phone_col.button("Update phone")
+
+    # Update number on Right Column
+    update_name_button = update_name_button_col.button("Update name")
 
     # Update info account UMC
     if update_phone_button:
         # Start Selenium
         umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
         table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
         left, right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
         # Loop through CSV & Search for HR Code
@@ -300,6 +302,27 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
                 phone_number=phone_number
             )
             left.write(list_error)  # Keep this line for debugging, but it might print None
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
+            umc_page.get_umc_url()
+
+    if update_name_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+        # loop through CSV & Search for HR code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            first_name = row["First Name"]
+            last_name = row["Last Name"]
+            list_error = update_name(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                first_name=first_name,
+                last_name=last_name
+            )
+            left.write(list_error) # Keep this line for debugging, but it might print None
             for i in range(len(list_error)):
                 table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
             umc_page.get_umc_url()

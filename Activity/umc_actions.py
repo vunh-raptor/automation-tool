@@ -273,6 +273,7 @@ def check_inactive(umc_page: umc, hr_code: str) -> bool:
 
 
 def update_phone_number(umc_page: umc, hr_code: str, phone_number: str) -> bool:
+    """Updates the phone number and returns a list of error/success messages."""
     list_of_error = []
     umc_page.search_hrid(hrid=hr_code)
     # Get account Status before running
@@ -294,5 +295,30 @@ def update_phone_number(umc_page: umc, hr_code: str, phone_number: str) -> bool:
             # Check if Update successfully
             list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
         return list_of_error
-    pass
+
+def update_name(umc_page: umc, hr_code: str, first_name: str, last_name: str) -> bool:
+    """
+    Update fisrt name/last name and return a list of error/success messages.
+    """
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    if umc_page.get_search_account_status():
+        # Check if account is Inactive
+        if umc_page.get_search_account_status() == "Inactive":
+            list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+        if umc_page.get_search_account_status() == "Account not found":
+            list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+        if umc_page.get_search_account_status() == "Active":
+            # Click to detail
+            umc_page.click_details_button()
+            # Click to edit
+            umc_page.click_edit()
+            # Replace name
+            umc_page.update_name(first_name=first_name, last_name=last_name)
+            # Clicking Save
+            umc_page.click_save()
+            # Check if Update successfully
+            list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+        return list_of_error
 
