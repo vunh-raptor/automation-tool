@@ -280,7 +280,8 @@ def update_phone_number(umc_page: umc, hr_code: str, phone_number: str) -> bool:
         # Check if account is Inactive
         if umc_page.get_search_account_status() == "Inactive":
             list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
-            return list_of_error
+        if umc_page.get_search_account_status() == "Account not found":
+            list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
         if umc_page.get_search_account_status() == "Active":
             # Click to detail
             umc_page.click_details_button()
@@ -291,11 +292,7 @@ def update_phone_number(umc_page: umc, hr_code: str, phone_number: str) -> bool:
             # Clicking Save
             umc_page.click_save()
             # Check if Update successfully
-            umc_page.verify_updated_info()
-    else:
-        list_of_error.append(hr_code + "-" + ErrorMessage.umc_message.USER_NOT_FOUND)
+            list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
         return list_of_error
-        pass
-    return list_of_error
-
+    pass
 

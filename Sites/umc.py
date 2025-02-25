@@ -198,6 +198,7 @@ class umc(Page):
         if status.flag:
             element = status.return_element()
             return element.text
+        return "Account not found"
 
     def search_first_owned_role(self) -> bool:
         """
