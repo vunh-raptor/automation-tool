@@ -238,7 +238,6 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
         umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
         data_user_status_list = []
         # Initial dataframe saving user status
-        # data_user_status = pd.DataFrame(columns=["Hr Code", "Status"])
         for hr_code in hr_code_input_area_lines:
             status = check_inactive(umc_page=umc_page, hr_code=hr_code)
             data_user_status_list.append({"Hr Code": hr_code, "Status": status})  # Add to the list
