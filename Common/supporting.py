@@ -1,9 +1,9 @@
 from pandas import DataFrame, read_excel
 import json
-from streamlit.runtime.uploaded_file_manager import UploadedFile
 from requests import Response
 import logging
-
+from pyotp import TOTP
+from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
 
 def support_Excel_read(read_path: str, sheet_name: str = "Sheet1") -> DataFrame:
     """This function is to support reading Excel file on xlsx attachment
@@ -91,3 +91,81 @@ def filter_id_from_response(response: Response) -> dict:
 #     except Exception as e:  # noqa: E722
 #         print(e)
 #         return {}
+
+def cyberark_get_credential_password(requestCredential: str, certThumbprint: str) -> str:
+    """This function is to get credential password stored on CyberArk Password Vault
+
+    Args:
+        requestCredential (str): the credential that the script needs to get on CyberArk Vault
+        certThumbprint (str): Network certificate thumbprint of current users
+
+    Returns:
+        str: the password value of the credential
+    """
+    result = ""
+    powershell_script = "Common\\data\\CBAAccess.ps1"
+    try:
+        result = powershell_run_output(script_path=powershell_script)
+        return result
+    except Exception as e:
+        print(e)
+        return ""
+    return result
+
+def powershell_run_output(script_path:str) -> str:
+    """This function to run Powershell cmd - return output
+
+    Args:
+        cmd (str): powershell command
+
+    Returns:
+        str: output of the powershell command
+    """
+    from subprocess import run
+    try:
+        completed = run(["powershell", "-File", script_path], capture_output=True)
+        print(completed.stdout) 
+        return str(completed.stdout)
+    except Exception as e:
+        print(e)
+        return ""
+
+def generate_OTP() -> TOTP:
+    """This function used to generate OTP and send to MSteams
+
+    Returns:
+        str: the generated OTP
+    """
+    try:
+        timeOTP = TOTP('base32secret3232', interval=420)
+        
+        #Assign the Power Automate Webhook
+        webhook = TeamsWebhook("https://prod-102.westeurope.logic.azure.com:443/workflows/622b616dc2a9428e9dfa90b97df7a5c2/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7J64W7hby4vALfHoRosepx0voq-jJd-KB0Nzepfgu0Y")
+        
+        #Build & send the message card
+        card = AdaptiveCard(title="Reactivate OTP", title_style=ContainerStyle.DEFAULT)
+        container = Container(style=ContainerStyle.DEFAULT)
+        container.add_text_block(text="Generated OTP: " + timeOTP.now())
+        card.add_container(container=container)
+        webhook.add_cards(card)
+        webhook.send()
+        
+        # return the OTP value to compare in the verify_OTP function
+        return timeOTP
+    except Exception as e:
+        print(e)
+
+def verify_OTP(sourceOTP: TOTP, OTP: str) -> bool:
+    """This function used to verify OTP when input
+
+    Args:
+        OTP (str): the OTP that SD input to verify
+
+    Returns:
+        bool: the status of the verification
+    """
+    try:
+        return sourceOTP.verify(OTP)
+    except Exception as e:
+        print(e)
+        return False

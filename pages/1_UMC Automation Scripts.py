@@ -14,6 +14,11 @@ from Activity.umc_actions import (
     update_phone_number, update_name
 )
 
+from Common.supporting import (
+    cyberark_get_credential_password,
+    generate_OTP,
+    verify_OTP
+)
 
 def main():
     # Title of the page
@@ -28,11 +33,11 @@ def main():
     ldap_user = st.text_input("LDAP USERNAME")
     ldap_pw = st.text_input("LDAP PASSWORD", type="password")
 
-    # Choose action to take on BSL
+    # Choose action to take on UMC
     st.subheader("Choose your action on UMC", divider="red")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info"])
-
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts"])
+    
     with tab1:
         tab1_exec(ldap_user, ldap_pw)
     with tab2:
@@ -41,6 +46,8 @@ def main():
         tab3_exec(ldap_user, ldap_pw)
     with tab4:
         tab4_exec(ldap_user, ldap_pw)
+    with tab5:
+        tab5_exec()    
     pass
 
 def tab1_exec(ldap_user: str, ldap_pw: str):
@@ -319,6 +326,40 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
             for i in range(len(list_error)):
                 table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
             umc_page.get_umc_url()
+
+def tab5_exec():
+    st.divider()
+    st.subheader("Reactivate accounts on UMC")
+    
+    
+    reactivate_upload = st.file_uploader(
+    label="Reactivate HRcode List",
+    type=["csv", "txt"],
+    accept_multiple_files=False,
+    )
+
+    if reactivate_upload is not None:
+        getOTP = st.button("Get OTP", use_container_width=True)
+        if getOTP:
+            cred = cyberark_get_credential_password("umc_admin", "6b14c3c96dc592c364f5a3ef642db09195550cb6")
+            st.write(cred)
+    #     if st.session_state.get('button') is not True:
+    #         st.session_state['button'] = getOTP
+    #     if st.session_state['button'] is True:
+    #         # Trigger OTP Generation
+    #         timeOTP = generate_OTP()
+    #         # Release front end verification for SD users
+    #         col1, col2 = st.columns([1,2], vertical_alignment="bottom")
+    #         with col1:
+    #             OTP = st.text_input("Verify OTP")
+    #         with col2:
+    #             confirm = st.button("Confirm OTP")
+                
+    #         # When user presses confirm
+    #         if confirm:
+    #             st.write(str(verify_OTP(timeOTP, OTP=OTP)))
+    #             # st.session_state['button'] = False
+
 
 if __name__ == "__main__":
     main()
