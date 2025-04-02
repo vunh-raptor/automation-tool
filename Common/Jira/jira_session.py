@@ -143,18 +143,18 @@ class JiraSession(Session):
             approval_id_list.append(str(key))
         return approval_id_list
     
-    def get_affected_account_username(self, ticket_key:str) -> str:
-        """
-        Retrieves affected account username in the ticket
-        Args:
-            ticket_key (str): key/ID of the ticket
+    # def get_affected_account_username(self, ticket_key:str) -> str:
+    #     """
+    #     Retrieves affected account username in the ticket
+    #     Args:
+    #         ticket_key (str): key/ID of the ticket
 
-        Returns:
-            str: account username
-        """
-        response = self.browse_ticket(ticket_key=ticket_key, params=JiraConst.customfield.AFFECTED_ACCOUNT)
-        username = response.get_affected_account_username()
-        return username
+    #     Returns:
+    #         str: account username
+    #     """
+    #     response = self.browse_ticket(ticket_key=ticket_key, params=JiraConst.customfield.AFFECTED_ACCOUNT)
+    #     username = response.get_affected_account_username()
+    #     return username
         
     def send_transition(self, ticket_key: str, transition_id: str) -> Response:
         """
@@ -362,8 +362,8 @@ class JiraTicket:
         """
         return self.ticket_data["fields"][JiraConst.customfield.EDIT_ACCOUNT_OPTION]['value']
     
-    def get_linked_ticket_id(self) -> list[str]:
-        return_list = []
-        for fields in self.ticket_data['fields']['issuelinks']:
-            return_list.append(fields['outwardIssue']['key'])
-        return return_list
+    # def get_linked_ticket_id(self) -> list[str]:
+    #     return_list = []
+    #     for fields in self.ticket_data['fields']['issuelinks']:
+    #         return_list.append(fields['outwardIssue']['key'])
+    #     return return_listo

@@ -13,6 +13,7 @@ from Activity.homesis_actions import (
     add_sup_code,
     update_note,
     update_id_number,
+    closed_partner,
 )
 
 
@@ -269,7 +270,7 @@ def main():
         # Select the option for change the role in bank
         option = rigth.selectbox(
             "Chose a role-in-bank",
-            ("** choose **", "SA", "RA", "Telesales operator"),
+            ("** choose **", "SA", "RA", "Telesales operator", "Telesales operator - push sevice"),
             index=None,
         )
 
@@ -394,6 +395,75 @@ def main():
                 homesis_page.get_homesis_url()
                 homesis_page.access_user_managerment()
 
+    section_divided_caption_other_action = st.subheader(
+        "Close/Block Shopcode/Partner", divider="red"
+        )
+    
+    (
+        partner_tab,
+        shopcode_tab,
+    ) = st.tabs(
+        [
+            "PARTNER",
+            "SHOPCODE",
+
+        ]
+    )
+
+    with partner_tab:
+        text = "This action may have consequence, please carefully check your data before click execute button."
+        st.markdown(f"<div style='color: red; word-wrap: break-word;'>{text}</div>", unsafe_allow_html=True)
+
+        partner_codes_input_area = st.text_area("Input partner codes here")
+        partner_codes_input_area_list = partner_codes_input_area.split("\n")  # This return a list of partner code
+        filtered_list = list(filter(None, partner_codes_input_area_list))
+        clean_value_partner_codes_input_area_list = [item.strip() for item in filtered_list]
+                
+        option = st.selectbox(
+            "Choose action with partner",
+            ("Closed", "Blocked"),
+            index=None,
+        )
+
+        if option is not None  and partner_codes_input_area != '':
+            execute_action_with_btn = st.button("Execute action with partners", type="primary")
+
+            if execute_action_with_btn:
+                # Start Selenium
+                homesis_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+                homesis_page.access_sales_managerment()
+                count = 0
+                if option== "Closed":
+                    for index, partner_code in enumerate(clean_value_partner_codes_input_area_list):
+                    
+                        if len(partner_code) == 6:
+                            count += 1                          
+                            closed_partner(homesis_page=homesis_page, partner_code= partner_code)
+
+                            homesis_page.get_homesis_url()
+                            homesis_page.access_sales_managerment()
+                        else:
+                            st.write("Code này khác 6 kí tự - " + str(partner_code))
+                            
+                    st.write("Tool đã đóng " + str(count) + " partner code.")
+
+                elif option == "Blocked":
+                        st.text("This function still not available, please wait for the release")
+
+
+    with shopcode_tab:
+        text = "This action may have consequence, please carefully check your data before click execute button"
+        st.markdown(f"<div style='color: red; word-wrap: break-word;'>{text}</div>", unsafe_allow_html=True)
+        option = st.selectbox(
+            "Chose action with shopcode",
+            ("Closed", "Blocked"),
+            index=None,
+        )
+        shop_codes_input_area = st.text_area("Input shop codes here")
+        shop_codes_input_area_list = partner_codes_input_area.split("\n")  # This return a list of partner code 
+        st.button("Execute action with shops", type="primary")       
+
+    
 
 if __name__ == "__main__":
     main()

@@ -166,9 +166,9 @@ def change_role_in_bank(homesis_page: homesis, hr_code: str, role: str) -> bool:
     
     if homesis_page.click_details_button():
         homesis_page.fill_role_in_bank("** choose **")
-        time.sleep(1)
+        time.sleep(2)
         homesis_page.fill_role_in_bank(role)
-        time.sleep(1)
+        time.sleep(2)
         return homesis_page.click_save_button()
     
 
@@ -232,3 +232,19 @@ def update_id_number(homesis_page: homesis, hr_code: str, id_number: str) -> boo
     if homesis_page.click_details_button():
         homesis_page.update_id_number(id_number)
         return homesis_page.click_save_button()
+
+#this fuction is to closed shopcode on homesis
+def closed_partner(homesis_page:homesis, partner_code:str) -> bool:
+    """_summary_
+
+    Args:
+        homesis_page (homesis): _description_
+        partner_code (str): _description_
+
+    Returns:
+        bool: _description_
+    """
+    homesis_page.search_sales_code(sales_code = partner_code)
+
+    if homesis_page.click_specific_info_sales_button():
+        return homesis_page.click_on_closed_button()  

@@ -67,3 +67,11 @@ class web_element:
         self.send_keys(Keys.CONTROL + "a")
         self.send_keys(Keys.DELETE)
         return self.value.text == ''
+    
+    def get_value(self):
+        """get value of web element field
+
+        Returns:
+            value of field in text
+        """
+        return self.value.text    
