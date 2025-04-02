@@ -376,16 +376,14 @@ def tab5_exec():
                     st.write("OTP failed to verify!")
                     
                     #Reset session state after function complete
-                    st.session_state['getOTP_clicked'] = False
-                    st.session_state['confirmOTP_clicked'] = False
-                    st.session_state['timeOTP'] = None
+                    st.session_state.clear()
             
             # Run Reactivate Scripts if the verification returns valid       
             if st.session_state['confirmOTP_clicked'] and result is True:
                 st.write("OTP validated! Script will run now")
                 from time import sleep
                 # Trigger request to CBA Vault to get UMC password
-                cred = cyberark_get_credential_password("umc_admin", "6b14c3c96dc592c364f5a3ef642db09195550cb6")
+                cred = cyberark_get_credential_password(requestCredential="umc_admin", certThumbprint="6b14c3c96dc592c364f5a3ef642db09195550cb6")
                 sleep(5)
                 umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
                 # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
@@ -396,9 +394,6 @@ def tab5_exec():
                         st.write(row + ": Reactivation Failed")
                     umc_page.get_umc_url()
                 #Reset session state after function complete
-                st.session_state['getOTP_clicked'] = False
-                st.session_state['confirmOTP_clicked'] = False
-                st.session_state['timeOTP'] = None
                 st.session_state.clear()
 
 if __name__ == "__main__":

@@ -92,7 +92,7 @@ def remove_role_umc(umc_page: umc, login_name: str, role_list: list) -> bool:
         umc_page.click_details_button()
         umc_page.click_edit()
 
-        for index in range(len(role_list)):
+        for index, value in enumerate(role_list):
             time.sleep(0.5)
             role = role_list[index]
             time.sleep(0.5)
@@ -149,7 +149,7 @@ def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> boo
 
         # Remove Successful or not. Return TRUE if Updated Successfully
         return umc_page.verify_updated_role()
-
+    return False
 
 def sales_reactivate(umc_page: umc, hr_code: str) -> bool:
     """This is a funciton to clear user of all dismissal roles and add in HOMESIS and HOMESIS_USER.
@@ -248,14 +248,14 @@ def deactivate_ra(umc_page: umc, hr_code: str) -> bool:
 
 
 def check_inactive(umc_page: umc, hr_code: str) -> str:
-    """_summary_
+    """This function used to check if account is active or not
 
     Args:
-        umc_page (umc): _description_
-        hr_code (str): _description_
+        umc_page (umc): active UMC session
+        hr_code (str): target HR code
 
     Returns:
-        str: _description_
+        str: status result
     """
     
     umc_page.search_hrid(hrid=hr_code)

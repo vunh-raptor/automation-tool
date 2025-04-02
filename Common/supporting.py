@@ -128,7 +128,7 @@ def powershell_run_output(script_path:str) -> str:
         print(e)
         return ""
 
-def generate_OTP() -> TOTP:
+def generate_OTP():
     """This function used to generate OTP and send to MSteams
 
     Returns:
