@@ -4,16 +4,23 @@ from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
     deactivate_user_with_reason,
-    reactivate_user,
+    sales_reactivate,
     remove_role,
     roles_table,
     deactivate_ra,
     check_inactive,
     add_role_umc,
     remove_role_umc,
-    update_phone_number, update_name
+    update_phone_number,
+    update_name,
+    reactivate_account
 )
 
+from Common.supporting import (
+    cyberark_get_credential_password,
+    generate_OTP,
+    verify_OTP
+)
 
 def main():
     # Title of the page
@@ -28,11 +35,11 @@ def main():
     ldap_user = st.text_input("LDAP USERNAME")
     ldap_pw = st.text_input("LDAP PASSWORD", type="password")
 
-    # Choose action to take on BSL
+    # Choose action to take on UMC
     st.subheader("Choose your action on UMC", divider="red")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info"])
-
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts"])
+    
     with tab1:
         tab1_exec(ldap_user, ldap_pw)
     with tab2:
@@ -41,6 +48,8 @@ def main():
         tab3_exec(ldap_user, ldap_pw)
     with tab4:
         tab4_exec(ldap_user, ldap_pw)
+    with tab5:
+        tab5_exec()    
     pass
 
 def tab1_exec(ldap_user: str, ldap_pw: str):
@@ -110,7 +119,7 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
     # Read CSV Data
     if csv_upload is not None:
         csv_data = pd.read_csv(csv_upload, converters={"HR Code": str})
-        result_table = st.write(csv_data)
+        st.write(csv_data)
 
     # Activate Account
     if active_account_button:
@@ -146,7 +155,7 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
             reason = options[options.index(deact_reason)]
-            reactivate_user(umc_page=umc_page, hr_code=hr_code)
+            sales_reactivate(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
 
     if remove_dismissal_button:
@@ -268,7 +277,7 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
     # Read CSV Data
     if csv_upload is not None:
         csv_data = pd.read_csv(csv_upload, converters={"HR Code": str, "Phone": str})
-        result_table = st.write(csv_data)
+        st.write(csv_data)
 
     # Create columns for update UMC info
     update_phone_col, _, update_name_button_col = st.columns(3)
@@ -319,6 +328,73 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
             for i in range(len(list_error)):
                 table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
             umc_page.get_umc_url()
+
+def tab5_exec():
+    st.divider()
+    st.subheader("Reactivate accounts on UMC")
+    
+    reactivate_upload = st.file_uploader(
+    label="Reactivate HRcode List",
+    type=["csv"],
+    accept_multiple_files=False,
+    )
+
+    if reactivate_upload is not None:
+        # Show 5 rows of data on screen
+        data = pd.read_csv(reactivate_upload, converters={"HRcode": str})
+        st.subheader("First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
+        st.write(data.head(5))
+        # Initialize Session State to properly perform nested button
+        if 'getOTP_clicked' not in st.session_state:
+            st.session_state['getOTP_clicked'] = False
+        if 'confirmOTP_clicked' not in st.session_state:
+            st.session_state['confirmOTP_clicked'] = False
+        if 'timeOTP' not in st.session_state:
+            st.session_state['timeOTP'] = None
+            
+        # Building FrontEnd Button to get OTP
+        getOTP = st.button("Get OTP", use_container_width=True)
+        if getOTP:
+            st.session_state['getOTP_clicked'] = True
+            
+        if st.session_state['getOTP_clicked'] and getOTP:
+            # Trigger OTP Generation
+            st.session_state['timeOTP'] = generate_OTP()
+            
+        # Display OTP verification input if OTP was generated
+        if st.session_state['getOTP_clicked']:
+            #Building FrontEnd OTP Verification
+            col1, col2 = st.columns([1,2], vertical_alignment="bottom")
+            with col1:
+                OTP  = st.text_input("Verify OTP")
+            with col2:
+                confirm = st.button("Confirm OTP")
+            if confirm:
+                st.session_state['confirmOTP_clicked'] = True
+                result = verify_OTP(sourceOTP=st.session_state['timeOTP'], OTP=OTP)
+                if not result:
+                    st.write("OTP failed to verify!")
+                    
+                    #Reset session state after function complete
+                    st.session_state.clear()
+            
+            # Run Reactivate Scripts if the verification returns valid       
+            if st.session_state['confirmOTP_clicked'] and result is True:
+                st.write("OTP validated! Script will run now")
+                from time import sleep
+                # Trigger request to CBA Vault to get UMC password
+                cred = cyberark_get_credential_password(requestCredential="umc_admin", certThumbprint="6b14c3c96dc592c364f5a3ef642db09195550cb6")
+                sleep(5)
+                umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
+                # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+                # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+                for row in data['HRcode']:
+                    reactivation_status = reactivate_account(umc_page=umc_page, hr_code=row)
+                    if reactivation_status is False:
+                        st.write(row + ": Reactivation Failed")
+                    umc_page.get_umc_url()
+                #Reset session state after function complete
+                st.session_state.clear()
 
 if __name__ == "__main__":
     main()

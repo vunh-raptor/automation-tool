@@ -38,11 +38,11 @@ def add_role_in_bank_SA(homesis_page: homesis, hr_code: str, id_number: str, not
     homesis_page.search_hrid(hrid=hr_code)
 
     if homesis_page.click_details_button():                 
-        if homesis_page.fill_id_number(id_number) == False:
+        if homesis_page.fill_id_number(id_number) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ID_NUMBER)
-        if homesis_page.fill_role_in_bank(role) == False:
+        if homesis_page.fill_role_in_bank(role) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ROLE)
-        if homesis_page.fill_note(note) == False:
+        if homesis_page.fill_note(note) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_NOTE)
         if homesis_page.select_location(location):
             homesis_page.click_add_location()
@@ -51,7 +51,7 @@ def add_role_in_bank_SA(homesis_page: homesis, hr_code: str, id_number: str, not
             time.sleep(1)
         else:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FIND_LOCATION)
-        if homesis_page.chose_supervisor(supervisor_code) == False:
+        if homesis_page.chose_supervisor(supervisor_code) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FIND_SUP_CODE)
         if homesis_page.click_save_button():
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)
@@ -76,9 +76,9 @@ def add_role_in_bank_RA_MW(homesis_page: homesis, hr_code: str, note: str, role:
     homesis_page.search_hrid(hrid=hr_code)
 
     if homesis_page.click_details_button():
-        if homesis_page.fill_role_in_bank(role) == False:
+        if homesis_page.fill_role_in_bank(role) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ROLE)
-        if homesis_page.fill_note(note) == False:
+        if homesis_page.fill_note(note) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_NOTE)
         if homesis_page.click_save_button():
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)  
@@ -105,11 +105,11 @@ def add_role_in_bank_RA_FPT(homesis_page: homesis, hr_code: str, note: str, id_n
     homesis_page.search_hrid(hrid=hr_code)
 
     if homesis_page.click_details_button():
-        if homesis_page.fill_role_in_bank(role) == False:
+        if homesis_page.fill_role_in_bank(role) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ROLE)
-        if homesis_page.fill_id_number(id_number) == False:
+        if homesis_page.fill_id_number(id_number) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ID_NUMBER)
-        if homesis_page.fill_note(note) == False:
+        if homesis_page.fill_note(note) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_NOTE)
         if homesis_page.click_save_button():
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)
@@ -137,13 +137,13 @@ def add_role_in_bank_RA_New_Segment(homesis_page: homesis, hr_code: str, note: s
     homesis_page.search_hrid(hrid=hr_code)
 
     if homesis_page.click_details_button():
-        if homesis_page.fill_id_number(id_number) == False:
+        if homesis_page.fill_id_number(id_number) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ID_NUMBER)
-        if homesis_page.fill_role_in_bank(role) == False:
+        if homesis_page.fill_role_in_bank(role) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ROLE)
-        if homesis_page.fill_note(note) == False:
+        if homesis_page.fill_note(note) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_NOTE)
-        if homesis_page.chose_supervisor(supervisor_code) == False:
+        if homesis_page.chose_supervisor(supervisor_code) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FIND_SUP_CODE)
         if homesis_page.click_save_button():
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)    
@@ -189,7 +189,7 @@ def add_sup_code(homesis_page: homesis, hr_code: str, supervisor_code: str) -> l
     homesis_page.search_hrid(hrid=hr_code)
     
     if homesis_page.click_details_button():
-        if homesis_page.chose_supervisor(supervisor_code) == False:
+        if homesis_page.chose_supervisor(supervisor_code) is False:
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FIND_SUP_CODE)
         if homesis_page.click_save_button():
             list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)
@@ -215,6 +215,8 @@ def update_note(homesis_page: homesis, hr_code: str, note: str) -> bool:
         homesis_page.update_note(note)
         return homesis_page.click_save_button()
     
+    return False
+
 #This funtion is to update ID number
 def update_id_number(homesis_page: homesis, hr_code: str, id_number: str) -> bool:
     """This function will clear the current ID number and update with a new ID number
@@ -232,3 +234,5 @@ def update_id_number(homesis_page: homesis, hr_code: str, id_number: str) -> boo
     if homesis_page.click_details_button():
         homesis_page.update_id_number(id_number)
         return homesis_page.click_save_button()
+    
+    return False
