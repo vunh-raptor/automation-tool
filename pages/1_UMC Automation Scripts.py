@@ -4,22 +4,60 @@ from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
     deactivate_user_with_reason,
-    reactivate_user,
+    sales_reactivate,
     remove_role,
     roles_table,
     deactivate_ra,
     check_inactive,
     add_role_umc,
     remove_role_umc,
+    update_phone_number,
+    update_name,
+    reactivate_account
 )
 
+from Common.supporting import (
+    cyberark_get_credential_password,
+    generate_OTP,
+    verify_OTP
+)
 
 def main():
+    # Title of the page
+    st.title("UMC AUTOMATION HUB")
     """
     This script is used for automating user account activation, deactivation, and reactivation in UMC (User Management Console).
     It utilizes the Streamlit library for creating a user interface and Selenium for interacting with the UMC web application.
     The script allows the user to input LDAP credentials, upload a CSV file containing HR codes or login names, and perform various actions on the user accounts.
     The available actions include activating accounts, deactivating accounts with a chosen reason, and reactivating accounts.
+    """
+    # Username & Password Input
+    ldap_user = st.text_input("LDAP USERNAME")
+    ldap_pw = st.text_input("LDAP PASSWORD", type="password")
+
+    # Choose action to take on UMC
+    st.subheader("Choose your action on UMC", divider="red")
+
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts"])
+    
+    with tab1:
+        tab1_exec(ldap_user, ldap_pw)
+    with tab2:
+        tab2_exec(ldap_user, ldap_pw)
+    with tab3:
+        tab3_exec(ldap_user, ldap_pw)
+    with tab4:
+        tab4_exec(ldap_user, ldap_pw)
+    with tab5:
+        tab5_exec()    
+    pass
+
+def tab1_exec(ldap_user: str, ldap_pw: str):
+    """tab1_exec execute Deactivate LDAP account
+
+        Args:
+            username (str): str value of login name
+            password (str): str value of password
     """
 
     # Radio button options
@@ -39,9 +77,6 @@ def main():
         "Remove all roles + Add SALES_AGENT_AF_DEACTIVE",
     ]
 
-    # Username & Password Input
-    ldap_user = st.text_input("LDAP USERNAME")
-    ldap_pw = st.text_input("LDAP PASSWORD", type="password")
 
     # List HR Code/Login Name Input
     csv_upload = st.file_uploader(
@@ -84,7 +119,7 @@ def main():
     # Read CSV Data
     if csv_upload is not None:
         csv_data = pd.read_csv(csv_upload, converters={"HR Code": str})
-        result_table = st.write(csv_data)
+        st.write(csv_data)
 
     # Activate Account
     if active_account_button:
@@ -120,7 +155,7 @@ def main():
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
             reason = options[options.index(deact_reason)]
-            reactivate_user(umc_page=umc_page, hr_code=hr_code)
+            sales_reactivate(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
 
     if remove_dismissal_button:
@@ -149,46 +184,8 @@ def main():
             deactivate_ra(umc_page=umc_page, hr_code=hr_code)
             umc_page.get_umc_url()
 
-    # check active account UMC
-    st.divider()
-    st.text("Check status account UMC")
-    hr_code_input_area = st.text_area("Input Hr code here")
-    hr_code_input_area_lines = hr_code_input_area.split(
-        "\n"
-    )  # This return a list of text area value
-    check_status_btn = st.button("Check status account", type="primary")
 
-    if check_status_btn:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        # Initial dataframe saving user status
-        data_user_status = pd.DataFrame(columns=["Hr Code", "Status"])
-
-        # Loop through list of user input in text area
-        for index in range(len(hr_code_input_area_lines)):
-            hr_code = hr_code_input_area_lines[index]
-            # check if user is inactive
-            if check_inactive(umc_page=umc_page, hr_code=hr_code) == False:
-                data_user_status = data_user_status._append(
-                    {"Hr Code": hr_code, "Status": "Inactive"}, ignore_index=True
-                )
-            else:
-                data_user_status = data_user_status._append(
-                    {"Hr Code": hr_code, "Status": "Active"}, ignore_index=True
-                )
-            umc_page.get_umc_url()
-
-        # display result
-        left, rigth = st.columns(2, vertical_alignment="top")
-        left.subheader(":red[Total result]")
-        left.text("Successfully run " + str(len(hr_code_input_area_lines)) + " users")
-        left.write(data_user_status)
-        data_user_status_inactive = data_user_status[
-            data_user_status["Status"] == "Inactive"
-        ]
-        rigth.subheader(":red[Inactive user]")
-        rigth.write(data_user_status_inactive)
-
+def tab2_exec(ldap_user: str, ldap_pw: str):
     st.divider()
     st.subheader("Add role for multiple user")
     left, rigth = st.columns(2, vertical_alignment="top")
@@ -209,9 +206,9 @@ def main():
                 login_name=login_name,
                 role_list=role_umc_input_area_list,
             )
-            
+
             umc_page.get_umc_url()
-    
+
     st.divider()
     st.subheader("Remove role for multiple user")
     left, rigth = st.columns(2, vertical_alignment="top")
@@ -232,9 +229,172 @@ def main():
                 login_name=login_name,
                 role_list=role_umc_input_area_list,
             )
-            
+
             umc_page.get_umc_url()
 
+def tab3_exec(ldap_user: str, ldap_pw: str):
+    # check active account UMC
+    st.divider()
+    st.text("Check status account UMC")
+    hr_code_input_area = st.text_area("Input Hr code or HCG here")
+    hr_code_input_area_lines = hr_code_input_area.split(
+        "\n"
+    )  # This return a list of text area value
+    check_status_btn = st.button("Check status account", type="primary")
+
+    if check_status_btn:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        data_user_status_list = []
+        # Initial dataframe saving user status
+        for hr_code in hr_code_input_area_lines:
+            status = check_inactive(umc_page=umc_page, hr_code=hr_code)
+            data_user_status_list.append({"Hr Code": hr_code, "Status": status})  # Add to the list
+            umc_page.get_umc_url()  # Move outside the loop if it doesn't depend on hr_code
+
+        # Create the DataFrame *outside* the loop (only once):
+        data_user_status = pd.DataFrame(data_user_status_list)  # <--- DataFrame created here
+
+        # display result
+        left, rigth = st.columns(2, vertical_alignment="top")
+        left.subheader(":red[Total result]")
+        left.text("Successfully run " + str(len(hr_code_input_area_lines)) + " users")
+        left.write(data_user_status)
+        data_user_status_inactive = data_user_status[
+            data_user_status["Status"] == "Inactive"
+            ]
+        rigth.subheader(":red[Inactive user]")
+        rigth.write(data_user_status_inactive)
+
+
+def tab4_exec(ldap_user: str, ldap_pw: str):
+    # List HR Code/Login Name Input
+    csv_upload = st.file_uploader(
+        label="HR Code/Login Name List",
+        type=["csv", "txt"],
+        accept_multiple_files=False,
+    )
+    # Read CSV Data
+    if csv_upload is not None:
+        csv_data = pd.read_csv(csv_upload, converters={"HR Code": str, "Phone": str})
+        st.write(csv_data)
+
+    # Create columns for update UMC info
+    update_phone_col, _, update_name_button_col = st.columns(3)
+
+    # Phone Button on the left Column
+    update_phone_button = update_phone_col.button("Update phone")
+
+    # Update number on Right Column
+    update_name_button = update_name_button_col.button("Update name")
+
+    # Update info account UMC
+    if update_phone_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+        # Loop through CSV & Search for HR Code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            phone_number = row["Phone"]
+            list_error = update_phone_number(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                phone_number=phone_number
+            )
+            left.write(list_error)  # Keep this line for debugging, but it might print None
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
+            umc_page.get_umc_url()
+
+    if update_name_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+        # loop through CSV & Search for HR code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            first_name = row["First Name"]
+            last_name = row["Last Name"]
+            list_error = update_name(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                first_name=first_name,
+                last_name=last_name
+            )
+            left.write(list_error) # Keep this line for debugging, but it might print None
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
+            umc_page.get_umc_url()
+
+def tab5_exec():
+    st.divider()
+    st.subheader("Reactivate accounts on UMC")
+    
+    reactivate_upload = st.file_uploader(
+    label="Reactivate HRcode List",
+    type=["csv"],
+    accept_multiple_files=False,
+    )
+
+    if reactivate_upload is not None:
+        # Show 5 rows of data on screen
+        data = pd.read_csv(reactivate_upload, converters={"HRcode": str})
+        st.subheader("First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
+        st.write(data.head(5))
+        # Initialize Session State to properly perform nested button
+        if 'getOTP_clicked' not in st.session_state:
+            st.session_state['getOTP_clicked'] = False
+        if 'confirmOTP_clicked' not in st.session_state:
+            st.session_state['confirmOTP_clicked'] = False
+        if 'timeOTP' not in st.session_state:
+            st.session_state['timeOTP'] = None
+            
+        # Building FrontEnd Button to get OTP
+        getOTP = st.button("Get OTP", use_container_width=True)
+        if getOTP:
+            st.session_state['getOTP_clicked'] = True
+            
+        if st.session_state['getOTP_clicked'] and getOTP:
+            # Trigger OTP Generation
+            st.session_state['timeOTP'] = generate_OTP()
+            
+        # Display OTP verification input if OTP was generated
+        if st.session_state['getOTP_clicked']:
+            #Building FrontEnd OTP Verification
+            col1, col2 = st.columns([1,2], vertical_alignment="bottom")
+            with col1:
+                OTP  = st.text_input("Verify OTP")
+            with col2:
+                confirm = st.button("Confirm OTP")
+            if confirm:
+                st.session_state['confirmOTP_clicked'] = True
+                result = verify_OTP(sourceOTP=st.session_state['timeOTP'], OTP=OTP)
+                if not result:
+                    st.write("OTP failed to verify!")
+                    
+                    #Reset session state after function complete
+                    st.session_state.clear()
+            
+            # Run Reactivate Scripts if the verification returns valid       
+            if st.session_state['confirmOTP_clicked'] and result is True:
+                st.write("OTP validated! Script will run now")
+                from time import sleep
+                # Trigger request to CBA Vault to get UMC password
+                cred = cyberark_get_credential_password(requestCredential="umc_admin", certThumbprint="6b14c3c96dc592c364f5a3ef642db09195550cb6")
+                sleep(5)
+                umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
+                # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+                # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+                for row in data['HRcode']:
+                    reactivation_status = reactivate_account(umc_page=umc_page, hr_code=row)
+                    if reactivation_status is False:
+                        st.write(row + ": Reactivation Failed")
+                    umc_page.get_umc_url()
+                #Reset session state after function complete
+                st.session_state.clear()
 
 if __name__ == "__main__":
     main()

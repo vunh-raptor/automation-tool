@@ -122,26 +122,26 @@ class JiraSession(Session):
         result = self.get_request(endpoint=endpoint)
         return filter_id_from_response(result)
     
-    def get_linked_ticket_id(self, ticket_key: str) -> list[str]:
-        """
-        Retrieves all ID of linked tickets to the specified issue - 
-        Args:
-            ticket_key (str): key/ID of the ticket
+    # def get_linked_ticket_id(self, ticket_key: str) -> list[str]:
+    #     """
+    #     Retrieves all ID of linked tickets to the specified issue - 
+    #     Args:
+    #         ticket_key (str): key/ID of the ticket
 
-        Returns:
-            list[str]: an ID list of related tickets
-        """
-        approval_id_list = []
+    #     Returns:
+    #         list[str]: an ID list of related tickets
+    #     """
+    #     approval_id_list = []
         
-        endpoint = self._BROWSE_TICKET.format(ticket_key=ticket_key) + self._ISSUELINKS
+    #     endpoint = self._BROWSE_TICKET.format(ticket_key=ticket_key) + self._ISSUELINKS
         
-        response = self.get_request(endpoint=endpoint)
+    #     response = self.get_request(endpoint=endpoint)
         
-        result = filter_linked_tickets_from_response(response)
+    #     result = filter_linked_tickets_from_response(response)
         
-        for key in result.keys():
-            approval_id_list.append(str(key))
-        return approval_id_list
+    #     for key in result.keys():
+    #         approval_id_list.append(str(key))
+    #     return approval_id_list
     
     # def get_affected_account_username(self, ticket_key:str) -> str:
     #     """

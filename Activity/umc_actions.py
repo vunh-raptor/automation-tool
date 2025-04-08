@@ -1,5 +1,6 @@
 from Sites.umc import umc
 from Common.constant.error_message import ErrorMessage
+from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
 import time
 
@@ -40,10 +41,10 @@ def add_homesis_homesis_user(umc_page: umc, hr_code: str) -> bool:
     """
     umc_page.search_hrid(hrid=hr_code)
     # Get account Status before running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
         umc_page.click_edit()
 
@@ -55,19 +56,16 @@ def add_homesis_homesis_user(umc_page: umc, hr_code: str) -> bool:
 
         # Clicking Save
         umc_page.click_save()
-
-        # Check if Update sucessfully
-        umc_page.verify_updated_role()
     return umc_page.verify_updated_role()
 
-def add_role_umc(umc_page: umc, login_name: str, role_list:list) -> bool:
 
+def add_role_umc(umc_page: umc, login_name: str, role_list: list) -> bool:
     umc_page.search_hrid(hrid=login_name)
     # Get account Status before running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
         umc_page.click_edit()
 
@@ -81,23 +79,20 @@ def add_role_umc(umc_page: umc, login_name: str, role_list:list) -> bool:
 
         # Clicking Save
         umc_page.click_save()
-
-        # Check if Update sucessfully
-        umc_page.verify_updated_role()
     return umc_page.verify_updated_role()
 
-def remove_role_umc(umc_page: umc, login_name: str, role_list:list) -> bool:
 
+def remove_role_umc(umc_page: umc, login_name: str, role_list: list) -> bool:
     umc_page.search_hrid(hrid=login_name)
     # Get account Status before running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
         umc_page.click_edit()
 
-        for index in range(len(role_list)):
+        for index, value in enumerate(role_list):
             time.sleep(0.5)
             role = role_list[index]
             time.sleep(0.5)
@@ -107,10 +102,8 @@ def remove_role_umc(umc_page: umc, login_name: str, role_list:list) -> bool:
 
         # Clicking Save
         umc_page.click_save()
-
-        # Check if Update sucessfully
-        umc_page.verify_updated_role()
     return umc_page.verify_updated_role()
+
 
 def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> bool:
     """This is a funciton to clear user of all roles and add in only the dismissal role.
@@ -126,10 +119,10 @@ def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> boo
     umc_page.search_hrid(hrid=hr_code)
 
     # Get account status beore running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
         umc_page.click_edit()
 
@@ -155,10 +148,10 @@ def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> boo
         umc_page.click_save()
 
         # Remove Successful or not. Return TRUE if Updated Successfully
-        return umc_page.verify_updated_role
+        return umc_page.verify_updated_role()
+    return False
 
-
-def reactivate_user(umc_page: umc, hr_code: str) -> bool:
+def sales_reactivate(umc_page: umc, hr_code: str) -> bool:
     """This is a funciton to clear user of all dismissal roles and add in HOMESIS and HOMESIS_USER.
 
     Args:
@@ -172,10 +165,10 @@ def reactivate_user(umc_page: umc, hr_code: str) -> bool:
     umc_page.search_hrid(hrid=hr_code)
 
     # Get account status beore running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
         umc_page.click_edit()
 
@@ -185,19 +178,19 @@ def reactivate_user(umc_page: umc, hr_code: str) -> bool:
             if umc_page.select_owned_role(role=dismissal):
                 umc_page.click_remove_role()
 
-        #Add Homesis and HOMESIS_USER role
+        # Add Homesis and HOMESIS_USER role
         umc_page.select_role("HOMESIS")
-        umc_page.click_add_role()
-        umc_page.select_role("HOMESIS_USER")
         umc_page.click_add_role()
 
         # Clicking Save
         umc_page.click_save()
 
         # Remove Successful or not. Return TRUE if Updated Successfully
-        return umc_page.verify_updated_role
+        return umc_page.verify_updated_role()
 
-def remove_role(umc_page: umc, hr_code:str, role:str) -> bool:
+    return False
+
+def remove_role(umc_page: umc, hr_code: str, role: str) -> bool:
     """
     Removes a specified role from a user in the UMC page.
 
@@ -213,13 +206,13 @@ def remove_role(umc_page: umc, hr_code:str, role:str) -> bool:
     Returns:
         bool: True if the role was successfully removed, False otherwise.
     """
-    
+
     umc_page.search_hrid(hrid=hr_code)
     # Get account Status before running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
         umc_page.click_edit()
 
@@ -230,12 +223,10 @@ def remove_role(umc_page: umc, hr_code:str, role:str) -> bool:
         # Clicking Save
         umc_page.click_save()
 
-        # Check if Update sucessfully
-        umc_page.verify_updated_role()
-    
     return umc_page.verify_updated_role()
 
-def deactivate_ra(umc_page: umc, hr_code:str) -> bool:
+
+def deactivate_ra(umc_page: umc, hr_code: str) -> bool:
     """_Deactive a specific RA account in UMC page
 
     Args:
@@ -247,22 +238,123 @@ def deactivate_ra(umc_page: umc, hr_code:str) -> bool:
     """
     umc_page.search_hrid(hrid=hr_code)
     # Get account Status before running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()
 
     # Check if account is Inactive
-    if umc_page.get_search_account_status() != "Inactive":
+    if account_status != "Inactive":
         umc_page.click_details_button()
     # Click deactive button
     return umc_page.click_deactivate()
 
 
-def check_inactive(umc_page: umc, hr_code:str) -> bool:
+def check_inactive(umc_page: umc, hr_code: str) -> str:
+    """This function used to check if account is active or not
+
+    Args:
+        umc_page (umc): active UMC session
+        hr_code (str): target HR code
+
+    Returns:
+        str: status result
+    """
+    
     umc_page.search_hrid(hrid=hr_code)
     # Get account Status before running
-    umc_page.get_search_account_status()
+    account_status = umc_page.get_search_account_status()  # Store the status
+    # if status == "Inactive":
+    #     return "Inactive"
+    # elif status == "Active":  # Use elif for efficiency
+    #     return "Active"
+    # elif status == "Account not found":
+    #     return "Not Found"
+    # else:
+    #     return "Not Found"
+    if account_status == "Account not found":
+        return "Not found"
+    return account_status
 
+def update_phone_number(umc_page: umc, hr_code: str, phone_number: str) -> list:
+    """_summary_
+
+    Args:
+        umc_page (umc): _description_
+        hr_code (str): _description_
+        phone_number (str): _description_
+
+    Returns:
+        list: _description_
+    """
+    
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    account_status = umc_page.get_search_account_status()
+    # Get account Status before running
     # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update phone actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_phone(phone_number=phone_number)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error
+
+def update_name(umc_page: umc, hr_code: str, first_name: str, last_name: str) -> list:
+    """_summary_
+
+    Args:
+        umc_page (umc): active umc session
+        hr_code (str): _description_
+        first_name (str): _description_
+        last_name (str): _description_
+
+    Returns:
+        list(str): _description_
+    """
+    
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    account_status = umc_page.get_search_account_status()
+    # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update name actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_name(first_name=first_name, last_name=last_name)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error
+
+def reactivate_account(umc_page: umc, hr_code: str) -> bool:
+    """This function reactivate the target account. Ex: Deactivated -> Activate
+
+    Args:
+        umc_page (umc): active umc session
+        hr_code (str): the target account/hr code
+    """
+    umc_page.search_hrid(hrid=hr_code)
     if umc_page.get_search_account_status() == "Inactive":
-        return False
+        # Account is found and not in Inactive status, start reactivate process
+        try:
+            umc_page.click_details_button()
+            umc_page.click_activate()
+            umc_page.click_edit()
+            umc_page.select_role(role="NON_HOSEL_USER")
+            umc_page.click_add_role()
+            return umc_page.click_save()
+        except Exception as e:
+            print("Exception at: " + str(e))
+            return False
     else:
         return True
