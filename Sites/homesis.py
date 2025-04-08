@@ -107,8 +107,10 @@ class homesis(Page):
             bool: True if login is successful, False otherwise.
         """
         if (ldap_user is not None) & (ldap_pw is not None):
-            self.search_by_xpath(self.ldap_user_input, delay=0.5).send_keys(ldap_user)
-            self.search_by_xpath(self.ldap_pw_input, delay=0.5).send_keys(ldap_pw)
+            self.search_by_xpath(self.ldap_user_input,
+                                 delay=0.5).send_keys(ldap_user)
+            self.search_by_xpath(self.ldap_pw_input,
+                                 delay=0.5).send_keys(ldap_pw)
             return self.search_by_xpath(self.login_button, delay=0.5).click()
         else:
             logging.critical("Missing Username or Password.")
@@ -121,7 +123,8 @@ class homesis(Page):
         Returns:
             bool: True if access is successful, False otherwise.
         """
-        self.search_by_xpath(self.homesis_tab_people_management, delay=0.5).click()
+        self.search_by_xpath(
+            self.homesis_tab_people_management, delay=0.5).click()
         return self.search_by_xpath(self.homesis_tab_user_management, delay=0.5).click()
 
     def access_sales_managerment(self) -> bool:
@@ -174,8 +177,10 @@ class homesis(Page):
         """
         if self.wait_element_to_visible(self.partner_management_id_field) and (sales_code != ''):
             self.search_by_xpath(self.sales_code_input, delay=0.5).clearText()
-            self.search_by_xpath(self.sales_code_input, delay=0.5).send_keys(sales_code)
-            self.search_by_xpath(self.partner_code_search_button, delay=0.5).click()
+            self.search_by_xpath(self.sales_code_input,
+                                 delay=0.5).send_keys(sales_code)
+            self.search_by_xpath(
+                self.partner_code_search_button, delay=0.5).click()
 
     def click_specific_info_sales_button(self) -> bool:
         """Clicks the specific info sales button if it is visible.
@@ -283,15 +288,18 @@ class homesis(Page):
             bool: True if the operation is successful, False otherwise.
         """
         self.search_by_xpath(self.homesis_supervisors_tab, delay=0.5).click()
-        self.search_by_xpath(self.homesis_supervisor_choose_button, delay=0.5).click()
+        self.search_by_xpath(
+            self.homesis_supervisor_choose_button, delay=0.5).click()
         self.search_by_xpath(
             self.homesis_supervisors_attached_button, delay=0.5
         ).click()
         self.search_by_xpath(self.homesis_supervisors_code_text, delay=0.5).send_keys(
             supervisor_code
         )
-        self.search_by_xpath(self.homesis_supervisors_search_btn, delay=0.5).click()
-        self.search_by_xpath(self.homesis_supervisors_checkbox, delay=0.5).click()
+        self.search_by_xpath(
+            self.homesis_supervisors_search_btn, delay=0.5).click()
+        self.search_by_xpath(
+            self.homesis_supervisors_checkbox, delay=0.5).click()
         return self.search_by_xpath(
             self.homesis_supervisors_attached_button, delay=0.5
         ).click()
@@ -306,7 +314,8 @@ class homesis(Page):
         Returns:
             bool: True if the location is selected, False otherwise.
         """
-        suffix = self.location_palette_suffix.replace("replaced_text", location)
+        suffix = self.location_palette_suffix.replace(
+            "replaced_text", location)
         xpath = self.location_palette + suffix
         return self.search_by_xpath(xpath=xpath, delay=0.5).click()
 
@@ -326,10 +335,10 @@ class homesis(Page):
             bool: true if the confirm alert is click ok successfully
         """
         try:
-            # nen chon dieu kien la button do dang bam duoc
             if self.wait_element_to_visible(self.contact_group_button):
                 if self.wait_element_to_visible(self.change_status_to_close_button):
-                    self.search_by_xpath(self.change_status_to_close_button).click()
+                    self.search_by_xpath(
+                        self.change_status_to_close_button).click()
                     self.accept_the_alert_pop_up()
                     return True
         except TimeoutException:
