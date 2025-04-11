@@ -7,3 +7,5 @@ streamlit_quill
 streamlit_ace
 pywin32
 openpyxl
+pyotp
+msteamsapi

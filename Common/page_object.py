@@ -4,9 +4,10 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from Common.web_element import web_element
-
-
 
 class page_object:
     def __init__(
@@ -20,11 +21,13 @@ class page_object:
         """
 
         self.default_delay = 0.2
-        self.default_timeout = 5
+        self.default_timeout = 10
 
         self.path = path
+
         self.profile = webdriver.ChromeService(executable_path=self.path)
-        self.driver = webdriver.Chrome(service=self.profile)
+        self.driver = webdriver.Chrome(service=self.profile)      
+        self.wait = WebDriverWait(self.driver, self.default_timeout)
 
     def headless(self) -> None:
         """This is to generate headless session for chromedriver"""
@@ -69,6 +72,19 @@ class page_object:
             return web_element(flag=found)
         else:
             return web_element(found, result)
+        
+    def wait_element_to_visible(self, xpath: str) -> bool:
+        """this function is wait for the element to be visible in the web page
+
+        Args:
+            xpath (str): direct xpath point to specific element
+
+        Returns:
+            bool: return true if the element is visible
+        """
+        # Wait until the element is visible
+        element = self.wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
+        return element.is_displayed()
 
     def click_by_xpath(self, xpath: str, timeout: int = 5, delay: float = 0.2) -> bool:
         """Search an object by XPATH, and click it.
@@ -196,3 +212,13 @@ class page_object:
                 logging.warning(warning)
                 sleep(delay)
                 continue
+    
+    def accept_the_alert_pop_up(self) -> None:
+        """ 
+        this function is to accept the alert pop up on the webpage
+        """
+
+        WebDriverWait(self.driver, self.default_timeout).until(EC.alert_is_present())
+        alert = Alert(self.driver)
+        alert.accept()
+        

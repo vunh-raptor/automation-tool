@@ -28,6 +28,7 @@ class umc(Page):
     detail_button = '//*[contains(text(),"Detail")]'
     block_button = '//button//*[contains(text(),"Block")]'
     deactivate_button = '//button//*[contains(text(),"Deactivate")]'
+    activate_button = '//button//*[contains(text(),"Activate")]'
     edit_button = '//button//*[contains(text(),"Edit")]'
     search_result_status = '//div[@data-better-uid="search-results:status"]'
 
@@ -75,7 +76,7 @@ class umc(Page):
         if (ldap_user is not None) & (ldap_pw is not None):
             self.search_by_xpath(self.ldap_user_input, delay=0.5).send_keys(ldap_user)
             self.search_by_xpath(self.ldap_pw_input, delay=0.5).send_keys(ldap_pw)
-            return self.search_by_xpath(self.login_button, delay=0.5).click()
+            return self.search_by_xpath(self.login_button, delay=1.5).click()
         else:
             logging.critical("Missing Username or Password.")
             return False
@@ -129,6 +130,20 @@ class umc(Page):
             bool: False if the button is clicked, True otherwise.
         """
         button = self.search_by_xpath(self.deactivate_button)
+        if button.flag:
+            button.click()
+            return False
+        else:
+            self.get_umc_url()
+            return True
+
+    def click_activate(self) -> bool:
+        """This method clicks the activate button
+
+        Returns:
+            bool: status of the action
+        """
+        button = self.search_by_xpath(self.activate_button)
         if button.flag:
             button.click()
             return False

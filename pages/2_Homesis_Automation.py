@@ -13,6 +13,7 @@ from Activity.homesis_actions import (
     add_sup_code,
     update_note,
     update_id_number,
+    closed_partner,
 )
 
 
@@ -60,14 +61,16 @@ def main():
         st.markdown("Required field:")
         st.text("HR Code, ID number, Notes, Sup Code, Role SA, Location")
         # Add role in bank SA button
-        add_role_in_bank_SA_btn = st.button("Add role-in-bank SA", type="primary")
+        add_role_in_bank_SA_btn = st.button(
+            "Add role-in-bank SA", type="primary")
         # Add role in bank SA for Homesis page
         if add_role_in_bank_SA_btn:
             # Start Selenium
             homesis_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
             homesis_page.access_user_managerment()
             table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-            left, rigth = st.columns([0.4, 0.6], vertical_alignment="top", gap= "large")            
+            left, rigth = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
             # Loop through CSV & Search for HR Code and take data from CSV
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
@@ -87,8 +90,9 @@ def main():
                 )
                 left.write(list_error)
                 for i in range(len(list_error)):
-                    table_of_error.loc[len(table_of_error)]= [hr_code,list_error[i].split("-", 1)[1]]
-                    
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+
                 homesis_page.get_homesis_url()
                 homesis_page.access_user_managerment()
             rigth.write("Run through " + str(csv_data.__len__()) + " users")
@@ -105,14 +109,16 @@ def main():
         st.text("HR Code, Notes, Role RA")
 
         # Add role in bank RA MW button
-        add_role_in_bank_RA_MW_btn = st.button("Add role-in-bank RA MW", type="primary")
+        add_role_in_bank_RA_MW_btn = st.button(
+            "Add role-in-bank RA MW", type="primary")
         # Add role in bank RA MW for Homesis page
         if add_role_in_bank_RA_MW_btn:
             # Start Selenium
             homesis_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
             homesis_page.access_user_managerment()
             table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-            left, rigth = st.columns([0.4, 0.6], vertical_alignment="top", gap= "large")
+            left, rigth = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
             # Loop through CSV & Search for HR Code and take data from CSV
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
@@ -127,7 +133,8 @@ def main():
                 left.write(list_of_error)
                 for i in range(len(list_of_error)):
                     table_of_error = table_of_error._append(
-                        {"Hr Code": hr_code, "Steps": list_of_error[i].split("-", 1)[1]},
+                        {"Hr Code": hr_code,
+                            "Steps": list_of_error[i].split("-", 1)[1]},
                         ignore_index=True,
                     )
                 homesis_page.get_homesis_url()
@@ -154,7 +161,8 @@ def main():
             homesis_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
             homesis_page.access_user_managerment()
             table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-            left, rigth = st.columns([0.4, 0.6], vertical_alignment="top", gap= "large")
+            left, rigth = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
             # Loop through CSV & Search for HR Code and take data from CSV
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
@@ -171,7 +179,8 @@ def main():
                 left.write(list_error)
                 for i in range(len(list_error)):
                     table_of_error = table_of_error._append(
-                        {"Hr Code": hr_code, "Steps": list_error[i].split("-", 1)[1]},
+                        {"Hr Code": hr_code,
+                            "Steps": list_error[i].split("-", 1)[1]},
                         ignore_index=True,
                     )
                 homesis_page.get_homesis_url()
@@ -183,7 +192,7 @@ def main():
                     table_of_error["Steps"]
                     != " Click Save button successfully"
                 ]
-            )    
+            )
 
     with tab4:
         st.markdown("Required field:")
@@ -198,7 +207,8 @@ def main():
             homesis_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
             homesis_page.access_user_managerment()
             table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-            left, rigth = st.columns([0.4, 0.6], vertical_alignment="top", gap= "large")
+            left, rigth = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
             # Loop through CSV & Search for HR Code and take data from CSV
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
@@ -217,7 +227,8 @@ def main():
                 left.write(list_error)
                 for i in range(len(list_error)):
                     table_of_error = table_of_error._append(
-                        {"Hr Code": hr_code, "Steps": list_error[i].split("-", 1)[1]},
+                        {"Hr Code": hr_code,
+                            "Steps": list_error[i].split("-", 1)[1]},
                         ignore_index=True,
                     )
                 homesis_page.get_homesis_url()
@@ -263,7 +274,8 @@ def main():
         # Read CSV Data
         if csv_upload_hrcode_change_role_in_bank is not None:
             csv_data_change_role_in_bank = pd.read_csv(
-                csv_upload_hrcode_change_role_in_bank, converters={"HR Code": str}
+                csv_upload_hrcode_change_role_in_bank, converters={
+                    "HR Code": str}
             )
 
         # Select the option for change the role in bank
@@ -304,7 +316,8 @@ def main():
         st.markdown(css.css, unsafe_allow_html=True)
 
         # Change role in bank button
-        change_role_in_bank_btn = st.button("Change Role-in-Bank", type="primary")
+        change_role_in_bank_btn = st.button(
+            "Change Role-in-Bank", type="primary")
         # Change role in bank action
         if change_role_in_bank_btn:
             # Start Selenium
@@ -322,7 +335,8 @@ def main():
                 homesis_page.access_user_managerment()
 
     with add_sup_code_tab:
-        st.text(":red[Please make sure these user are not assign any sup code before]")
+        st.text(
+            ":red[Please make sure these user are not assign any sup code before]")
         # Insert excel file for add sup code
         csv_upload_homesis_add_sup_code = st.file_uploader(
             label="Please input list user and their sup code",
@@ -369,7 +383,8 @@ def main():
         # Read CSV Data
         if csv_upload_homesis_update_note is not None:
             csv_data_update_note = pd.read_csv(
-                csv_upload_homesis_update_note, converters={"HR Code": str, "Note": str}
+                csv_upload_homesis_update_note, converters={
+                    "HR Code": str, "Note": str}
             )
             result_table = st.write(csv_data_update_note)
 
@@ -384,7 +399,8 @@ def main():
             for index, row in csv_data_update_note.iterrows():
                 hr_code = row["HR Code"]
                 note = row["Notes"]
-                update_note(homesis_page=homesis_page, hr_code=hr_code, note=note)
+                update_note(homesis_page=homesis_page,
+                            hr_code=hr_code, note=note)
                 homesis_page.get_homesis_url()
                 homesis_page.access_user_managerment()
 
@@ -420,6 +436,73 @@ def main():
                 )
                 homesis_page.get_homesis_url()
                 homesis_page.access_user_managerment()
+
+    section_divided_caption_other_action = st.subheader(
+        "Close/Block Shopcode/Partner", divider="red"
+    )
+
+    (
+        partner_tab,
+        shopcode_tab,
+    ) = st.tabs(
+        [
+            "PARTNER",
+            "SHOPCODE",
+
+        ]
+    )
+
+    with partner_tab:
+        text = "This action may have consequence, please carefully check your data before click execute button."
+        st.markdown(
+            f"<div style='color: red; word-wrap: break-word;'>{text}</div>", unsafe_allow_html=True)
+
+        partner_codes_input_area = st.text_area("Input partner codes here")
+        partner_codes_input_area_list = partner_codes_input_area.split(
+            "\n")  # This return a list of partner code
+        filtered_list = list(filter(None, partner_codes_input_area_list))
+        clean_value_partner_codes_input_area_list = [
+            item.strip() for item in filtered_list]
+
+        option = st.selectbox(
+            "Choose action with partner",
+            ("Closed", "Blocked"),
+            index=None,
+        )
+
+        if option == "Closed" and partner_codes_input_area != '':
+            execute_action_with_btn = st.button(
+                "Execute action with partners", type="primary")
+
+            if execute_action_with_btn:
+                # Start Selenium
+                homesis_page = login_to_site(
+                    ldap_user=ldap_user, ldap_pw=ldap_pw)
+                homesis_page.access_sales_managerment()
+                count = 0
+                if option == "Closed":
+                    for index, partner_code in enumerate(clean_value_partner_codes_input_area_list):
+
+                        if len(partner_code) == 6:
+                            count += 1
+                            closed_partner(homesis_page=homesis_page,
+                                           partner_code=partner_code)
+
+                            homesis_page.get_homesis_url()
+                            homesis_page.access_sales_managerment()
+                        else:
+                            st.write("Code này khác 6 kí tự - " +
+                                     str(partner_code))
+
+                    st.write("Tool đã đóng " + str(count) + " partner code.")
+
+        if option == "Blocked":
+            st.text("This action is not available")
+
+    with shopcode_tab:
+        text = "This feature remains in its testing phase. Due to the potential for significant adverse impacts, it is currently unavailable."
+        st.markdown(
+            f"<div style='color: red; word-wrap: break-word;'>{text}</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
