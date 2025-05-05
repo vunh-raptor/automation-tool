@@ -9,3 +9,4 @@ pywin32
 openpyxl
 pyotp
 msteamsapi
+pytest

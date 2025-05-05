@@ -27,7 +27,7 @@ class JiraSession(Session):
     _JQL_SEARCH = "search?jql="
     _TRANSITION = "issue/{ticket_key}/transitions"
     _COMMENT = "issue/{ticket_key}/comment"
-    
+
     # PARAMs append for JIRA API
     _GENERAL_PARAM = "?fields={param}"
     _ISSUELINKS = "?fields=issuelinks"
@@ -42,7 +42,7 @@ class JiraSession(Session):
         ${optional_message}
     }
     """)
-    
+
     _COMMENT_BODY = Template(
         """{
             "body":"${message}"
@@ -50,7 +50,7 @@ class JiraSession(Session):
         ${optional_message}
         """
     )
-    
+
     _INTERNAL_COMMENT_BODY = Template(
         """{
         "body": "${message}",
@@ -80,7 +80,8 @@ class JiraSession(Session):
         endpoint = self._BROWSE_TICKET.format(ticket_key=ticket_key)
         if kwargs:
             for value in kwargs.values():
-                endpoint = endpoint + self._GENERAL_PARAM.format(param=value) + "&"
+                endpoint = endpoint + \
+                    self._GENERAL_PARAM.format(param=value) + "&"
             # By adding ? in the _GENERAL_PARAM, it's required to remove the excess ? in the API request cURL
             endpoint = endpoint.replace("&?", "&")
         else:
@@ -105,7 +106,7 @@ class JiraSession(Session):
     #     result = self.get_request(endpoint=endpoint)
 
     #     return JiraTicketList(rawdata=result.text)
-    
+
     def get_available_transition_id(self, ticket_key: str):
         """
         Retrieves all transitions the specified issue can perform.
@@ -121,10 +122,10 @@ class JiraSession(Session):
 
         result = self.get_request(endpoint=endpoint)
         return filter_id_from_response(result)
-    
+
     # def get_linked_ticket_id(self, ticket_key: str) -> list[str]:
     #     """
-    #     Retrieves all ID of linked tickets to the specified issue - 
+    #     Retrieves all ID of linked tickets to the specified issue -
     #     Args:
     #         ticket_key (str): key/ID of the ticket
 
@@ -132,17 +133,17 @@ class JiraSession(Session):
     #         list[str]: an ID list of related tickets
     #     """
     #     approval_id_list = []
-        
+
     #     endpoint = self._BROWSE_TICKET.format(ticket_key=ticket_key) + self._ISSUELINKS
-        
+
     #     response = self.get_request(endpoint=endpoint)
-        
+
     #     result = filter_linked_tickets_from_response(response)
-        
+
     #     for key in result.keys():
     #         approval_id_list.append(str(key))
     #     return approval_id_list
-    
+
     # def get_affected_account_username(self, ticket_key:str) -> str:
     #     """
     #     Retrieves affected account username in the ticket
@@ -155,7 +156,7 @@ class JiraSession(Session):
     #     response = self.browse_ticket(ticket_key=ticket_key, params=JiraConst.customfield.AFFECTED_ACCOUNT)
     #     username = response.get_affected_account_username()
     #     return username
-        
+
     def send_transition(self, ticket_key: str, transition_id: str) -> Response:
         """
         Sends a transition request to the JIRA server.
@@ -171,8 +172,9 @@ class JiraSession(Session):
 
         endpoint = self._TRANSITION.format(ticket_key=ticket_key)
 
-        #payload = self._TRANSITION_BODY.format(transition_id=transition_id, fields_info=fields_info)
-        payload = json.loads(self._TRANSITION_BODY.substitute(transition_id=transition_id))
+        # payload = self._TRANSITION_BODY.format(transition_id=transition_id, fields_info=fields_info)
+        payload = json.loads(self._TRANSITION_BODY.substitute(
+            transition_id=transition_id))
 
         result = self.post_request(endpoint=endpoint, payload=payload)
         return result
@@ -180,26 +182,28 @@ class JiraSession(Session):
     def add_comment(self, ticket_key: str, message: str, internal: bool = False) -> Response:
         """
         Input a comment to the designated ticket
-        
+
         Params:
             ticket_key (str): the key of the ticket that need to input comment
             message (str): Message that needed to be input
             internal (bool): Value define if whether the comment is Internal or not. True mean Internal
-        
+
         Returns:
             result: The result of add comment request
         """
         endpoint = self._COMMENT.format(ticket_key=ticket_key)
         payload = ""
         if internal:
-             # Using json loads parse the text string into a valid JSON object that Jira Server can understand, avoid having response 400 
-            payload = json.loads(self._INTERNAL_COMMENT_BODY.substitute(message=message))
+            # Using json loads parse the text string into a valid JSON object that Jira Server can understand, avoid having response 400
+            payload = json.loads(
+                self._INTERNAL_COMMENT_BODY.substitute(message=message))
         else:
-            payload = json.loads(self._COMMENT_BODY.substitute(message=message))
-        
+            payload = json.loads(
+                self._COMMENT_BODY.substitute(message=message))
+
         result = self.post_request(endpoint=endpoint, payload=payload)
         return result
-        
+
     def extract_comment(self, ticket_key: str):
         """
         Extract all comment of the designated ticket
@@ -207,7 +211,7 @@ class JiraSession(Session):
         Args:
             ticket_key (str): _description_
         """
-        
+
     def send_classify(self, ticket_key: str) -> Response:
         """This action to send classification action to the ticket
 
@@ -217,16 +221,17 @@ class JiraSession(Session):
         Returns:
             Response: response from request call
         """
-        
-        endpoint = self._TRANSITION.format(ticket_key=ticket_key)
 
-        #payload = self._TRANSITION_BODY.format(transition_id=transition_id, fields_info=fields_info)
-        payload = json.loads(self._TRANSITION_BODY.substitute(transition_id="911"))
+        # endpoint = self._TRANSITION.format(ticket_key=ticket_key)
 
-        result = self.post_request(endpoint=endpoint, payload=payload)
-        return result
-    
-    def send_progress(self, ticket_key:str) -> Response:
+        # #payload = self._TRANSITION_BODY.format(transition_id=transition_id, fields_info=fields_info)
+        # payload = json.loads(self._TRANSITION_BODY.substitute(transition_id="911"))
+
+        # result = self.post_request(endpoint=endpoint, payload=payload)
+
+        return self.send_transition(ticket_key=ticket_key, transition_id="911")
+
+    def send_progress(self, ticket_key: str) -> Response:
         """This action to send Start Progress action to the ticket
 
         Args:
@@ -235,15 +240,9 @@ class JiraSession(Session):
         Returns:
             Response: Response from request call
         """
-        
-        endpoint = self._TRANSITION.format(ticket_key=ticket_key)
-        
-        payload = json.loads(self._TRANSITION_BODY.substitute(transition_id="21"))
+        return self.send_transition(ticket_key=ticket_key, transition_id="21")
 
-        result = self.post_request(endpoint=endpoint, payload=payload)
-        return result
-    
-    def send_resolution(self, ticket_key:str, solution:str) -> Response:
+    def send_resolution(self, ticket_key: str, solution: str) -> Response:
         """This action to send Resolve action to the ticket
 
         Args:
@@ -252,24 +251,26 @@ class JiraSession(Session):
 
         Returns:
             Response: Response from request call
-        """       
-         
+        """
+
         endpoint = self._TRANSITION.format(ticket_key=ticket_key)
 
         # Solution payload in the Rest request, append to the _TRANSITION_BODY
         payload = self._TRANSITION_BODY.substitute(transition_id="721", optional_message=""",
         "fields":
             {""" +
-            f'\"{JiraConst.customfield.SOLUTION}\":' + f'\"{solution}\"' + """
+                                                   f'\"{JiraConst.customfield.SOLUTION}\":' + f'\"{solution}\"' + """
             }
         """)
-        
+
         print(payload)
         payload = json.loads(payload)
         result = self.post_request(endpoint=endpoint, payload=payload)
         return result
-    
-#--------------------------------------------------------------------------------------------------------    
+
+# --------------------------------------------------------------------------------------------------------
+
+
 class JiraTicket:
     """
     Represents a JIRA ticket.
@@ -329,13 +330,13 @@ class JiraTicket:
         Retrieves the impact of the ticket.
         """
         return self.get_fields(JiraConst.customfield.IMPACT)
-    
+
     def get_summary(self) -> str:
         """
         Retrieves the title/summary of the ticket
         """
         return self.get_fields(JiraConst.customfield.SUMMARY)
-    
+
     def get_resolution(self) -> str:
         """
         Retrieves the resolution of the ticket
@@ -344,16 +345,16 @@ class JiraTicket:
             return str(self.ticket_data["fields"][JiraConst.customfield.RESOLUTION]['name'])
         except TypeError:
             pass
-    
+
     def get_affected_account(self) -> str:
         """
         Retrieves the affected account of the ticket
         """
         return self.get_fields(JiraConst.customfield.AFFECTED_ACCOUNT)
-    
+
     def get_affected_account_username(self) -> str:
         return str(self.get_affected_account()[0]).split("(")[0]
-    
+
     def get_edit_account_option(self) -> str:
         """_summary_
 
@@ -361,7 +362,7 @@ class JiraTicket:
             str: _description_
         """
         return self.ticket_data["fields"][JiraConst.customfield.EDIT_ACCOUNT_OPTION]['value']
-    
+
     # def get_linked_ticket_id(self) -> list[str]:
     #     return_list = []
     #     for fields in self.ticket_data['fields']['issuelinks']:

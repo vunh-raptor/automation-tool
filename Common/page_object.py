@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Common.web_element import web_element
 
+
 class page_object:
     def __init__(
         self,
@@ -26,7 +27,7 @@ class page_object:
         self.path = path
 
         self.profile = webdriver.ChromeService(executable_path=self.path)
-        self.driver = webdriver.Chrome(service=self.profile)      
+        self.driver = webdriver.Chrome(service=self.profile)
         self.wait = WebDriverWait(self.driver, self.default_timeout)
 
     def headless(self) -> None:
@@ -37,8 +38,13 @@ class page_object:
         op.add_argument("--window-size=1920,1080")
         self.driver = webdriver.Chrome(service=service, options=op)
 
+    def end_process(self) -> None:
+        """This is to end the current selenium process
+        """
+        self.driver.quit()
+
     def search_by_xpath(
-        self, xpath: str, timeout: int = 5, delay: float = 0.2
+        self, xpath: str, timeout: int = 10, delay: float = 0.2
     ) -> web_element:
         """Search an object by XPATH, return a web_element object.
 
@@ -72,7 +78,7 @@ class page_object:
             return web_element(flag=found)
         else:
             return web_element(found, result)
-        
+
     def wait_element_to_visible(self, xpath: str) -> bool:
         """this function is wait for the element to be visible in the web page
 
@@ -83,7 +89,8 @@ class page_object:
             bool: return true if the element is visible
         """
         # Wait until the element is visible
-        element = self.wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
+        element = self.wait.until(
+            EC.visibility_of_element_located((By.XPATH, xpath)))
         return element.is_displayed()
 
     def click_by_xpath(self, xpath: str, timeout: int = 5, delay: float = 0.2) -> bool:
@@ -97,7 +104,8 @@ class page_object:
         Returns:
             bool: True if the element is clicked, and False if there's no such element found.
         """
-        element = self.search_by_xpath(xpath=xpath, timeout=timeout, delay=delay)
+        element = self.search_by_xpath(
+            xpath=xpath, timeout=timeout, delay=delay)
         return element.click()
 
     def send_keys_by_xpath(
@@ -114,7 +122,8 @@ class page_object:
         Returns:
             bool: True if the keys are sent, and False if there's no such element found.
         """
-        element = self.search_by_xpath(xpath=xpath, timeout=timeout, delay=delay)
+        element = self.search_by_xpath(
+            xpath=xpath, timeout=timeout, delay=delay)
         return element.send_keys(keys=keys)
 
     def get(self, url: str):
@@ -124,7 +133,7 @@ class page_object:
             url (str): the desired URL.
         """
         self.driver.get(url=url)
-            
+
     def select_dropdown_value(
         self, xpath: str, value: str, timeout: int = 5, delay: float = 0.2
     ) -> None:
@@ -153,7 +162,7 @@ class page_object:
                 logging.warning(warning)
                 sleep(delay)
                 continue
-            
+
     def select_dropdown_by_visible_text(
         self, xpath: str, value: str, timeout: int = 5, delay: float = 0.2
     ) -> None:
@@ -182,7 +191,7 @@ class page_object:
                 logging.warning(warning)
                 sleep(delay)
                 continue
-            
+
     def select_dropdown_by_contains_text(
         self, xpath: str, value: str, timeout: int = 5, delay: float = 0.2
     ) -> None:
@@ -212,13 +221,13 @@ class page_object:
                 logging.warning(warning)
                 sleep(delay)
                 continue
-    
+
     def accept_the_alert_pop_up(self) -> None:
         """ 
         this function is to accept the alert pop up on the webpage
         """
 
-        WebDriverWait(self.driver, self.default_timeout).until(EC.alert_is_present())
+        WebDriverWait(self.driver, self.default_timeout).until(
+            EC.alert_is_present())
         alert = Alert(self.driver)
         alert.accept()
-        
