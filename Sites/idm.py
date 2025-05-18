@@ -10,7 +10,7 @@ class idm(Page):
         Page (_type_): This is a wrapper for Selenium driver
 
     Returns:
-        _type_: A customed BSL object    
+        _type_: A customed BSL object
     """
 
     # Base URL
@@ -26,6 +26,7 @@ class idm(Page):
     idm_view_user_modify = '//ul[@id="mp-1"]//li//a[@title="Modify User"]'
     idm_seacrh_user_dropdown_menu = '//*[@id="Filter.0.Field"]'
     idm_search_user_by_login_name_option = '//*[@id="Filter.0.Field"]//option[@value="idmLoginName02"]'
+    idm_search_user_by_hr_code_option = '//*[@id="Filter.0.Field"]//option[@value="%USER_ID%"]'
     idm_input_search_value_field = '//*[@name="Filter.0.Value"]'
     idm_search_button = '//*[@id="imh_1"]'
     idm_search_button_in_modify_page = '//*[@id="imh_5"]'
@@ -35,6 +36,12 @@ class idm(Page):
     idm_user_select_button = '//*[@id="ext-gen49"]'
 
     # user information
+    idm_user_hr_code = '//*[@id="HCGDefaultUserSearch"]/tbody/tr[3]//td[2]'
+    idm_user_login_name = '//*[@id="HCGDefaultUserSearch"]/tbody/tr[3]//td[3]'
+    idm_user_organization = '//*[@id="HCGDefaultUserSearch"]/tbody/tr[3]//td[6]'
+    idm_user_position = '//*[@id="HCGDefaultUserSearch"]/tbody/tr[3]//td[7]'
+    idm_user_email = '//*[@id="HCGDefaultUserSearch"]/tbody/tr[3]//td[8]'
+    idm_user_status = '//*[@id="HCGDefaultUserSearch"]/tbody/tr[3]//td[9]'
 
     # Function
 
@@ -64,7 +71,7 @@ class idm(Page):
         return self.search_by_xpath(self.idm_manage_user, delay=0.5).click()
 
     def click_view_user_extended(self) -> bool:
-        """_summary_
+        """This function is to click the view user extended tab
 
         Returns:
             bool: _description_
@@ -97,6 +104,14 @@ class idm(Page):
         """
         return self.search_by_xpath(self.idm_search_user_by_login_name_option).click()
 
+    def choose_search_user_by_hr_code_option(self) -> bool:
+        """_summary_
+
+        Returns:
+            bool: _description_
+        """
+        return self.search_by_xpath(self.idm_search_user_by_hr_code_option).click()
+
     def input_search_value_field(self, idm_login_name) -> bool:
         """_summary_
 
@@ -106,6 +121,24 @@ class idm(Page):
         self.search_by_xpath(
             self.idm_input_search_value_field, delay=1).clearText()
         return self.search_by_xpath(self.idm_input_search_value_field, delay=0.5).send_keys(idm_login_name)
+
+    def get_user_hr_code(self):
+        return self.search_by_xpath(self.idm_user_hr_code, delay=0.5).get_value()
+
+    def get_user_login_name(self):
+        return self.search_by_xpath(self.idm_user_login_name, delay=0.5).get_value()
+
+    def get_user_organization(self):
+        return self.search_by_xpath(self.idm_user_organization, delay=0.5).get_value()
+
+    def get_user_position(self):
+        return self.search_by_xpath(self.idm_user_position, delay=0.5).get_value()
+
+    def get_user_email(self):
+        return self.search_by_xpath(self.idm_user_email, delay=0.5).get_value()
+
+    def get_user_status(self):
+        return self.search_by_xpath(self.idm_user_status, delay=0.5).get_value()
 
     def click_idm_search_button(self) -> bool:
         """_summary_

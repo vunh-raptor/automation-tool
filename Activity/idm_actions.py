@@ -21,12 +21,24 @@ def search_user_by_login_name(idm_page: idm, user_login_name: str) -> bool:
     return idm_page.click_idm_search_button()
 
 
+def search_user_by_hr_code(idm_page: idm, user_login_name: str) -> bool:
+    time.sleep(1)
+    idm_page.click_view_user_extended()
+    time.sleep(1)
+    idm_page.click_choose_search_user_type_of_info()
+    idm_page.choose_search_user_by_hr_code_option()
+    time.sleep(1)
+    idm_page.input_search_value_field(user_login_name)
+    time.sleep(1)
+    return idm_page.click_idm_search_button()
+
+
 def search_user_in_modify(idm_page: idm, user_login_name: str) -> bool:
-    time.sleep(0.5)
+    time.sleep(1)
     idm_page.click_view_user_modify()
     time.sleep(1)
     idm_page.input_search_value_field(user_login_name)
-    time.sleep(0.5)
+    time.sleep(1)
     return idm_page.click_idm_search_button_in_modify_page()
 
 
