@@ -85,7 +85,7 @@ class homesis(Page):
 
     def get_homesis_url(self) -> None:
         """
-        This method navigates to the UMC URL.
+        This method navigates to the homesis URL.
         """
         self.get(self.homesis_url)
 
