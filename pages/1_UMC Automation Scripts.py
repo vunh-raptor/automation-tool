@@ -5,12 +5,12 @@ from Activity.umc_actions import (
     add_homesis_homesis_user,
     deactivate_user_with_reason,
     sales_reactivate,
-    remove_role,
+    remove_single_role,
     roles_table,
     deactivate_ra,
-    check_inactive,
+    check_account_status,
     add_role_umc,
-    remove_role_umc,
+    remove_multi_roles_umc,
     update_phone_number,
     update_name,
     reactivate_account
@@ -21,6 +21,7 @@ from Common.supporting import (
     generate_OTP,
     verify_OTP
 )
+
 
 def main():
     # Title of the page
@@ -38,8 +39,9 @@ def main():
     # Choose action to take on UMC
     st.subheader("Choose your action on UMC", divider="red")
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts"])
-    
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+        ["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts", "Emergency Role Add"])
+
     with tab1:
         tab1_exec(ldap_user, ldap_pw)
     with tab2:
@@ -49,8 +51,11 @@ def main():
     with tab4:
         tab4_exec(ldap_user, ldap_pw)
     with tab5:
-        tab5_exec()    
+        tab5_exec()
+    with tab6:
+        tab6_exec()
     pass
+
 
 def tab1_exec(ldap_user: str, ldap_pw: str):
     """tab1_exec execute Deactivate LDAP account
@@ -76,7 +81,6 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         "Remove all roles + Add SALES_AGENT_TEMP_DEACTIVE",
         "Remove all roles + Add SALES_AGENT_AF_DEACTIVE",
     ]
-
 
     # List HR Code/Login Name Input
     csv_upload = st.file_uploader(
@@ -166,7 +170,7 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
             role = roles_table[options.index(deact_reason)]
-            remove_role(umc_page=umc_page, hr_code=hr_code, role=role)
+            remove_single_role(umc_page=umc_page, hr_code=hr_code, role=role)
             umc_page.get_umc_url()
 
     st.divider()
@@ -190,9 +194,11 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
     st.subheader("Add role for multiple user")
     left, rigth = st.columns(2, vertical_alignment="top")
     login_name_input_area = left.text_area("Input login name here")
-    login_name_input_area_list = login_name_input_area.split("\n")  # This return a list
+    login_name_input_area_list = login_name_input_area.split(
+        "\n")  # This return a list
     role_umc_input_area = rigth.text_area("Input roles here")
-    role_umc_input_area_list = role_umc_input_area.split("\n")  # This return a list
+    role_umc_input_area_list = role_umc_input_area.split(
+        "\n")  # This return a list
     add_role_umc_btn = st.button("Add roles UMC", type="primary")
 
     if add_role_umc_btn:
@@ -203,7 +209,7 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
             login_name = login_name_input_area_list[index]
             add_role_umc(
                 umc_page=umc_page,
-                login_name=login_name,
+                hr_code=login_name,
                 role_list=role_umc_input_area_list,
             )
 
@@ -213,9 +219,11 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
     st.subheader("Remove role for multiple user")
     left, rigth = st.columns(2, vertical_alignment="top")
     login_name_input_area = left.text_area("Input login name to remove here")
-    login_name_input_area_list = login_name_input_area.split("\n")  # This return a list
+    login_name_input_area_list = login_name_input_area.split(
+        "\n")  # This return a list
     role_umc_input_area = rigth.text_area("Input remove roles here")
-    role_umc_input_area_list = role_umc_input_area.split("\n")  # This return a list
+    role_umc_input_area_list = role_umc_input_area.split(
+        "\n")  # This return a list
     remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
 
     if remove_role_umc_btn:
@@ -224,13 +232,14 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
 
         for index in range(len(login_name_input_area_list)):
             login_name = login_name_input_area_list[index]
-            remove_role_umc(
+            remove_multi_roles_umc(
                 umc_page=umc_page,
-                login_name=login_name,
+                hr_code=login_name,
                 role_list=role_umc_input_area_list,
             )
 
             umc_page.get_umc_url()
+
 
 def tab3_exec(ldap_user: str, ldap_pw: str):
     # check active account UMC
@@ -248,21 +257,24 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
         data_user_status_list = []
         # Initial dataframe saving user status
         for hr_code in hr_code_input_area_lines:
-            status = check_inactive(umc_page=umc_page, hr_code=hr_code)
-            data_user_status_list.append({"Hr Code": hr_code, "Status": status})  # Add to the list
+            status = check_account_status(umc_page=umc_page, hr_code=hr_code)
+            data_user_status_list.append(
+                {"Hr Code": hr_code, "Status": status})  # Add to the list
             umc_page.get_umc_url()  # Move outside the loop if it doesn't depend on hr_code
 
         # Create the DataFrame *outside* the loop (only once):
-        data_user_status = pd.DataFrame(data_user_status_list)  # <--- DataFrame created here
+        # <--- DataFrame created here
+        data_user_status = pd.DataFrame(data_user_status_list)
 
         # display result
         left, rigth = st.columns(2, vertical_alignment="top")
         left.subheader(":red[Total result]")
-        left.text("Successfully run " + str(len(hr_code_input_area_lines)) + " users")
+        left.text("Successfully run " +
+                  str(len(hr_code_input_area_lines)) + " users")
         left.write(data_user_status)
         data_user_status_inactive = data_user_status[
             data_user_status["Status"] == "Inactive"
-            ]
+        ]
         rigth.subheader(":red[Inactive user]")
         rigth.write(data_user_status_inactive)
 
@@ -276,7 +288,8 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
     )
     # Read CSV Data
     if csv_upload is not None:
-        csv_data = pd.read_csv(csv_upload, converters={"HR Code": str, "Phone": str})
+        csv_data = pd.read_csv(csv_upload, converters={
+                               "HR Code": str, "Phone": str})
         st.write(csv_data)
 
     # Create columns for update UMC info
@@ -293,7 +306,8 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
         # Start Selenium
         umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
         table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+        left, right = st.columns(
+            [0.4, 0.6], vertical_alignment="top", gap="large")
         # Loop through CSV & Search for HR Code
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
@@ -303,16 +317,19 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
                 hr_code=hr_code,
                 phone_number=phone_number
             )
-            left.write(list_error)  # Keep this line for debugging, but it might print None
+            # Keep this line for debugging, but it might print None
+            left.write(list_error)
             for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
+                table_of_error.loc[len(table_of_error)] = [
+                    hr_code, list_error[i].split("-", 1)[1]]
             umc_page.get_umc_url()
 
     if update_name_button:
         # Start Selenium
         umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
         table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+        left, right = st.columns(
+            [0.4, 0.6], vertical_alignment="top", gap="large")
         # loop through CSV & Search for HR code
         for index, row in csv_data.iterrows():
             hr_code = row["HR Code"]
@@ -324,25 +341,29 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
                 first_name=first_name,
                 last_name=last_name
             )
-            left.write(list_error) # Keep this line for debugging, but it might print None
+            # Keep this line for debugging, but it might print None
+            left.write(list_error)
             for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [hr_code,list_error[i].split("-",1)[1]]
+                table_of_error.loc[len(table_of_error)] = [
+                    hr_code, list_error[i].split("-", 1)[1]]
             umc_page.get_umc_url()
+
 
 def tab5_exec():
     st.divider()
     st.subheader("Reactivate accounts on UMC")
-    
+
     reactivate_upload = st.file_uploader(
-    label="Reactivate HRcode List",
-    type=["csv"],
-    accept_multiple_files=False,
+        label="Reactivate HRcode List",
+        type=["csv"],
+        accept_multiple_files=False,
     )
 
     if reactivate_upload is not None:
         # Show 5 rows of data on screen
         data = pd.read_csv(reactivate_upload, converters={"HRcode": str})
-        st.subheader("First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
+        st.subheader(
+            "First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
         st.write(data.head(5))
         # Initialize Session State to properly perform nested button
         if 'getOTP_clicked' not in st.session_state:
@@ -351,50 +372,74 @@ def tab5_exec():
             st.session_state['confirmOTP_clicked'] = False
         if 'timeOTP' not in st.session_state:
             st.session_state['timeOTP'] = None
-            
+
         # Building FrontEnd Button to get OTP
         getOTP = st.button("Get OTP", use_container_width=True)
         if getOTP:
             st.session_state['getOTP_clicked'] = True
-            
+
         if st.session_state['getOTP_clicked'] and getOTP:
             # Trigger OTP Generation
             st.session_state['timeOTP'] = generate_OTP()
-            
+
         # Display OTP verification input if OTP was generated
         if st.session_state['getOTP_clicked']:
-            #Building FrontEnd OTP Verification
-            col1, col2 = st.columns([1,2], vertical_alignment="bottom")
+            # Building FrontEnd OTP Verification
+            col1, col2 = st.columns([1, 2], vertical_alignment="bottom")
             with col1:
-                OTP  = st.text_input("Verify OTP")
+                OTP = st.text_input("Verify OTP")
             with col2:
                 confirm = st.button("Confirm OTP")
             if confirm:
                 st.session_state['confirmOTP_clicked'] = True
-                result = verify_OTP(sourceOTP=st.session_state['timeOTP'], OTP=OTP)
+                result = verify_OTP(
+                    sourceOTP=st.session_state['timeOTP'], OTP=OTP)
                 if not result:
                     st.write("OTP failed to verify!")
-                    
-                    #Reset session state after function complete
+
+                    # Reset session state after function complete
                     st.session_state.clear()
-            
-            # Run Reactivate Scripts if the verification returns valid       
+
+            # Run Reactivate Scripts if the verification returns valid
             if st.session_state['confirmOTP_clicked'] and result is True:
                 st.write("OTP validated! Script will run now")
                 from time import sleep
                 # Trigger request to CBA Vault to get UMC password
-                cred = cyberark_get_credential_password(requestCredential="umc_admin", certThumbprint="6b14c3c96dc592c364f5a3ef642db09195550cb6")
+                cred = cyberark_get_credential_password()
                 sleep(5)
                 umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
                 # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
                 # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
                 for row in data['HRcode']:
-                    reactivation_status = reactivate_account(umc_page=umc_page, hr_code=row)
+                    reactivation_status = reactivate_account(
+                        umc_page=umc_page, hr_code=row)
                     if reactivation_status is False:
                         st.write(row + ": Reactivation Failed")
                     umc_page.get_umc_url()
-                #Reset session state after function complete
+                # Reset session state after function complete
                 st.session_state.clear()
+
+
+def tab6_exec():
+    st.divider()
+    st.subheader("Emergency add role on UMC")
+
+    hr_code_text_area = st.text_area("Input Hr codes or HCGs")
+    if hr_code_text_area is not None:
+        hr_code_input_area_lines = hr_code_text_area.split(
+            "\n"
+        )
+        emergency = st.button("Perform emergency add role", type="primary")
+        if emergency:
+            cred = cyberark_get_credential_password()
+            umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
+            for code in hr_code_input_area_lines:
+                add_role_status = add_role_umc(
+                    umc_page=umc_page, hr_code=code, role_list=["NON_HOSEL_USER"])
+                if add_role_status is False:
+                    st.write(code + ": Emergency add role Failed")
+                umc_page.get_umc_url()
+
 
 if __name__ == "__main__":
     main()

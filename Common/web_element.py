@@ -1,7 +1,7 @@
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.keys import Keys
 import logging
-from Common.db_connection import DBConnection as db
+
 
 class web_element:
     def __init__(self, flag: bool, value: any = None) -> None:
@@ -11,7 +11,7 @@ class web_element:
             flag (bool): True if this object hold any WebElement object inside, and vice versa
             value (any): This is intend to contain the WebElement object
         """
-        
+
         self.flag = flag
         if flag:
             self.value = value
@@ -55,7 +55,6 @@ class web_element:
         else:
             logging.critical("There is no element to send keys to.")
             return False
-        
 
     def get_child_element(self) -> int:
         """Return the number of child elements of the element
@@ -63,15 +62,16 @@ class web_element:
         Returns:
             int: Number of the child element. Return 0 if there's no element found
         """
+
     def clearText(self) -> bool:
         self.send_keys(Keys.CONTROL + "a")
         self.send_keys(Keys.DELETE)
         return self.value.text == ''
-    
+
     def get_value(self):
         """get value of web element field
 
         Returns:
             value of field in text
         """
-        return self.value.text    
+        return self.value.text

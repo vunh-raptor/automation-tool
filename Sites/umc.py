@@ -61,7 +61,6 @@ class umc(Page):
         """
         self.get(self.umc_url)
 
-
     def login_with_data(self, ldap_user: str, ldap_pw: str) -> bool:
         """
         This method logs in with the provided LDAP user and password.
@@ -74,12 +73,17 @@ class umc(Page):
             bool: True if login is successful, False otherwise.
         """
         if (ldap_user is not None) & (ldap_pw is not None):
-            self.search_by_xpath(self.ldap_user_input, delay=0.5).send_keys(ldap_user)
-            self.search_by_xpath(self.ldap_pw_input, delay=0.5).send_keys(ldap_pw)
-            return self.search_by_xpath(self.login_button, delay=1.5).click()
+            self.search_by_xpath(self.ldap_user_input,
+                                 delay=1.5).send_keys(ldap_user)
+            self.search_by_xpath(self.ldap_pw_input,
+                                 delay=1.5).send_keys(ldap_pw)
+            return self.search_by_xpath(self.login_button, delay=3.5).click()
         else:
             logging.critical("Missing Username or Password.")
             return False
+
+    def stop(self) -> None:
+        self.end_process()
 
     def logout(self) -> None:
         """
@@ -97,15 +101,28 @@ class umc(Page):
         self.search_by_xpath(self.hrid_input).send_keys(hrid)
         self.search_by_xpath(self.hrid_search_button).click()
 
+    def update_info(self, field: str, data: str) -> bool:
+        """
+        This method update information by field
+
+        Args:
+            field (str): the field needed to be updated
+            data (str): the new data
+
+        Returns:
+            bool: status of the action
+        """
+        update_field = self.search_by_xpath(xpath=field)
+        update_field.click()
+        update_field.clearText()
+        return update_field.send_keys(data)
+
     def click_details_button(self) -> None:
         """
         This method clicks the details button.
         """
 
         self.search_by_xpath(self.detail_button).click()
-
-
-
 
     def click_block_button(self) -> bool:
         """
@@ -236,24 +253,10 @@ class umc(Page):
         """
         role_selected_field = self.search_by_xpath(self.first_owned_role)
         if role_selected_field.flag:
-            element = role_selected_field.click()
+            role_selected_field.click()
             return True
         else:
             return False
-
-    def verify_updated_role(self) -> bool:
-        """
-        This method verifies if the role is updated.
-
-        Returns:
-            bool: True if the role is updated, False otherwise.
-        """
-        updated_notif = self.search_by_xpath(self.feedback_panel)
-
-        if updated_notif.flag:
-            text = updated_notif.return_element().text
-            return ("has been updated" in text)
-        return False
 
     def verify_updated_info(self) -> bool:
         """
@@ -279,7 +282,7 @@ class umc(Page):
         Returns:
             bool: True if the role is selected, False otherwise.
         """
-        suffix = self.role_palette_suffix.replace("replaced_text",role)
+        suffix = self.role_palette_suffix.replace("replaced_text", role)
         xpath = self.role_palette + suffix
 
         return self.search_by_xpath(xpath=xpath).click()
@@ -294,39 +297,7 @@ class umc(Page):
         Returns:
             bool: True if the role is selected, False otherwise.
         """
-        role_suffix = self.role_palette_suffix.replace("replaced_text",role)
+        role_suffix = self.role_palette_suffix.replace("replaced_text", role)
         xpath = self.owned_role_prefixed + role_suffix
         owned_role = self.search_by_xpath(xpath=xpath)
         return owned_role.click()
-
-    def update_phone(self, phone_number: str) -> bool:
-        """
-        This method selects phone/mobile
-        clear old phone and send new phone number
-        """
-        # Chose detail phone and input new value
-        phone_number_field = self.search_by_xpath(xpath=self.detail_phone)
-        phone_number_field.click()
-        phone_number_field.clearText()
-        phone_number_field.send_keys(phone_number)
-        # Chose detail Mobile and input new value
-        mobile_number_field = self.search_by_xpath(xpath=self.detail_mobile)
-        mobile_number_field.click()
-        mobile_number_field.clearText()
-        mobile_number_field.send_keys(phone_number)
-
-    def update_name(self, first_name: str, last_name: str) -> bool:
-        """
-        This method select first name and last name
-        Clear old first name/last name and add new first name/last name
-        """
-        # Chose detail name and input new value
-        detail_name_field = self.search_by_xpath(xpath=self.first_name)
-        detail_name_field.click()
-        detail_name_field.clearText()
-        detail_name_field.send_keys(first_name)
-        # Chose detail surname and input new value
-        detail_surname_field = self.search_by_xpath(xpath=self.last_name)
-        detail_surname_field.click()
-        detail_surname_field.clearText()
-        detail_surname_field.send_keys(last_name)
