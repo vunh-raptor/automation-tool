@@ -29,7 +29,6 @@ class page_object:
 
         self.profile = webdriver.ChromeService(executable_path=self.path)
         self.driver = webdriver.Chrome(service=self.profile)
-        self.driver = webdriver.Chrome(service=self.profile)
         self.wait = WebDriverWait(self.driver, self.default_timeout)
 
     def headless(self) -> None:
