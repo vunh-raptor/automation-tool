@@ -2,6 +2,7 @@ import time
 from Sites.bsl import bsl
 from Common.constant.error_message import ErrorMessage
 
+
 def login_to_site(ldap_user: str, ldap_pw: str) -> bsl:
     """This is a funciton to login to Homesis with the provided username and password
 
@@ -17,6 +18,7 @@ def login_to_site(ldap_user: str, ldap_pw: str) -> bsl:
     bsl_page.login_with_data(ldap_user=ldap_user, ldap_pw=ldap_pw)
     return bsl_page
 
+
 def create_bank_branch_single(bsl_page: bsl, bank_name: str, bank_branch_name: str, region: str, district: str, bank_branch_code: str) -> str:
     """This function is to create bank branch
 
@@ -29,11 +31,11 @@ def create_bank_branch_single(bsl_page: bsl, bank_name: str, bank_branch_name: s
         bank_branch_code (str): string value of branch code
 
     Returns:
-        str: _description_
+        str: error message if any
     """
     error_message = ''
     bsl_page.search_bank_name(bankname=bank_name)
-    
+
     if bsl_page.click_bank_detail():
         if bsl_page.click_create_branch():
             if bsl_page.fill_branch_name(branch_name=bank_branch_name) is False:
@@ -54,6 +56,7 @@ def create_bank_branch_single(bsl_page: bsl, bank_name: str, bank_branch_name: s
     else:
         error_message = "Bank not found"
     return error_message
+
 
 def get_ticketing_ID() -> str:
     pass

@@ -16,13 +16,13 @@ class JiraSession(Session):
     - url (str): The URL of the JIRA server.
 
     Methods:
-    - __init__(self, token:str=DEFAULT_TOKEN, url:str='https://sd.homecredit.net/rest/api/2/'): Initializes a JIRA session object.
+    - __init__(self, token:str=DEFAULT_TOKEN, url:str='https://sd.homecredit.vn/rest/api/2/'): Initializes a JIRA session object.
     - parse_ticket(self, result): Parses the result of a ticket request.
     - browse_ticket(self, ticket_key:str): Retrieves and parses a specific ticket.
     """
 
     # DEFAULT cURL for JIRA API
-    _DEFAULT_URL = "https://sd.homecredit.net/rest/api/2/"
+    _DEFAULT_URL = "https://sd.homecredit.vn/rest/api/2/"
     _BROWSE_TICKET = "issue/{ticket_key}"
     _JQL_SEARCH = "search?jql="
     _TRANSITION = "issue/{ticket_key}/transitions"

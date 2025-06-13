@@ -126,9 +126,9 @@ class bsl(Page):
         Returns:
             bool: _description_
         """
-        return self.search_by_xpath(self.bank_branch_name, delay=0.5).send_keys(branch_name)
+        return self.search_by_xpath(self.bank_branch_name, delay=2).send_keys(branch_name)
 
-    def select_branch_status(self, value: str) -> bool:
+    def select_branch_status(self, value: str) -> None:
         """This is select branch staus in create screen
 
         Args:
@@ -137,7 +137,7 @@ class bsl(Page):
         Returns:
             bool: 
         """
-        return self.select_dropdown_value(self.bank_branch_status, value=value, delay=0.5)
+        return self.select_dropdown_value(self.bank_branch_status, value=value, delay=2)
 
     def fill_branch_code(self, code: str) -> bool:
         """This is to fill bank branch code in create screen
@@ -159,7 +159,7 @@ class bsl(Page):
         Returns:
             bool: result of the action
         """
-        return self.select_dropdown_by_visible_text(self.bank_branch_region, value=region.strip(), delay=0.5)
+        return self.select_dropdown_by_visible_text(self.bank_branch_region, value=region.strip(), delay=2)
 
     def select_branch_district(self, district: str) -> None:
         """This is to select branch district location, note that there is another data cleaning function to ensure the dropdown value can be selected on PROD env
@@ -172,7 +172,7 @@ class bsl(Page):
         """
         district = self.remove_district_prefix(
             district)  # cleaning function called
-        return self.select_dropdown_by_contains_text(self.bank_branch_district, value=district, delay=0.5)
+        return self.select_dropdown_by_contains_text(self.bank_branch_district, value=district, delay=2)
 
     def click_OK_create_button(self) -> bool:
         """This method finalize the bank branch creation with OK button
