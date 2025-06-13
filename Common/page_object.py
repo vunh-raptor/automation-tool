@@ -2,8 +2,6 @@ import logging
 from time import sleep
 
 from selenium import webdriver
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.alert import Alert
@@ -30,7 +28,8 @@ class page_object:
 
         self.profile = webdriver.ChromeService(executable_path=self.path)
         self.driver = webdriver.Chrome(service=self.profile)
-        self.wait = WebDriverWait(self.driver, self.default_timeout)
+        self.wait = WebDriverWait(
+            self.driver, self.default_timeout)
 
     def headless(self) -> None:
         """This is to generate headless session for chromedriver"""

@@ -206,7 +206,15 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-        return self.search_by_xpath(self.homesis_id_number_text).send_keys(id_number)
+        try:
+            if self.wait_element_to_visible(self.homesis_id_number_text):
+                self.search_by_xpath(self.homesis_id_number_text).clearText()
+                self.search_by_xpath(
+                    self.homesis_id_number_text).send_keys(id_number)
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def fill_note(self, note) -> bool:
         """
@@ -218,8 +226,14 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-
-        return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)
+        try:
+            if self.wait_element_to_visible(self.homesis_note_text_field):
+                self.search_by_xpath(
+                    self.homesis_note_text_field).send_keys(note)
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def update_note(self, note) -> bool:
         """
@@ -231,8 +245,15 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-        self.search_by_xpath(self.homesis_note_text_field).clearText()
-        return self.search_by_xpath(self.homesis_note_text_field).send_keys(note)
+        try:
+            if self.wait_element_to_visible(self.homesis_note_text_field):
+                self.search_by_xpath(self.homesis_note_text_field).clearText()
+                self.search_by_xpath(
+                    self.homesis_note_text_field).send_keys(note)
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def update_id_number(self, id_number) -> bool:
         """
@@ -244,8 +265,15 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-        self.search_by_xpath(self.homesis_id_number_text).clearText()
-        return self.search_by_xpath(self.homesis_id_number_text).send_keys(id_number)
+        try:
+            if self.wait_element_to_visible(self.homesis_id_number_text):
+                self.search_by_xpath(self.homesis_id_number_text).clearText()
+                self.search_by_xpath(
+                    self.homesis_id_number_text).send_keys(id_number)
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def fill_role_in_bank(self, role) -> bool:
         """
@@ -257,7 +285,14 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-        return self.search_by_xpath(self.homesis_role_bank_selector).send_keys(role)
+        try:
+            if self.wait_element_to_visible(self.homesis_role_bank_selector):
+                self.search_by_xpath(
+                    self.homesis_role_bank_selector).send_keys(role)
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def click_add_location(self) -> bool:
         """
@@ -275,7 +310,14 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-        return self.search_by_xpath(self.assign_district_button).click()
+        try:
+            if self.wait_element_to_visible(self.assign_district_button):
+                self.search_by_xpath(
+                    self.assign_district_button).click()
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def chose_supervisor(self, supervisor_code) -> bool:
         """
@@ -326,7 +368,14 @@ class homesis(Page):
         Returns:
             bool: True if the operation is successful, False otherwise.
         """
-        return self.search_by_xpath(self.homesis_save_button).click()
+        try:
+            if self.wait_element_to_visible(self.homesis_save_button):
+                self.search_by_xpath(
+                    self.homesis_save_button).click()
+                return True
+        except TimeoutException:
+            print("Timeout while waiting for elements.")
+        return False
 
     def click_on_closed_button(self) -> bool:
         """this function is click on the closed button in sale management section
