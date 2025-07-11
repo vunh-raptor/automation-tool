@@ -2,7 +2,6 @@ import logging
 from Common.page_object import page_object as Page
 from selenium.common.exceptions import TimeoutException
 from requests import Response
-from Common.api_client import APIClient
 
 # Element Path
 
