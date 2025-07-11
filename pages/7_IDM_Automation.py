@@ -84,6 +84,15 @@ def main():
                 search_user_by_login_name(
                     idm_page=idm_page, user_login_name=login_name)
 
+                if "User Hr Code" in selected_options:
+                    try:
+                        time.sleep(1)
+                        user_hr_code = idm_page.get_user_hr_code()
+
+                        user_data["User Hr Code"].append(user_hr_code)
+                    except Exception:
+                        user_data["User Hr Code"].append(None)
+
             if selected_user_type_of_information == "Search by Hr Code":
                 search_user_by_hr_code(
                     idm_page=idm_page, user_login_name=login_name)

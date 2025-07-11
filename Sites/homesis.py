@@ -1,9 +1,12 @@
 import logging
 from Common.page_object import page_object as Page
 from selenium.common.exceptions import TimeoutException
-
+from requests import Response
+from Common.api_client import APIClient
 
 # Element Path
+
+
 class homesis(Page):
     """This is a wrapper for homesis Page, based on the customed Page Object, which is also a wrapper of Selenium driver
 
@@ -393,3 +396,18 @@ class homesis(Page):
         except TimeoutException:
             print("Timeout while waiting for elements.")
         return False
+# --------------------------------------------------------------------------------
+
+
+# class Homesis_API(APIClient):
+#     """
+#     This class representing a Homesis API session
+
+#     Args:
+#         APIClient (_type_): _description_
+#     """
+
+#     _DEFAULT_URL = 'https://homesis.homecredit.vn/homesis/'
+
+#     def login_request_post(self, username: str, password: str, endpoint: str) -> Response:
+#         self.post_request()

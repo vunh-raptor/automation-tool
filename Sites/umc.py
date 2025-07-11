@@ -42,6 +42,7 @@ class umc(Page):
     detail_mobile = '//*[@data-better-uid="detail.mobile"]'
     first_name = '//*[@data-better-uid="detail.name"]'
     last_name = '//*[@data-better-uid="detail.surname"]'
+    roles_table = '//*[@id="roles"]/tbody[contains(text(), "")]'
 
     role_palette = '//*[@data-better-uid="role-palette"]'
     first_owned_role = '//*[@data-better-uid="role-palette:selected-field"]/option'
@@ -74,10 +75,13 @@ class umc(Page):
         """
         if (ldap_user is not None) & (ldap_pw is not None):
             self.search_by_xpath(self.ldap_user_input,
-                                 delay=1.5).send_keys(ldap_user)
+                                 delay=0.5).send_keys(ldap_user)
             self.search_by_xpath(self.ldap_pw_input,
-                                 delay=1.5).send_keys(ldap_pw)
-            return self.search_by_xpath(self.login_button, delay=3.5).click()
+                                 delay=0.5).send_keys(ldap_pw)
+            # if self.wait_element_to_visible(self.login_button)
+            self.search_by_xpath(self.login_button, delay=0.5).click()
+            return True
+            # return False
         else:
             logging.critical("Missing Username or Password.")
             return False
@@ -189,6 +193,11 @@ class umc(Page):
         add_role = self.role_palette + self.add_role_button
         add_button = self.search_by_xpath(add_role)
         return add_button.click()
+
+    def is_table_is_empty(self) -> bool:
+        """This method check the table is empty or not"""
+        table = self.search_by_xpath(self.roles_table, delay=0.5)
+        return table is not None
 
     def click_save(self) -> bool:
         """

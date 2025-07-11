@@ -359,12 +359,17 @@ def tab5_exec():
         accept_multiple_files=False,
     )
 
-    if reactivate_upload is not None:
+    login_name_input_area = st.text_area("Please insert reactive account here")
+    login_name_input_area_list = login_name_input_area.split(
+        "\n")  # This return a list
+
+    if login_name_input_area != '':
+
         # Show 5 rows of data on screen
-        data = pd.read_csv(reactivate_upload, converters={"HRcode": str})
-        st.subheader(
-            "First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
-        st.write(data.head(5))
+        # data = pd.read_csv(reactivate_upload, converters={"HRcode": str})
+        # st.subheader(
+        #     "First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
+        # st.write(data.head(5))
         # Initialize Session State to properly perform nested button
         if 'getOTP_clicked' not in st.session_state:
             st.session_state['getOTP_clicked'] = False
@@ -410,11 +415,11 @@ def tab5_exec():
                 umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
                 # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
                 # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
-                for row in data['HRcode']:
+                for index, hr_code in enumerate(login_name_input_area_list):
                     reactivation_status = reactivate_account(
-                        umc_page=umc_page, hr_code=row)
+                        umc_page=umc_page, hr_code=hr_code)
                     if reactivation_status is False:
-                        st.write(row + ": Reactivation Failed")
+                        st.write(hr_code + ": Reactivation Failed")
                     umc_page.get_umc_url()
                 # Reset session state after function complete
                 st.session_state.clear()

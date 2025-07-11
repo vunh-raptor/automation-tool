@@ -112,7 +112,7 @@ def cyberark_get_credential_password() -> str:
     powershell_script = "Common\\data\\CBAAccess.ps1"
     try:
         result = powershell_run_output(script_path=powershell_script)
-        return result
+        return result.replace("\n", "")
     except Exception as e:
         print(e)
         return ""
