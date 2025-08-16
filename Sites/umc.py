@@ -42,6 +42,9 @@ class umc(Page):
     detail_mobile = '//*[@data-better-uid="detail.mobile"]'
     first_name = '//*[@data-better-uid="detail.name"]'
     last_name = '//*[@data-better-uid="detail.surname"]'
+    date_of_birth = '//*[@data-better-uid="detail.date-of-birth"]'
+    detail_gender = '//*[@data-better-uid="detail.gender"]'
+    employedSince = '//*[@data-better-uid="detail.employed-since"]'
     roles_table = '//*[@id="roles"]/tbody[contains(text(), "")]'
 
     role_palette = '//*[@data-better-uid="role-palette"]'
