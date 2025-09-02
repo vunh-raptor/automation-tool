@@ -388,3 +388,105 @@ def update_name(umc_page: umc, hr_code: str, first_name: str, last_name: str) ->
         list_of_error.append(
             hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
     return list_of_error
+
+
+def update_dob(umc_page: umc, hr_code: str, date_of_birth: str) -> list:
+    """ Update date of birth for account LDAP
+
+    Args:
+        umc_page (umc): login to UMC pasge
+        hr_code (str): HR code format 000xxxx or HCG account A.NguyenV
+        date_of_birth (str): date of birth format: yyyy-mm-dd
+
+    Returns:
+        list: replace and update new DOB
+    """
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    account_status = umc_page.get_search_account_status()
+    # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update date of birth actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_info(data=date_of_birth, field=umc_page.date_of_birth)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error
+
+
+def update_gender(umc_page: umc, hr_code: str, detail_gender: str) -> list:
+    """ Update gender for account LDAP
+
+    Args:
+        umc_page (umc): login to UMC page
+        hr_code (str): HR code format 000xxxx or HCG account A.NguyenV
+        detail_gender (str): detail gender format male or female
+
+    Returns:
+        list: replace and update gender for account LDAP
+    """
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    account_status = umc_page.get_search_account_status()
+    # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update gender actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_info(data=detail_gender, field=umc_page.detail_gender)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error
+
+
+def update_employed_since(umc_page: umc, hr_code: str, employedSince: str) -> list:
+    """ Update employed since for account LDAP
+
+    Args:
+        umc_page (umc): login to UMC page
+        hr_code (str): HR code format 000xxxx or HCG account A.NguyenV
+        employedSince (str): employed since day format: yyyy-mm-dd
+
+    Returns:
+        list: replace and update new employed since
+    """
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    account_status = umc_page.get_search_account_status()
+    # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update employed since actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_info(data=employedSince, field=umc_page.employedSince)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error
