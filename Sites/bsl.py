@@ -68,10 +68,17 @@ class bsl(Page):
         """
         if (ldap_user is not None) & (ldap_pw is not None):
             self.search_by_xpath(self.ldap_user_input,
+<<<<<<< HEAD
+                                 delay=1.0).send_keys(ldap_user)
+            self.search_by_xpath(self.ldap_pw_input,
+                                 delay=1.0).send_keys(ldap_pw)
+            return self.search_by_xpath(self.login_button, delay=1.0).click()
+=======
                                  delay=0.5).send_keys(ldap_user)
             self.search_by_xpath(self.ldap_pw_input,
                                  delay=0.5).send_keys(ldap_pw)
             return self.search_by_xpath(self.login_button, delay=0.5).click()
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
         else:
             logging.critical("Missing Username or Password.")
             return False
@@ -99,10 +106,17 @@ class bsl(Page):
         """
         This method trigger search and return result for bank name searching
         """
+<<<<<<< HEAD
+        self.search_by_xpath(self.bank_name_input, delay=1.0).clearText()
+        self.search_by_xpath(self.bank_name_input,
+                             delay=1.0).send_keys(bankname)
+        self.search_by_xpath(self.search_button, delay=1.0).click()
+=======
         self.search_by_xpath(self.bank_name_input, delay=0.5).clearText()
         self.search_by_xpath(self.bank_name_input,
                              delay=0.5).send_keys(bankname)
         self.search_by_xpath(self.search_button, delay=0.5).click()
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
 
     def click_bank_detail(self) -> bool:
         """This is click bank detail method
@@ -110,7 +124,11 @@ class bsl(Page):
         Returns:
             bool: The result if the button can be clicked or not
         """
+<<<<<<< HEAD
+        return self.search_by_xpath(self.first_search_detail_button, delay=1.0).click()
+=======
         return self.search_by_xpath(self.first_search_detail_button, delay=0.5).click()
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
 
     def click_create_branch(self) -> bool:
         """This is click new branch button method
@@ -126,9 +144,15 @@ class bsl(Page):
         Returns:
             bool: _description_
         """
+<<<<<<< HEAD
+        return self.search_by_xpath(self.bank_branch_name, delay=1.0).send_keys(branch_name)
+
+    def select_branch_status(self, value: str) -> bool:
+=======
         return self.search_by_xpath(self.bank_branch_name, delay=2).send_keys(branch_name)
 
     def select_branch_status(self, value: str) -> None:
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
         """This is select branch staus in create screen
 
         Args:
@@ -137,7 +161,11 @@ class bsl(Page):
         Returns:
             bool: 
         """
+<<<<<<< HEAD
+        return self.select_dropdown_value(self.bank_branch_status, value=value, delay=1.0)
+=======
         return self.select_dropdown_value(self.bank_branch_status, value=value, delay=2)
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
 
     def fill_branch_code(self, code: str) -> bool:
         """This is to fill bank branch code in create screen
@@ -150,7 +178,11 @@ class bsl(Page):
         """
         return self.search_by_xpath(self.bank_branch_code, delay=2).send_keys(code)
 
+<<<<<<< HEAD
+    def select_branch_region(self, region: str) -> bool:
+=======
     def select_branch_region(self, region: str) -> None:
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
         """This is to select branch region
 
         Args:
@@ -159,9 +191,15 @@ class bsl(Page):
         Returns:
             bool: result of the action
         """
+<<<<<<< HEAD
+        return self.select_dropdown_by_visible_text(self.bank_branch_region, value=region.strip(), delay=2.0)
+
+    def select_branch_district(self, district: str) -> bool:
+=======
         return self.select_dropdown_by_visible_text(self.bank_branch_region, value=region.strip(), delay=2)
 
     def select_branch_district(self, district: str) -> None:
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
         """This is to select branch district location, note that there is another data cleaning function to ensure the dropdown value can be selected on PROD env
 
         Args:
@@ -172,9 +210,15 @@ class bsl(Page):
         """
         district = self.remove_district_prefix(
             district)  # cleaning function called
+<<<<<<< HEAD
+        return self.select_dropdown_by_contains_text(self.bank_branch_district, value=district, delay=2.0)
+
+    def click_OK_create_button(self) -> None:
+=======
         return self.select_dropdown_by_contains_text(self.bank_branch_district, value=district, delay=2)
 
     def click_OK_create_button(self) -> bool:
+>>>>>>> 11e75a2023dcb2d9da6f25602c9ab59fb8e1af1a
         """This method finalize the bank branch creation with OK button
         """
         return self.search_by_xpath(self.OK_button).click()
