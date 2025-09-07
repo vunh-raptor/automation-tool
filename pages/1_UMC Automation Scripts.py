@@ -13,6 +13,9 @@ from Activity.umc_actions import (
     remove_multi_roles_umc,
     update_phone_number,
     update_name,
+    update_dob,
+    update_gender,
+    update_employed_since,
     reactivate_account
 )
 
@@ -190,7 +193,7 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
 
 
 def tab2_exec(ldap_user: str, ldap_pw: str):
-    st.divider()
+
     st.subheader("Add role for multiple user")
     left, rigth = st.columns(2, vertical_alignment="top")
     login_name_input_area = left.text_area("Input login name here")
@@ -243,7 +246,6 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
 
 def tab3_exec(ldap_user: str, ldap_pw: str):
     # check active account UMC
-    st.divider()
     st.text("Check status account UMC")
     hr_code_input_area = st.text_area("Input Hr code or HCG here")
     hr_code_input_area_lines = hr_code_input_area.split(
@@ -293,13 +295,20 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
         st.write(csv_data)
 
     # Create columns for update UMC info
-    update_phone_col, _, update_name_button_col = st.columns(3)
+    col_1, col_2, col_3, col_4 = st.columns(4)
 
-    # Phone Button on the left Column
-    update_phone_button = update_phone_col.button("Update phone")
+    # Phone Button on the Column 1
+    update_phone_button = col_1.button("Update phone")
+    update_employed_since_button = col_1.button("Update employed_since")
 
-    # Update number on Right Column
-    update_name_button = update_name_button_col.button("Update name")
+    # DoB update Button on Column 2
+    update_dob_button = col_2.button("Update BoB")
+
+    # Update number on Column 3
+    update_name_button = col_3.button("Update name")
+
+    # Update Gender on column 4
+    update_gender_button = col_4.button("Update Gender")
 
     # Update info account UMC
     if update_phone_button:
@@ -348,16 +357,75 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
                     hr_code, list_error[i].split("-", 1)[1]]
             umc_page.get_umc_url()
 
+    if update_dob_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns(
+            [0.4, 0.6], vertical_alignment="top", gap="large")
+        # loop through CSV & Search for HR code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            date_of_birth = row["DateOfBirth"]
+            list_error = update_dob(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                date_of_birth=date_of_birth
+            )
+            # Keep this line for debugging, but it might print None
+            left.write(list_error)
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [
+                    hr_code, list_error[i].split("-", 1)[1]]
+            umc_page.get_umc_url()
+
+    if update_gender_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns(
+            [0.4, 0.6], vertical_alignment="top", gap="large")
+        # loop through CSV & Search for HR code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            detail_gender = row["Gender"]
+            list_error = update_gender(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                detail_gender=detail_gender
+            )
+            # Keep this line for debugging, but it might print None
+            left.write(list_error)
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [
+                    hr_code, list_error[i].split("-", 1)[1]]
+            umc_page.get_umc_url()
+
+    if update_employed_since_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns(
+            [0.4, 0.6], vertical_alignment="top", gap="large")
+        # loop through CSV & Search for HR code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            employedSince = row["Employed Since"]
+            list_error = update_employed_since(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                employedSince=employedSince
+            )
+            # Keep this line for debugging, but it might print None
+            left.write(list_error)
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [
+                    hr_code, list_error[i].split("-", 1)[1]]
+            umc_page.get_umc_url()
+
 
 def tab5_exec():
-    st.divider()
     st.subheader("Reactivate accounts on UMC")
-
-    reactivate_upload = st.file_uploader(
-        label="Reactivate HRcode List",
-        type=["csv"],
-        accept_multiple_files=False,
-    )
 
     login_name_input_area = st.text_area("Please insert reactive account here")
     login_name_input_area_list = login_name_input_area.split(
@@ -426,7 +494,6 @@ def tab5_exec():
 
 
 def tab6_exec():
-    st.divider()
     st.subheader("Emergency add role on UMC")
 
     hr_code_text_area = st.text_area("Input Hr codes or HCGs")

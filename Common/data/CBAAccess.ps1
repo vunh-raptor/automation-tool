@@ -2,7 +2,7 @@ $CCPHost = 'cyberarkccp.homecredit.vn'
 $appID = "umc"
 $safe = "IT_Service_Desk _Safe"
 $accountObject = "umc_admin"
-$certThumbprint = "6b14c3c96dc592c364f5a3ef642db09195550cb6"
+$certThumbprint = "4ea9bc0d0ff8c3e52fabe2dc55d4a2a1beae5ab8"
 # certThumbprint is the thumbprint of the certificate that will use for authentication with Cyberark
 #If calling the cert from Current User cert store:
 $certPath = "Cert:\CurrentUser\My\" + $certThumbprint
