@@ -17,6 +17,15 @@ from Activity.idm_actions import (
 
 )
 
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
+
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
+
 
 def main():
 

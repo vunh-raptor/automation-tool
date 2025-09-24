@@ -1,10 +1,11 @@
 from pandas import DataFrame, read_excel
+import streamlit as st
 import json
 from requests import Response
 import logging
 from pyotp import TOTP
 from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
-from ldap3 import Server, Connection, ALL
+from ldap3 import Server, Connection, ALL, SUBTREE
 
 
 def support_Excel_read(read_path: str, sheet_name: str = "Sheet1") -> DataFrame:
@@ -137,6 +138,8 @@ def powershell_run_output(script_path: str) -> str:
         print(e)
         return ""
 
+# OTP Generating and verifying functions
+
 
 def generate_OTP():
     """This function used to generate OTP and send to MSteams
@@ -183,18 +186,48 @@ def verify_OTP(sourceOTP: TOTP, OTP: str) -> bool:
         print(f"Error when calling to OTP fucntions: {e}")
         return False
 
+# Authentication functions
 
-def authenticate_ldap(username: str, password: str) -> bool:
+
+def authenticate_ldap(username: str, password: str) -> str:
+    """This function is used to authenticate with Home Credit Credential with LDAP
+
+    Args:
+        username (str): username of the user
+        password (str): password of the user
+
+    Returns:
+        bool: the status of the login request, True if success login and False if failed login
+    """
     try:
+        userDN = ""
         server = Server("ldap://vn-ldaps.hcg.homecredit.net", get_info=ALL)
         conn = Connection(
             server, f"CN={username},OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net", f"{password}", auto_bind=True)
         if conn.bound:
+            conn.search(search_base="OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net",
+                        search_filter=f"(samAccountName={username})", search_scope=SUBTREE, attributes="displayName")
+            userDN = conn.entries[0].displayName
             conn.unbind()
-            return True
+            return userDN
         else:
             conn.unbind()
-            return False
+            return ""
     except Exception as e:
         print(f"Error when calling to LDAP server: {e}")
-        return False
+        return ""
+
+
+def login_status_check():
+    """This is a quick function to constantly check if user is authenticated
+    """
+    if st.session_state["authenticated"] is not True:
+        st.switch_page("main_site.py")
+
+
+def logout_render():
+    """This is function to render logout button
+    """
+    if st.sidebar.button("Logout"):
+        st.session_state["authenticated"] = False
+        st.rerun()

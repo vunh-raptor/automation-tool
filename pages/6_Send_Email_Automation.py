@@ -12,6 +12,14 @@ from streamlit_ace import st_ace
 from Common.constant.css_file import css
 
 from Activity.send_email_actions import send_email_automation
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
+
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 def main():

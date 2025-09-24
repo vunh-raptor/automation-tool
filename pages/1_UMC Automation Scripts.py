@@ -1,9 +1,8 @@
-import streamlit as st
-
-# This is to jump the user back to login if their are not authenticated
-if st.session_state["authenticated"] is not True:
-    st.switch_page("main_site.py")
-import pandas as pd
+from Common.supporting import (
+    cyberark_get_credential_password,
+    generate_OTP,
+    verify_OTP
+)
 from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
@@ -22,12 +21,13 @@ from Activity.umc_actions import (
     update_employed_since,
     reactivate_account
 )
+import pandas as pd
+import streamlit as st
+from Common.supporting import login_status_check, logout_render
 
-from Common.supporting import (
-    cyberark_get_credential_password,
-    generate_OTP,
-    verify_OTP
-)
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 def main():

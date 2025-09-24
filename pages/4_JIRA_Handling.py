@@ -1,11 +1,14 @@
+from Activity.jira_action import general_request_reqdata_SINGLE
+from Common.Jira.jira_session import JiraSession
 import streamlit as st
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
 
 # This is to jump the user back to login if their are not authenticated
-if st.session_state["authenticated"] is not True:
-    st.switch_page("main_site.py")
-
-from Common.Jira.jira_session import JiraSession
-from Activity.jira_action import general_request_reqdata_SINGLE
+login_status_check()
+logout_render()
 
 
 st.write("This page simply for testing Jira Bot, will be designed later")

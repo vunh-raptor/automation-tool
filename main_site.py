@@ -10,12 +10,14 @@ st.set_page_config(
     page_title="Welcome to SD AutoHub",
     page_icon="👋",
     layout="wide",  # Optional: makes better use of screen space
-    initial_sidebar_state="collapsed"  # This hides the sidebar by default
-
+    initial_sidebar_state="collapsed",  # This hides the sidebar by default
+    menu_items={"Get help": None,
+                "About": "Developed and maintained by: **Service Desk Team** with Tech Leader: **Nhu.HuynhNY**"}
 )
 # nav = st.navigation([homepage], position="hidden")
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
+    st.session_state["userDisplayName"] = ""
 
 
 def login_page():
@@ -25,23 +27,18 @@ def login_page():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if authenticate_ldap(username, password):
+        displayName = authenticate_ldap(username, password)
+        if len(displayName) > 0:
             st.session_state["authenticated"] = True
-            st.success("Logged in successfully!")
+            st.session_state["userDisplayName"] = displayName
             st.rerun()
         else:
             st.error("Invalid credentials.")
 
 
-def main_app():
-    st.sidebar.success("Select a demo above.")
-    if st.sidebar.button("Logout"):
-        st.session_state["authenticated"] = False
-        st.rerun()
-
-
 if st.session_state["authenticated"]:
     # nav = st.navigation([homepage, umc_page], position="sidebar")
-    main_app()
+    st.success("Login success! Welcome " +
+               str(st.session_state["userDisplayName"]))
 else:
     login_page()
