@@ -1,4 +1,8 @@
 import streamlit as st
+
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
 import pandas as pd
 from Activity.umc_actions import (
     login_to_site,
@@ -42,8 +46,8 @@ def main():
     # Choose action to take on UMC
     st.subheader("Choose your action on UMC", divider="red")
 
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
-        ["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts", "Emergency Role Add", "TestLDAPs"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
+        ["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts", "Emergency Role Add"])
 
     with tab1:
         tab1_exec(ldap_user, ldap_pw)

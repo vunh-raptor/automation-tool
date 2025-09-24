@@ -4,6 +4,7 @@ from requests import Response
 import logging
 from pyotp import TOTP
 from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
+from ldap3 import Server, Connection, ALL
 
 
 def support_Excel_read(read_path: str, sheet_name: str = "Sheet1") -> DataFrame:
@@ -179,5 +180,21 @@ def verify_OTP(sourceOTP: TOTP, OTP: str) -> bool:
     try:
         return sourceOTP.verify(OTP)
     except Exception as e:
-        print(e)
+        print(f"Error when calling to OTP fucntions: {e}")
+        return False
+
+
+def authenticate_ldap(username: str, password: str) -> bool:
+    try:
+        server = Server("ldap://vn-ldaps.hcg.homecredit.net", get_info=ALL)
+        conn = Connection(
+            server, f"CN={username},OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net", f"{password}", auto_bind=True)
+        if conn.bound:
+            conn.unbind()
+            return True
+        else:
+            conn.unbind()
+            return False
+    except Exception as e:
+        print(f"Error when calling to LDAP server: {e}")
         return False

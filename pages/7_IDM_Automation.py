@@ -1,7 +1,11 @@
-import time
 import streamlit as st
-import pandas as pd
 
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
+
+import pandas as pd
+import time
 
 from Activity.idm_actions import (
     login_to_site,

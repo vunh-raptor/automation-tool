@@ -1,15 +1,24 @@
 import streamlit as st
+
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
+
 from Common.Jira.jira_session import JiraSession
 from Activity.jira_action import general_request_reqdata_SINGLE
 
 
 st.write("This page simply for testing Jira Bot, will be designed later")
-jql_get_new_ticket_button = st.button('Get new ticket on queue', type='primary')
+jql_get_new_ticket_button = st.button(
+    'Get new ticket on queue', type='primary')
 jql_get_approval_ticket_button = st.button('Get all approval')
 
 # Function to reset the state
+
+
 def reset_state():
     st.session_state.counter = 0
+
 
 # Button to reset the counter
 if st.button("Reset"):
