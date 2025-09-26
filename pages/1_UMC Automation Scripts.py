@@ -479,22 +479,23 @@ def tab5_exec():
 
             # Run Reactivate Scripts if the verification returns valid
             if st.session_state['confirmOTP_clicked'] and result is True:
-                st.write("OTP validated! Script will run now")
-                from time import sleep
-                # Trigger request to CBA Vault to get UMC password
-                cred = cyberark_get_credential_password()
-                sleep(5)
-                umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
-                # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-                # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
-                for index, hr_code in enumerate(login_name_input_area_list):
-                    reactivation_status = reactivate_account(
-                        umc_page=umc_page, hr_code=hr_code)
-                    if reactivation_status is False:
-                        st.write(hr_code + ": Reactivation Failed")
-                    umc_page.get_umc_url()
-                # Reset session state after function complete
-                st.session_state.clear()
+                with st.spinner('Processing...'):
+                    from time import sleep
+                    # Trigger request to CBA Vault to get UMC password
+                    cred = cyberark_get_credential_password()
+                    sleep(5)
+                    umc_page = login_to_site(
+                        ldap_user="umc_admin1", ldap_pw=cred)
+                    # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+                    # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+                    for index, hr_code in enumerate(login_name_input_area_list):
+                        reactivation_status = reactivate_account(
+                            umc_page=umc_page, hr_code=hr_code)
+                        if reactivation_status is False:
+                            st.write(hr_code + ": Reactivation Failed")
+                        umc_page.get_umc_url()
+                    # Reset session state after function complete
+                    st.session_state.clear()
 
 
 def tab6_exec():
