@@ -10,3 +10,4 @@ openpyxl
 pyotp
 msteamsapi
 pytest
+ldap3>=2.9.1

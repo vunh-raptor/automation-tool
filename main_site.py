@@ -24,16 +24,17 @@ def login_page():
     st.write("# Welcome to SD Automation Hub!👋")
     # Login function
     st.title("Please login with your HCG credential")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        displayName = authenticate_ldap(username, password)
-        if len(displayName) > 0:
-            st.session_state["authenticated"] = True
-            st.session_state["userDisplayName"] = displayName
-            st.rerun()
-        else:
-            st.error("Invalid credentials.")
+    with st.form("loginForm"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.form_submit_button("Login"):
+            displayName = authenticate_ldap(username, password)
+            if len(displayName) > 0:
+                st.session_state["authenticated"] = True
+                st.session_state["userDisplayName"] = displayName
+                st.rerun()
+            else:
+                st.error("Invalid credentials.")
 
 
 if st.session_state["authenticated"]:
