@@ -1,7 +1,8 @@
 from Common.supporting import (
     cyberark_get_credential_password,
     generate_OTP,
-    verify_OTP
+    verify_OTP,
+    system_env_get_cred
 )
 from Activity.umc_actions import (
     login_to_site,
@@ -506,7 +507,7 @@ def tab5_exec():
                 with st.spinner('Processing...'):
                     from time import sleep
                     # Trigger request to CBA Vault to get UMC password
-                    cred = cyberark_get_credential_password()
+                    cred = system_env_get_cred()
                     sleep(5)
                     umc_page = login_to_site(
                         ldap_user="umc_admin1", ldap_pw=cred)
@@ -532,7 +533,7 @@ def tab6_exec():
         )
         emergency = st.button("Perform emergency add role", type="primary")
         if emergency:
-            cred = cyberark_get_credential_password()
+            cred = system_env_get_cred()
             umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
             for code in hr_code_input_area_lines:
                 add_role_status = add_role_umc(

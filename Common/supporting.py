@@ -120,6 +120,22 @@ def cyberark_get_credential_password() -> str:
         return ""
 
 
+def system_env_get_cred() -> str:
+    """This function is to get credential password stored on System Variables
+
+    Returns:
+        str: password value of the credential
+    """
+    from os import environ
+    result = ""
+    try:
+        result = environ['UMCAdminCred']
+        return result
+    except Exception as e:
+        print(e)
+        return ""
+
+
 def powershell_run_output(script_path: str) -> str:
     """This function to run Powershell cmd - return output
 
