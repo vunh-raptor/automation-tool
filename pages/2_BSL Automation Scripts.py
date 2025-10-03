@@ -60,12 +60,12 @@ def tab1_exec(username: str, password: str):
     if excel_upload_branch_template is not None:
         read_cols = [1, 2, 3, 4]
         excel_data = pd.read_excel(excel_upload_branch_template, converters={
-                                   "Bank Name": str, "Bank Branch code": str, "Region and District": str}, usecols=read_cols)
+                                   "Bank Name": str, "Bank Branch code": str, "Region and Ward": str}, usecols=read_cols)
         st.write(excel_data)
         confirm_button = st.button("Confirm & Proceed", type="primary")
         if confirm_button:
             # Process Data
-            excel_data[['Region', 'District']] = excel_data['Region and District'].str.split(
+            excel_data[['Region', 'District']] = excel_data['Region and Ward'].str.split(
                 ',', expand=True)
             # Action starts
             bsl_page = login_to_site(username, password)
@@ -76,13 +76,15 @@ def tab1_exec(username: str, password: str):
                     branch_code = row[excel_data.columns[1]]
                     branch_name = row[excel_data.columns[2]]
                     branch_region = row[excel_data.columns[4]]
-                    branch_district = row[excel_data.columns[5]]
+                    # branch_district = row[excel_data.columns[5]]
                     create_bank_branch_single(bsl_page=bsl_page, bank_name=bank_name, bank_branch_name=branch_name,
-                                              bank_branch_code=branch_code, region=branch_region, district=branch_district)
+                                              bank_branch_code=branch_code, region=branch_region, district=".")
                     bsl_page.get_bsl_url()
                     bsl_page.click_find_bank()
                     continue  # Continue to next iteration if bank name not valid on correct bank sample
                 else:
+                    st.write(
+                        "Bank is not in predefined list, to be safe the branch will log here" + bank_name)
                     continue
 
 

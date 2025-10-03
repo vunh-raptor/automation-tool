@@ -126,7 +126,7 @@ class bsl(Page):
         Returns:
             bool: _description_
         """
-        return self.search_by_xpath(self.bank_branch_name, delay=1.0).send_keys(branch_name)
+        return self.search_by_xpath(self.bank_branch_name, delay=2).send_keys(branch_name)
 
     def select_branch_status(self, value: str) -> None:
         """This is select branch staus in create screen
@@ -137,7 +137,7 @@ class bsl(Page):
         Returns:
             bool: 
         """
-        return self.select_dropdown_value(self.bank_branch_status, value=value, delay=1.0)
+        return self.select_dropdown_value(self.bank_branch_status, value=value, delay=2)
 
     def fill_branch_code(self, code: str) -> bool:
         """This is to fill bank branch code in create screen
@@ -159,7 +159,7 @@ class bsl(Page):
         Returns:
             bool: result of the action
         """
-        return self.select_dropdown_by_visible_text(self.bank_branch_region, value=region.strip(), delay=2.0)
+        return self.select_dropdown_by_visible_text(self.bank_branch_region, value=region.strip(), delay=2)
 
     def select_branch_district(self, district: str) -> None:
         """This is to select branch district location, note that there is another data cleaning function to ensure the dropdown value can be selected on PROD env
@@ -170,30 +170,30 @@ class bsl(Page):
         Returns:
             bool: result of the action
         """
-        district = self.remove_district_prefix(
-            district)  # cleaning function called
-        return self.select_dropdown_by_contains_text(self.bank_branch_district, value=district, delay=2.0)
+        # district = self.remove_district_prefix(
+        #     district)  # cleaning function called
+        return self.select_dropdown_by_contains_text(self.bank_branch_district, value=district, delay=2)
 
     def click_OK_create_button(self) -> bool:
         """This method finalize the bank branch creation with OK button
         """
         return self.search_by_xpath(self.OK_button).click()
 
-    def remove_district_prefix(self, district: str) -> str:
-        """As the district information is always input manually, so there is no validation or alignment of data consistency.
-        This function will perform trying to CLEAN the inputted data as much as it can
+    # def remove_district_prefix(self, district: str) -> str:
+    #     """As the district information is always input manually, so there is no validation or alignment of data consistency.
+    #     This function will perform trying to CLEAN the inputted data as much as it can
 
-        Args:
-            district (str): str value of district
+    #     Args:
+    #         district (str): str value of district
 
-        Returns:
-            str: str value of district (after cleaning)
-        """
-        clean_data = ""
-        lst = ['H.', 'Q.', 'TT.', 'TX.', 'TP.', 'Quận',
-               'Huyện', 'Thị Xã', 'Thị Trấn', 'Thành Phố']
-        for pref in lst:
-            if pref in district:
-                clean_data = district.replace(pref, '')
-                return clean_data.strip()
-        return district.strip()
+    #     Returns:
+    #         str: str value of district (after cleaning)
+    #     """
+    #     clean_data = ""
+    #     lst = ['H.', 'Q.', 'TT.', 'TX.', 'TP.', 'Quận',
+    #            'Huyện', 'Thị Xã', 'Thị Trấn', 'Thành Phố']
+    #     for pref in lst:
+    #         if pref in district:
+    #             clean_data = district.replace(pref, '')
+    #             return clean_data.strip()
+    #     return district.strip()
