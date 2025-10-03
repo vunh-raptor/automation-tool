@@ -1,5 +1,10 @@
-import datetime
 import streamlit as st
+
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
+
+import datetime
 import pandas as pd
 import streamlit.components.v1 as components
 from streamlit_quill import st_quill
@@ -7,6 +12,14 @@ from streamlit_ace import st_ace
 from Common.constant.css_file import css
 
 from Activity.send_email_actions import send_email_automation
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
+
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 def main():
@@ -63,7 +76,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_to_email_upload)):
-            to_email_data = pd.read_csv(list_to_email_upload[i], converters={"Email": str})
+            to_email_data = pd.read_csv(
+                list_to_email_upload[i], converters={"Email": str})
             for index, row in to_email_data.iterrows():
                 # read each email from csv file
                 to_emails = row["Email"]
@@ -84,7 +98,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_cc_email_upload)):
-            cc_email_data = pd.read_csv(list_cc_email_upload[i], converters={"Email": str})
+            cc_email_data = pd.read_csv(
+                list_cc_email_upload[i], converters={"Email": str})
             for index, row in cc_email_data.iterrows():
                 # read each email from csv file
                 cc_emails = row["Email"]
@@ -104,7 +119,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_bcc_email_upload)):
-            bcc_email_data = pd.read_csv(list_bcc_email_upload[i], converters={"Email": str})
+            bcc_email_data = pd.read_csv(
+                list_bcc_email_upload[i], converters={"Email": str})
             for index, row in bcc_email_data.iterrows():
                 # read each email from csv file
                 bcc_emails = row["Email"]
@@ -123,7 +139,8 @@ def main():
 
         # Fill the input value to the email template and show it in a editor section
         external_mail_maintenance_content = st_ace(
-            value=external_maintenance_notification_html.format(**date_start_and_end),
+            value=external_maintenance_notification_html.format(
+                **date_start_and_end),
             auto_update=True,
         )
 
@@ -178,7 +195,8 @@ def main():
         st.markdown(css.css_send_email_automation_hub, unsafe_allow_html=True)
         # Read CSV Data
         for i in range(len(list_to_email_upload_internal)):
-            to_email_internal_data = pd.read_csv(list_to_email_upload_internal[i], converters={"Email": str})
+            to_email_internal_data = pd.read_csv(
+                list_to_email_upload_internal[i], converters={"Email": str})
             for index, row in to_email_internal_data.iterrows():
                 # read each email from csv file
                 to_emails_internal = row["Email"]
@@ -199,7 +217,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_cc_email_internal_upload)):
-            cc_email_internal_data = pd.read_csv(list_cc_email_internal_upload[i], converters={"Email": str})
+            cc_email_internal_data = pd.read_csv(
+                list_cc_email_internal_upload[i], converters={"Email": str})
             for index, row in cc_email_internal_data.iterrows():
                 # read each email from csv file
                 cc_emails_internal = row["Email"]
@@ -219,7 +238,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_bcc_email_internal_upload)):
-            bcc_email_internal_data = pd.read_csv(list_bcc_email_internal_upload[i], converters={"Email": str})
+            bcc_email_internal_data = pd.read_csv(
+                list_bcc_email_internal_upload[i], converters={"Email": str})
             for index, row in bcc_email_internal_data.iterrows():
                 # read each email from csv file
                 bcc_internal_emails = row["Email"]
@@ -246,7 +266,8 @@ def main():
         internal_maintenance_notification_html = HTMLFile.read()
         # Fill the input value to the email template and show it in editor section
         internal_mail_maintenance_content = st_ace(
-            value=internal_maintenance_notification_html.format(**filled_value),
+            value=internal_maintenance_notification_html.format(
+                **filled_value),
             auto_update=True,
         )
 
@@ -293,7 +314,8 @@ def main():
         st.markdown(css.css_send_email_automation_hub, unsafe_allow_html=True)
         # Read CSV Data
         for i in range(len(list_to_email_upload_incident)):
-            to_email_incident_data = pd.read_csv(list_to_email_upload_incident[i], converters={"Email": str})
+            to_email_incident_data = pd.read_csv(
+                list_to_email_upload_incident[i], converters={"Email": str})
             for index, row in to_email_incident_data.iterrows():
                 # read each email from csv file
                 to_emails_incident = row["Email"]
@@ -314,7 +336,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_cc_email_incident_upload)):
-            cc_email_incident_data = pd.read_csv(list_cc_email_incident_upload[i], converters={"Email": str})
+            cc_email_incident_data = pd.read_csv(
+                list_cc_email_incident_upload[i], converters={"Email": str})
             for index, row in cc_email_incident_data.iterrows():
                 # read each email from csv file
                 cc_emails_incident = row["Email"]
@@ -333,7 +356,8 @@ def main():
 
         # Read CSV Data
         for i in range(len(list_bcc_email_incident_upload)):
-            bcc_email_incident_data = pd.read_csv(list_bcc_email_incident_upload[i], converters={"Email": str})
+            bcc_email_incident_data = pd.read_csv(
+                list_bcc_email_incident_upload[i], converters={"Email": str})
             for index, row in bcc_email_incident_data.iterrows():
                 # read each email from csv file
                 bcc_incident_emails = row["Email"]

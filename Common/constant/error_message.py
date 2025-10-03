@@ -1,5 +1,5 @@
-#homesis
 class ErrorMessage:
+    # homesis errors
     class homesis_message:
         CAN_NOT_FIND_USER = "Can't find user"
         CAN_NOT_FIND_LOCATION = "Can't find location"
@@ -9,6 +9,7 @@ class ErrorMessage:
         CAN_NOT_FILL_NOTE = "Can't fill note"
         CLICK_SAVE_BUTTON = "Click Save button successfully"
 
+    # umc errors
     class umc_message:
         USER_INACTIVE = "is inactive"
         USER_NOT_FOUND = "is not found"

@@ -1,4 +1,9 @@
 import streamlit as st
+
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
+
 import pandas as pd
 from Common.constant.css_file import css
 
@@ -15,6 +20,15 @@ from Activity.homesis_actions import (
     update_id_number,
     closed_partner,
 )
+
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
+
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 def main():

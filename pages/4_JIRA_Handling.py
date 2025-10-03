@@ -1,15 +1,27 @@
-import streamlit as st
-from Common.Jira.jira_session import JiraSession
 from Activity.jira_action import general_request_reqdata_SINGLE
+from Common.Jira.jira_session import JiraSession
+import streamlit as st
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
+
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 st.write("This page simply for testing Jira Bot, will be designed later")
-jql_get_new_ticket_button = st.button('Get new ticket on queue', type='primary')
+jql_get_new_ticket_button = st.button(
+    'Get new ticket on queue', type='primary')
 jql_get_approval_ticket_button = st.button('Get all approval')
 
 # Function to reset the state
+
+
 def reset_state():
     st.session_state.counter = 0
+
 
 # Button to reset the counter
 if st.button("Reset"):

@@ -42,6 +42,7 @@ class umc(Page):
     detail_mobile = '//*[@data-better-uid="detail.mobile"]'
     first_name = '//*[@data-better-uid="detail.name"]'
     last_name = '//*[@data-better-uid="detail.surname"]'
+    mail = '//*[@data-better-uid="detail.mail"]'
     date_of_birth = '//*[@data-better-uid="detail.date-of-birth"]'
     detail_gender = '//*[@data-better-uid="detail.gender"]'
     employedSince = '//*[@data-better-uid="detail.employed-since"]'
@@ -194,7 +195,7 @@ class umc(Page):
         This method clicks the add role button.
         """
         add_role = self.role_palette + self.add_role_button
-        add_button = self.search_by_xpath(add_role, delay= 0.5)
+        add_button = self.search_by_xpath(add_role, delay=0.5)
         return add_button.click()
 
     def is_table_is_empty(self) -> bool:

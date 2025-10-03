@@ -490,3 +490,37 @@ def update_employed_since(umc_page: umc, hr_code: str, employedSince: str) -> li
         list_of_error.append(
             hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
     return list_of_error
+
+
+def update_mail(umc_page: umc, hr_code: str, mail: str) -> list:
+    """ Update mail for account LDAP
+
+    Args:
+        umc_page (umc): login to UMC page
+        hr_code (str): HR code format 000xxxx, RAxxxx, FPTxxx or HCG account ex: A.NguyenV
+        mail (str): input mail to account UMC ex: abc@doamin.com
+
+    Returns:
+        list: replace and update mail for account LDAP
+    """
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Check account status before running
+    account_status = umc_page.get_search_account_status()
+    # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update employed since actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_info(data=mail, field=umc_page.mail)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error

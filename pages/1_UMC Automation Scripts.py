@@ -1,5 +1,9 @@
-import streamlit as st
-import pandas as pd
+from Common.supporting import (
+    cyberark_get_credential_password,
+    generate_OTP,
+    verify_OTP,
+    system_env_get_cred
+)
 from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
@@ -16,14 +20,16 @@ from Activity.umc_actions import (
     update_dob,
     update_gender,
     update_employed_since,
+    update_mail,
     reactivate_account
 )
+import pandas as pd
+import streamlit as st
+from Common.supporting import login_status_check, logout_render
 
-from Common.supporting import (
-    cyberark_get_credential_password,
-    generate_OTP,
-    verify_OTP
-)
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 def main():
@@ -303,6 +309,7 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
 
     # DoB update Button on Column 2
     update_dob_button = col_2.button("Update BoB")
+    update_mail_button = col_2.button("Update Mail")
 
     # Update number on Column 3
     update_name_button = col_3.button("Update name")
@@ -423,6 +430,28 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
                     hr_code, list_error[i].split("-", 1)[1]]
             umc_page.get_umc_url()
 
+    if update_mail_button:
+        # Start Selenium
+        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+        left, right = st.columns(
+            [0.4, 0.6], vertical_alignment="top", gap="large")
+        # loop through CSV & Search for HR code
+        for index, row in csv_data.iterrows():
+            hr_code = row["HR Code"]
+            mail = row["Mail"]
+            list_error = update_mail(
+                umc_page=umc_page,
+                hr_code=hr_code,
+                mail=mail
+            )
+            # Keep this line for debugging, but it might print None
+            left.write(list_error)
+            for i in range(len(list_error)):
+                table_of_error.loc[len(table_of_error)] = [
+                    hr_code, list_error[i].split("-", 1)[1]]
+            umc_page.get_umc_url()
+
 
 def tab5_exec():
     st.subheader("Reactivate accounts on UMC")
@@ -475,22 +504,23 @@ def tab5_exec():
 
             # Run Reactivate Scripts if the verification returns valid
             if st.session_state['confirmOTP_clicked'] and result is True:
-                st.write("OTP validated! Script will run now")
-                from time import sleep
-                # Trigger request to CBA Vault to get UMC password
-                cred = cyberark_get_credential_password()
-                sleep(5)
-                umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
-                # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-                # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
-                for index, hr_code in enumerate(login_name_input_area_list):
-                    reactivation_status = reactivate_account(
-                        umc_page=umc_page, hr_code=hr_code)
-                    if reactivation_status is False:
-                        st.write(hr_code + ": Reactivation Failed")
-                    umc_page.get_umc_url()
-                # Reset session state after function complete
-                st.session_state.clear()
+                with st.spinner('Processing...'):
+                    from time import sleep
+                    # Trigger request to CBA Vault to get UMC password
+                    cred = system_env_get_cred()
+                    sleep(5)
+                    umc_page = login_to_site(
+                        ldap_user="umc_admin1", ldap_pw=cred)
+                    # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+                    # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+                    for index, hr_code in enumerate(login_name_input_area_list):
+                        reactivation_status = reactivate_account(
+                            umc_page=umc_page, hr_code=hr_code)
+                        if reactivation_status is False:
+                            st.write(hr_code + ": Reactivation Failed")
+                        umc_page.get_umc_url()
+                    # Reset session state after function complete
+                    st.session_state.clear()
 
 
 def tab6_exec():
@@ -503,7 +533,7 @@ def tab6_exec():
         )
         emergency = st.button("Perform emergency add role", type="primary")
         if emergency:
-            cred = cyberark_get_credential_password()
+            cred = system_env_get_cred()
             umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
             for code in hr_code_input_area_lines:
                 add_role_status = add_role_umc(

@@ -1,5 +1,18 @@
 import streamlit as st
+
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
+
 import pytest
+from Common.supporting import (
+    login_status_check,
+    logout_render
+)
+
+# This is to jump the user back to login if their are not authenticated
+login_status_check()
+logout_render()
 
 
 def main():
