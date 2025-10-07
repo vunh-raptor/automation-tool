@@ -1,7 +1,5 @@
 from Sites.umc import umc
 from Common.constant.error_message import ErrorMessage
-from selenium.common.exceptions import NoSuchElementException
-import pandas as pd
 import time
 
 roles_table = [

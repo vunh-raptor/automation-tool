@@ -1,5 +1,5 @@
 import streamlit as st
-from Common.supporting import authenticate_ldap
+from Common.supporting import authenticate_ldap, logout_render
 
 # Pages setup
 # homepage = st.Page("main_site.py", title="Home")
@@ -25,6 +25,8 @@ def login_page():
     # Login function
     st.title("Please login with your HCG credential")
     with st.form("loginForm"):
+        st.warning(
+            "Please request role VN.SD.SD_AUTOMATION_HUB.USER on IDM if you need access")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         if st.form_submit_button("Login"):
@@ -34,12 +36,13 @@ def login_page():
                 st.session_state["userDisplayName"] = displayName
                 st.rerun()
             else:
-                st.error("Invalid credentials.")
+                st.error("Invalid credentials or lack of permission")
 
 
 if st.session_state["authenticated"]:
     # nav = st.navigation([homepage, umc_page], position="sidebar")
     st.success("Login success! Welcome " +
                str(st.session_state["userDisplayName"]))
+    logout_render()
 else:
     login_page()

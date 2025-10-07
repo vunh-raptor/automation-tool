@@ -1,5 +1,6 @@
 from Common.supporting import (
-    cyberark_get_credential_password,
+    push_msg_to_MSTeams,
+    adaptive_card_build_MSteams,
     generate_OTP,
     verify_OTP,
     system_env_get_cred
@@ -539,6 +540,9 @@ def tab6_exec():
                 add_role_status = add_role_umc(
                     umc_page=umc_page, hr_code=code, role_list=["NON_HOSEL_USER"])
                 if add_role_status is False:
+                    card = adaptive_card_build_MSteams(
+                        msg_title="Error when running Emergency add role on UMC", param1="User: " + str(st.session_state["userDisplayName"]))
+                    push_msg_to_MSTeams(adaptiveCard=card)
                     st.write(code + ": Emergency add role Failed")
                 umc_page.get_umc_url()
 
