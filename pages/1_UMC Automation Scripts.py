@@ -135,15 +135,17 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         st.write(csv_data)
 
     # Activate Account
-    if active_account_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            add_homesis_homesis_user(umc_page=umc_page, hr_code=hr_code)
-            umc_page.get_umc_url()
+    if active_account_button:
+        with st.spinner("Automation Script is running"):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                add_homesis_homesis_user(umc_page=umc_page, hr_code=hr_code)
+                umc_page.get_umc_url()
+        st.write("Automation Script has finished")
 
     # Deactivate Account
     if remove_roles_button:
