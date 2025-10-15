@@ -6,6 +6,7 @@ import logging
 from pyotp import TOTP
 from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
 from ldap3 import Server, Connection, ALL, SUBTREE
+# from Activity import Request_to_automate
 
 REACTIVATE_WEBHOOK_URL = "https://prod-102.westeurope.logic.azure.com:443/workflows/622b616dc2a9428e9dfa90b97df7a5c2/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7J64W7hby4vALfHoRosepx0voq-jJd-KB0Nzepfgu0Y"
 ERROR_WEBHOOK_URL = "https://default5675d32119d14c9596842c28ac8f80.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2441849b00aa40dfbfd4badcc9f748d3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ypI1uwC9FCskpObxzJxKqzZD85tSs2lTYV5QfrDcdWs"
@@ -264,3 +265,75 @@ def logout_render():
     if st.sidebar.button("Logout"):
         st.session_state["authenticated"] = False
         st.rerun()
+
+
+def request_to_automate_button():
+    """This is function to submit Request to automate your work
+    """
+    if st.sidebar.button("Request to automate"):
+        st.session_state["autoreq"] = True
+
+    if st.session_state["autoreq"] is True:
+        request_to_automate()
+
+
+@st.dialog("Request to automate", width="large")
+def request_to_automate():
+    """Display the contribution form dialog"""
+    st.markdown("Fill in the details below to create a JIRA Request.")
+
+    with st.form("contribution_form", clear_on_submit=True):
+        # Summary field
+        summary = st.text_input(
+            "Summary *",
+            placeholder="Enter a brief summary",
+            help="Brief summary of the request to automate"
+        )
+
+        # Description field
+        description = st.text_area(
+            "Description *",
+            placeholder="Enter detailed description",
+            height=120,
+            help="Detailed description of the request to automate"
+        )
+
+        # File uploader for attachments
+        attachments = st.file_uploader(
+            "Picture Attachments",
+            type=["png", "jpg", "jpeg", "gif"],
+            accept_multiple_files=True,
+            help="Upload files (optional)"
+        )
+
+        # Display uploaded files
+        if attachments:
+            st.markdown("**Uploaded files:**")
+            for file in attachments:
+                st.markdown(f"- {file.name} ({file.size / 1024:.1f} KB)")
+
+        # Form buttons
+        col1, col2 = st.columns([1, 5])
+
+        with col1:
+            cancel_button = st.form_submit_button(
+                "Cancel", use_container_width=True)
+
+        with col2:
+            submit_button = st.form_submit_button(
+                "Submit",
+                type="primary",
+                use_container_width=True
+            )
+
+        # Handle form submission
+        if submit_button:
+            if not summary or not description:
+                st.error(
+                    "Please fill in all required fields (Summary and Description)")
+                st.session_state["autoreq"] = False
+            else:
+                st.session_state["autoreq"] = False
+            st.session_state["autoreq"] = False
+        if cancel_button:
+            st.session_state["autoreq"] = False

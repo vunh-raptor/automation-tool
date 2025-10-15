@@ -3,7 +3,10 @@ from Common.supporting import (
     adaptive_card_build_MSteams,
     generate_OTP,
     verify_OTP,
-    system_env_get_cred
+    system_env_get_cred,
+    login_status_check,
+    logout_render,
+    request_to_automate_button
 )
 from Activity.umc_actions import (
     login_to_site,
@@ -26,11 +29,11 @@ from Activity.umc_actions import (
 )
 import pandas as pd
 import streamlit as st
-from Common.supporting import login_status_check, logout_render
 
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
 logout_render()
+request_to_automate_button()
 
 
 def main():
