@@ -6,6 +6,7 @@ if st.session_state["authenticated"] is not True:
 
 import pandas as pd
 from Common.constant.css_file import css
+import Common.constant.app_message as app_msg
 
 
 from Activity.homesis_actions import (
@@ -79,7 +80,7 @@ def main():
             "Add role-in-bank SA", type="primary")
         # Add role in bank SA for Homesis page
         if add_role_in_bank_SA_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -120,7 +121,7 @@ def main():
                         != " Click Save button successfully"
                     ]
                 )
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     with tab2:
         st.markdown("Required field:")
@@ -131,7 +132,7 @@ def main():
             "Add role-in-bank RA MW", type="primary")
         # Add role in bank RA MW for Homesis page
         if add_role_in_bank_RA_MW_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -168,7 +169,7 @@ def main():
                         != " Click Save button successfully"
                     ]
                 )
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     with tab3:
         st.markdown("Required field:")
@@ -179,7 +180,7 @@ def main():
         )
         # Add role in bank RA FPT for Homesis page
         if add_role_in_bank_RA_FPT_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -218,7 +219,7 @@ def main():
                         != " Click Save button successfully"
                     ]
                 )
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     with tab4:
         st.markdown("Required field:")
@@ -229,7 +230,7 @@ def main():
         )
         # Add role in bank RA New Segment for Homesis page
         if add_role_in_bank_RA_NS_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -270,7 +271,7 @@ def main():
                         != " Click Save button successfully"
                     ]
                 )
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     section_divided_caption_other_action = st.subheader(
         "Update Homesis information", divider="red"
@@ -350,7 +351,7 @@ def main():
             "Change Role-in-Bank", type="primary")
         # Change role in bank action
         if change_role_in_bank_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -365,7 +366,7 @@ def main():
                     )
                     homesis_page.get_homesis_url()
                     homesis_page.access_user_managerment()
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     with add_sup_code_tab:
         st.text(
@@ -388,7 +389,7 @@ def main():
         # nhét chức năng thêm dô ở đây
         add_sup_code_btn = st.button("Add Sup Code", type="primary")
         if add_sup_code_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -406,7 +407,7 @@ def main():
                     st.write(list_error)
                     homesis_page.get_homesis_url()
                     homesis_page.access_user_managerment()
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     with update_note_tab:
         # Insert excel file for create Homesis account
@@ -427,7 +428,7 @@ def main():
         # nhét chức năng thêm dô ở đây
         update_note_btn = st.button("Update Note", type="primary")
         if update_note_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -441,7 +442,7 @@ def main():
                                 hr_code=hr_code, note=note)
                     homesis_page.get_homesis_url()
                     homesis_page.access_user_managerment()
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     with update_id_number_tab:
         # Insert excel file for create Homesis account
@@ -462,7 +463,7 @@ def main():
         # function to update ID number
         update_id_number_btn = st.button("Update ID number", type="primary")
         if update_id_number_btn:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Start Selenium
                 homesis_page = login_to_site(
                     ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -477,7 +478,7 @@ def main():
                     )
                     homesis_page.get_homesis_url()
                     homesis_page.access_user_managerment()
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     section_divided_caption_other_action = st.subheader(
         "Close/Block Shopcode/Partner", divider="red"
@@ -517,7 +518,7 @@ def main():
                 "Execute action with partners", type="primary")
 
             if execute_action_with_btn:
-                with st.spinner("Automation Script is running"):
+                with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                     # Start Selenium
                     homesis_page = login_to_site(
                         ldap_user=ldap_user, ldap_pw=ldap_pw)
@@ -539,7 +540,7 @@ def main():
 
                         st.write("Tool đã đóng " +
                                  str(count) + " partner code.")
-                st.write("Automation Script has finished")
+                st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
         if option == "Blocked":
             st.text("This action is not available")

@@ -7,6 +7,7 @@ from Common.supporting import (
     login_status_check,
     logout_render
 )
+import Common.constant.app_message as app_msg
 import pandas as pd
 import streamlit as st
 
@@ -64,7 +65,7 @@ def tab1_exec(username: str, password: str):
         st.write(excel_data)
         confirm_button = st.button("Confirm & Proceed", type="primary")
         if confirm_button:
-            with st.spinner("Automation Script is running"):
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 # Process Data
                 excel_data[['Region', 'District']] = excel_data['Region and Ward'].str.split(
                     ',', expand=True)
@@ -87,7 +88,7 @@ def tab1_exec(username: str, password: str):
                         st.write(
                             "Bank is not in predefined list, to be safe the branch will log here" + bank_name)
                         continue
-            st.write("Automation Script has finished")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
 def tab2_exec(username, password):
