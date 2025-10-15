@@ -23,6 +23,7 @@ from Activity.umc_actions import (
     update_mail,
     reactivate_account
 )
+import Common.constant.app_message as app_msg
 import pandas as pd
 import streamlit as st
 from Common.supporting import login_status_check, logout_render
@@ -135,67 +136,79 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         st.write(csv_data)
 
     # Activate Account
-    if active_account_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            add_homesis_homesis_user(umc_page=umc_page, hr_code=hr_code)
-            umc_page.get_umc_url()
+    if active_account_button:
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                add_homesis_homesis_user(umc_page=umc_page, hr_code=hr_code)
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     # Deactivate Account
     if remove_roles_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            reason = roles_table[options.index(deact_reason)]
-            deactivate_user_with_reason(
-                umc_page=umc_page, hr_code=hr_code, reason=reason
-            )
-            umc_page.get_umc_url()
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                reason = roles_table[options.index(deact_reason)]
+                deactivate_user_with_reason(
+                    umc_page=umc_page, hr_code=hr_code, reason=reason
+                )
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     # Reactivate Account
     if reactivate_account_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            reason = options[options.index(deact_reason)]
-            sales_reactivate(umc_page=umc_page, hr_code=hr_code)
-            umc_page.get_umc_url()
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                reason = options[options.index(deact_reason)]
+                sales_reactivate(umc_page=umc_page, hr_code=hr_code)
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if remove_dismissal_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            role = roles_table[options.index(deact_reason)]
-            remove_single_role(umc_page=umc_page, hr_code=hr_code, role=role)
-            umc_page.get_umc_url()
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                role = roles_table[options.index(deact_reason)]
+                remove_single_role(umc_page=umc_page,
+                                   hr_code=hr_code, role=role)
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     st.divider()
     st.text("Deactive RA")
-    deactive_ra_button = st.button("Deactive RA", type="primary")
+    deactive_ra_button = st.button(
+        "Deactive RA", type="primary")
 
     # deactive account
     if deactive_ra_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            deactivate_ra(umc_page=umc_page, hr_code=hr_code)
-            umc_page.get_umc_url()
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                deactivate_ra(umc_page=umc_page, hr_code=hr_code)
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
 def tab2_exec(ldap_user: str, ldap_pw: str):
@@ -212,17 +225,18 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
 
     if add_role_umc_btn:
         # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        for index in range(len(login_name_input_area_list)):
-            login_name = login_name_input_area_list[index]
-            add_role_umc(
-                umc_page=umc_page,
-                hr_code=login_name,
-                role_list=role_umc_input_area_list,
-            )
-
-            umc_page.get_umc_url()
+            for index in range(len(login_name_input_area_list)):
+                login_name = login_name_input_area_list[index]
+                add_role_umc(
+                    umc_page=umc_page,
+                    hr_code=login_name,
+                    role_list=role_umc_input_area_list,
+                )
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     st.divider()
     st.subheader("Remove role for multiple user")
@@ -236,18 +250,20 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
     remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
 
     if remove_role_umc_btn:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
-        for index in range(len(login_name_input_area_list)):
-            login_name = login_name_input_area_list[index]
-            remove_multi_roles_umc(
-                umc_page=umc_page,
-                hr_code=login_name,
-                role_list=role_umc_input_area_list,
-            )
+            for index in range(len(login_name_input_area_list)):
+                login_name = login_name_input_area_list[index]
+                remove_multi_roles_umc(
+                    umc_page=umc_page,
+                    hr_code=login_name,
+                    role_list=role_umc_input_area_list,
+                )
 
-            umc_page.get_umc_url()
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
 def tab3_exec(ldap_user: str, ldap_pw: str):
@@ -260,15 +276,18 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
     check_status_btn = st.button("Check status account", type="primary")
 
     if check_status_btn:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        data_user_status_list = []
-        # Initial dataframe saving user status
-        for hr_code in hr_code_input_area_lines:
-            status = check_account_status(umc_page=umc_page, hr_code=hr_code)
-            data_user_status_list.append(
-                {"Hr Code": hr_code, "Status": status})  # Add to the list
-            umc_page.get_umc_url()  # Move outside the loop if it doesn't depend on hr_code
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            data_user_status_list = []
+            # Initial dataframe saving user status
+            for hr_code in hr_code_input_area_lines:
+                status = check_account_status(
+                    umc_page=umc_page, hr_code=hr_code)
+                data_user_status_list.append(
+                    {"Hr Code": hr_code, "Status": status})  # Add to the list
+                umc_page.get_umc_url()  # Move outside the loop if it doesn't depend on hr_code
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
         # Create the DataFrame *outside* the loop (only once):
         # <--- DataFrame created here
@@ -319,138 +338,150 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
 
     # Update info account UMC
     if update_phone_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns(
-            [0.4, 0.6], vertical_alignment="top", gap="large")
-        # Loop through CSV & Search for HR Code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            phone_number = row["Phone"]
-            list_error = update_phone_number(
-                umc_page=umc_page,
-                hr_code=hr_code,
-                phone_number=phone_number
-            )
-            # Keep this line for debugging, but it might print None
-            left.write(list_error)
-            for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [
-                    hr_code, list_error[i].split("-", 1)[1]]
-            umc_page.get_umc_url()
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            # Loop through CSV & Search for HR Code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                phone_number = row["Phone"]
+                list_error = update_phone_number(
+                    umc_page=umc_page,
+                    hr_code=hr_code,
+                    phone_number=phone_number
+                )
+                # Keep this line for debugging, but it might print None
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if update_name_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns(
-            [0.4, 0.6], vertical_alignment="top", gap="large")
-        # loop through CSV & Search for HR code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            first_name = row["First Name"]
-            last_name = row["Last Name"]
-            list_error = update_name(
-                umc_page=umc_page,
-                hr_code=hr_code,
-                first_name=first_name,
-                last_name=last_name
-            )
-            # Keep this line for debugging, but it might print None
-            left.write(list_error)
-            for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [
-                    hr_code, list_error[i].split("-", 1)[1]]
-            umc_page.get_umc_url()
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            # loop through CSV & Search for HR code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                first_name = row["First Name"]
+                last_name = row["Last Name"]
+                list_error = update_name(
+                    umc_page=umc_page,
+                    hr_code=hr_code,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+                # Keep this line for debugging, but it might print None
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if update_dob_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns(
-            [0.4, 0.6], vertical_alignment="top", gap="large")
-        # loop through CSV & Search for HR code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            date_of_birth = row["DateOfBirth"]
-            list_error = update_dob(
-                umc_page=umc_page,
-                hr_code=hr_code,
-                date_of_birth=date_of_birth
-            )
-            # Keep this line for debugging, but it might print None
-            left.write(list_error)
-            for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [
-                    hr_code, list_error[i].split("-", 1)[1]]
-            umc_page.get_umc_url()
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            # loop through CSV & Search for HR code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                date_of_birth = row["DateOfBirth"]
+                list_error = update_dob(
+                    umc_page=umc_page,
+                    hr_code=hr_code,
+                    date_of_birth=date_of_birth
+                )
+                # Keep this line for debugging, but it might print None
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if update_gender_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns(
-            [0.4, 0.6], vertical_alignment="top", gap="large")
-        # loop through CSV & Search for HR code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            detail_gender = row["Gender"]
-            list_error = update_gender(
-                umc_page=umc_page,
-                hr_code=hr_code,
-                detail_gender=detail_gender
-            )
-            # Keep this line for debugging, but it might print None
-            left.write(list_error)
-            for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [
-                    hr_code, list_error[i].split("-", 1)[1]]
-            umc_page.get_umc_url()
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            # loop through CSV & Search for HR code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                detail_gender = row["Gender"]
+                list_error = update_gender(
+                    umc_page=umc_page,
+                    hr_code=hr_code,
+                    detail_gender=detail_gender
+                )
+                # Keep this line for debugging, but it might print None
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if update_employed_since_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns(
-            [0.4, 0.6], vertical_alignment="top", gap="large")
-        # loop through CSV & Search for HR code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            employedSince = row["Employed Since"]
-            list_error = update_employed_since(
-                umc_page=umc_page,
-                hr_code=hr_code,
-                employedSince=employedSince
-            )
-            # Keep this line for debugging, but it might print None
-            left.write(list_error)
-            for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [
-                    hr_code, list_error[i].split("-", 1)[1]]
-            umc_page.get_umc_url()
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            # loop through CSV & Search for HR code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                employedSince = row["Employed Since"]
+                list_error = update_employed_since(
+                    umc_page=umc_page,
+                    hr_code=hr_code,
+                    employedSince=employedSince
+                )
+                # Keep this line for debugging, but it might print None
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if update_mail_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-        table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-        left, right = st.columns(
-            [0.4, 0.6], vertical_alignment="top", gap="large")
-        # loop through CSV & Search for HR code
-        for index, row in csv_data.iterrows():
-            hr_code = row["HR Code"]
-            mail = row["Mail"]
-            list_error = update_mail(
-                umc_page=umc_page,
-                hr_code=hr_code,
-                mail=mail
-            )
-            # Keep this line for debugging, but it might print None
-            left.write(list_error)
-            for i in range(len(list_error)):
-                table_of_error.loc[len(table_of_error)] = [
-                    hr_code, list_error[i].split("-", 1)[1]]
-            umc_page.get_umc_url()
+        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+            # Start Selenium
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            # loop through CSV & Search for HR code
+            for index, row in csv_data.iterrows():
+                hr_code = row["HR Code"]
+                mail = row["Mail"]
+                list_error = update_mail(
+                    umc_page=umc_page,
+                    hr_code=hr_code,
+                    mail=mail
+                )
+                # Keep this line for debugging, but it might print None
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
+        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
 def tab5_exec():
@@ -533,14 +564,16 @@ def tab6_exec():
         )
         emergency = st.button("Perform emergency add role", type="primary")
         if emergency:
-            cred = system_env_get_cred()
-            umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
-            for code in hr_code_input_area_lines:
-                add_role_status = add_role_umc(
-                    umc_page=umc_page, hr_code=code, role_list=["NON_HOSEL_USER"])
-                if add_role_status is False:
-                    st.write(code + ": Emergency add role Failed")
-                umc_page.get_umc_url()
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+                cred = system_env_get_cred()
+                umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
+                for code in hr_code_input_area_lines:
+                    add_role_status = add_role_umc(
+                        umc_page=umc_page, hr_code=code, role_list=["NON_HOSEL_USER"])
+                    if add_role_status is False:
+                        st.write(code + ": Emergency add role Failed")
+                    umc_page.get_umc_url()
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
 if __name__ == "__main__":
