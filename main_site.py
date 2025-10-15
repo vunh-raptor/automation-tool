@@ -1,6 +1,5 @@
 import streamlit as st
 from Common.supporting import authenticate_ldap, logout_render, request_to_automate_button
-from Activity.Request_to_automate import request_to_automate
 
 # Pages setup
 # homepage = st.Page("main_site.py", title="Home")
@@ -46,7 +45,6 @@ if st.session_state["authenticated"]:
     st.success("Login success! Welcome " +
                str(st.session_state["userDisplayName"]))
     request_to_automate_button()
-    # request_to_automate()
     logout_render()
 else:
     login_page()

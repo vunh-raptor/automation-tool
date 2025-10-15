@@ -6,7 +6,6 @@ import logging
 from pyotp import TOTP
 from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
 from ldap3 import Server, Connection, ALL, SUBTREE
-# from Activity import Request_to_automate
 
 REACTIVATE_WEBHOOK_URL = "https://prod-102.westeurope.logic.azure.com:443/workflows/622b616dc2a9428e9dfa90b97df7a5c2/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7J64W7hby4vALfHoRosepx0voq-jJd-KB0Nzepfgu0Y"
 ERROR_WEBHOOK_URL = "https://default5675d32119d14c9596842c28ac8f80.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2441849b00aa40dfbfd4badcc9f748d3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ypI1uwC9FCskpObxzJxKqzZD85tSs2lTYV5QfrDcdWs"
