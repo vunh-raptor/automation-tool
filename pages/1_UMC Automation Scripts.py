@@ -11,6 +11,7 @@ from Common.supporting import (
 import streamlit as st
 import pandas as pd
 from inspect import currentframe
+from Common.constant import app_message as app_msg
 from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
@@ -22,6 +23,12 @@ from Activity.umc_actions import (
     check_account_status,
     add_role_umc,
     remove_multi_roles_umc,
+    update_name,
+    update_phone_number,
+    update_mail,
+    update_dob,
+    update_employed_since,
+    update_gender,
     reactivate_account
 )
 
