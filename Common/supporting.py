@@ -254,6 +254,8 @@ def authenticate_ldap(username: str, password: str) -> str:
 def login_status_check():
     """This is a quick function to constantly check if user is authenticated
     """
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
     if st.session_state["authenticated"] is not True:
         st.switch_page("main_site.py")
 
@@ -270,7 +272,6 @@ def feedback_form_render(target: str, user: str):
     try:
         with st.container(border=True, height="content"):
             st.write("Our solution solved your problem?")
-            st.write(target)
             feedback = st.feedback(options="thumbs", width="stretch")
             return feedback
     except Exception as e:

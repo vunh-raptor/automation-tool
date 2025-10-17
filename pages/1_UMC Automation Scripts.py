@@ -12,7 +12,6 @@ from Activity.umc_actions import (
     check_account_status,
     add_role_umc,
     remove_multi_roles_umc,
-    update_info_UMC,
     reactivate_account
 )
 from Common.supporting import (
