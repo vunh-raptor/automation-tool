@@ -8,10 +8,6 @@ from Common.supporting import (
     logout_render,
     request_to_automate_button
 )
-import streamlit as st
-import pandas as pd
-from inspect import currentframe
-from Common.constant import app_message as app_msg
 from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
@@ -23,14 +19,17 @@ from Activity.umc_actions import (
     check_account_status,
     add_role_umc,
     remove_multi_roles_umc,
-    update_name,
     update_phone_number,
-    update_mail,
+    update_name,
     update_dob,
-    update_employed_since,
     update_gender,
+    update_employed_since,
+    update_mail,
     reactivate_account
 )
+import Common.constant.app_message as app_msg
+import pandas as pd
+import streamlit as st
 
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
@@ -547,14 +546,14 @@ def tab5_exec():
                     sleep(5)
                     umc_page = login_to_site(
                         ldap_user="umc_admin1", ldap_pw=cred)
+                    # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+                    # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
                     for index, hr_code in enumerate(login_name_input_area_list):
                         reactivation_status = reactivate_account(
                             umc_page=umc_page, hr_code=hr_code)
                         if reactivation_status is False:
-                            st.write(f"{hr_code}: Reactivation Failed")
+                            st.write(hr_code + ": Reactivation Failed")
                         umc_page.get_umc_url()
-                    feedback_form_render(target=currentframe(
-                    ).f_code.co_name, user=st.session_state["userDisplayName"])
                     # Reset session state after function complete
                     st.session_state.clear()
 

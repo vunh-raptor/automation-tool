@@ -1,6 +1,11 @@
 import streamlit as st
 from Common.supporting import authenticate_ldap, logout_render, request_to_automate_button
 
+# Pages setup
+# homepage = st.Page("main_site.py", title="Home")
+# umc_page = st.Page("pages/1_UMC Automation Scripts.py", title="UMC Scripts")
+# # # Hide Navigation automatically if not loggedin
+# st.navigation([homepage, umc_page], position="hidden")
 st.set_page_config(
     page_title="Welcome to SD AutoHub",
     page_icon="👋",
@@ -9,6 +14,7 @@ st.set_page_config(
     menu_items={"Get help": None,
                 "About": "Developed and maintained by: **Service Desk Team** with Tech Leader: **Nhu.HuynhNY**"}
 )
+# nav = st.navigation([homepage], position="hidden")
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
     st.session_state["userDisplayName"] = ""
@@ -35,6 +41,7 @@ def login_page():
 
 
 if st.session_state["authenticated"]:
+    # nav = st.navigation([homepage, umc_page], position="sidebar")
     st.success("Login success! Welcome " +
                str(st.session_state["userDisplayName"]))
     request_to_automate_button()

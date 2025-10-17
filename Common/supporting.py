@@ -230,7 +230,7 @@ def authenticate_ldap(username: str, password: str) -> str:
         password (str): password of the user
 
     Returns:
-        str: the status of the login request, return user DisplayName if success login and emptyString if failed login
+        bool: the status of the login request, True if success login and False if failed login
     """
     try:
         userDN = ""
@@ -254,8 +254,6 @@ def authenticate_ldap(username: str, password: str) -> str:
 def login_status_check():
     """This is a quick function to constantly check if user is authenticated
     """
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
     if st.session_state["authenticated"] is not True:
         st.switch_page("main_site.py")
 
@@ -266,18 +264,6 @@ def logout_render():
     if st.sidebar.button("Logout"):
         st.session_state["authenticated"] = False
         st.rerun()
-
-
-def feedback_form_render(target: str, user: str):
-    try:
-        with st.container(border=True, height="content"):
-            st.write("Our solution solved your problem?")
-            feedback = st.feedback(options="thumbs", width="stretch")
-            return feedback
-    except Exception as e:
-        print(e)
-        return None
-    return None
 
 
 def request_to_automate_button():

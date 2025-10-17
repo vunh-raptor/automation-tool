@@ -1,5 +1,9 @@
 import streamlit as st
 
+# This is to jump the user back to login if their are not authenticated
+if st.session_state["authenticated"] is not True:
+    st.switch_page("main_site.py")
+
 import pandas as pd
 from Common.constant.css_file import css
 import Common.constant.app_message as app_msg
