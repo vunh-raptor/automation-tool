@@ -1,6 +1,6 @@
 class ErrorMessage:
     # homesis errors
-    class HomesisMessage:
+    class homesis_message:
         CAN_NOT_FIND_USER = "Can't find user"
         CAN_NOT_FIND_LOCATION = "Can't find location"
         CAN_NOT_FIND_SUP_CODE = "Can't find sup code"
@@ -10,11 +10,7 @@ class ErrorMessage:
         CLICK_SAVE_BUTTON = "Click Save button successfully"
 
     # umc errors
-    class UmcMessage:
+    class umc_message:
         USER_INACTIVE = "is inactive"
         USER_NOT_FOUND = "is not found"
         USER_UPDATED = "is update successfully"
-
-    class AppMessage:
-        LOGIN_ERROR = "Invalid username and password"
-        CSV_ERROR = "Invalid CSV. Check your CSV format again"
