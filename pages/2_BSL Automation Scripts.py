@@ -10,13 +10,14 @@ from Common.supporting import (
 from Common.constant import exception
 import pandas as pd
 import streamlit as st
+from Common.constant import app_logic_exception
 
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
 logout_render()
 
 
-@exception.handler
+@app_logic_exception.app_logic_exception_handler
 def main():
     """
     This function is to support SD task interact with BSL

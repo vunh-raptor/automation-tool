@@ -8,6 +8,7 @@ if st.session_state["authenticated"] is not True:
 import pandas as pd
 from Common.constant.css_file import css
 import Common.constant.app_message as app_msg
+from Common.constant import app_logic_exception
 
 
 from Activity.homesis_actions import (
@@ -33,7 +34,7 @@ login_status_check()
 logout_render()
 
 
-@exception.handler
+@app_logic_exception.app_logic_exception_handler
 def main():
     """
     This function is to support SD task interact with Homesis

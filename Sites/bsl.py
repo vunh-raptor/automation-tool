@@ -1,7 +1,7 @@
 import logging
 import time
 from Common.page_object import page_object as Page
-from Common.constant import exception
+from Common.constant import app_logic_exception
 
 # Element Path
 
@@ -78,13 +78,13 @@ class bsl(Page):
             time.sleep(2)
             if self.check_login_status() is False:
                 logging.critical("Invalid Username or Password.")
-                raise exception.LoginError
+                raise app_logic_exception.LoginError
                 # return False
             else:
                 return True
         else:
             logging.critical("Missing Username or Password.")
-            raise exception.LoginError
+            raise app_logic_exception.LoginError
             # return False
 
     def logout(self) -> None:

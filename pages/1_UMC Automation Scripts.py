@@ -31,7 +31,7 @@ import Common.constant.app_message as app_msg
 import pandas as pd
 import streamlit as st
 from Common.supporting import login_status_check, logout_render
-from Common.constant import exception
+from Common.constant import app_logic_exception
 
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
@@ -39,7 +39,7 @@ logout_render()
 request_to_automate_button()
 
 
-@exception.handler
+@app_logic_exception.app_logic_exception_handler
 def main():
     # Title of the page
     st.title("UMC AUTOMATION HUB")
@@ -143,9 +143,6 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         st.write(csv_data)
 
     # Activate Account
-    if active_account_button:
-        # Start Selenium
-        umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
 
     if active_account_button:
         with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
