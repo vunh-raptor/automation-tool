@@ -538,7 +538,6 @@ def tab5_exec():
                     st.write("OTP failed to verify!")
 
                     # Reset session state after function complete
-                    # st.session_state.clear()
                     st.session_state['getOTP_clicked'] = False
                     st.session_state['confirmOTP_clicked'] = False
                     st.rerun()
@@ -557,11 +556,8 @@ def tab5_exec():
                     for index, hr_code in enumerate(login_name_input_area_list):
                         reactivation_status = reactivate_account(
                             umc_page=umc_page, hr_code=hr_code)
-                        if reactivation_status is False:
-                            st.write(hr_code + ": Reactivation Failed")
-                    umc_page.get_umc_url()
+                        umc_page.get_umc_url()
                     # Reset session state after function complete
-                    # st.session_state.clear()
                     st.session_state['getOTP_clicked'] = False
                     st.session_state['confirmOTP_clicked'] = False
                     st.rerun()

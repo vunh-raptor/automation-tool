@@ -68,6 +68,7 @@ class umc(Page):
         This method navigates to the UMC URL.
         """
         self.get(self.umc_url)
+        time.sleep(1)
 
     def login_with_data(self, ldap_user: str, ldap_pw: str) -> bool:
         """
@@ -140,7 +141,7 @@ class umc(Page):
         This method clicks the details button.
         """
 
-        self.search_by_xpath(self.detail_button).click()
+        self.search_by_xpath(self.detail_button, delay=0.5).click()
 
     def click_block_button(self) -> bool:
         """
@@ -178,7 +179,7 @@ class umc(Page):
         Returns:
             bool: status of the action
         """
-        button = self.search_by_xpath(self.activate_button)
+        button = self.search_by_xpath(self.activate_button, delay=0.5)
         if button.flag:
             button.click()
             return False
@@ -190,7 +191,7 @@ class umc(Page):
         """
         This method clicks the edit button.
         """
-        self.search_by_xpath(self.edit_button).click()
+        self.search_by_xpath(self.edit_button, delay=0.5).click()
 
     def click_remove_role(self) -> None:
         """
