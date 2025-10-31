@@ -1,7 +1,9 @@
 import logging
+import time
 from Common.page_object import page_object as Page
 from selenium.common.exceptions import TimeoutException
 from requests import Response
+from Common.constant import app_logic_exception
 
 # Element Path
 
@@ -113,10 +115,19 @@ class homesis(Page):
                                  delay=0.5).send_keys(ldap_user)
             self.search_by_xpath(self.ldap_pw_input,
                                  delay=0.5).send_keys(ldap_pw)
-            return self.search_by_xpath(self.login_button, delay=0.5).click()
+            self.search_by_xpath(self.login_button, delay=0.5).click()
+            # wait for login
+            time.sleep(2)
+            if self.check_login_status() is False:
+                logging.critical("Invalid Username or Password.")
+                raise app_logic_exception.LoginError
+                # return False
+            else:
+                return True
         else:
             logging.critical("Missing Username or Password.")
-            return False
+            raise app_logic_exception.LoginError
+            # return False
 
     def access_user_managerment(self) -> bool:
         """

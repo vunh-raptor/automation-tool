@@ -30,6 +30,8 @@ from Activity.umc_actions import (
 import Common.constant.app_message as app_msg
 import pandas as pd
 import streamlit as st
+from Common.supporting import login_status_check, logout_render
+from Common.constant import app_logic_exception
 
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
@@ -37,6 +39,7 @@ logout_render()
 request_to_automate_button()
 
 
+@app_logic_exception.app_logic_exception_handler
 def main():
     # Title of the page
     st.title("UMC AUTOMATION HUB")
@@ -535,7 +538,9 @@ def tab5_exec():
                     st.write("OTP failed to verify!")
 
                     # Reset session state after function complete
-                    st.session_state.clear()
+                    st.session_state['getOTP_clicked'] = False
+                    st.session_state['confirmOTP_clicked'] = False
+                    st.rerun()
 
             # Run Reactivate Scripts if the verification returns valid
             if st.session_state['confirmOTP_clicked'] and result is True:
@@ -551,11 +556,11 @@ def tab5_exec():
                     for index, hr_code in enumerate(login_name_input_area_list):
                         reactivation_status = reactivate_account(
                             umc_page=umc_page, hr_code=hr_code)
-                        if reactivation_status is False:
-                            st.write(hr_code + ": Reactivation Failed")
                         umc_page.get_umc_url()
                     # Reset session state after function complete
-                    st.session_state.clear()
+                    st.session_state['getOTP_clicked'] = False
+                    st.session_state['confirmOTP_clicked'] = False
+                    st.rerun()
 
 
 def tab6_exec():

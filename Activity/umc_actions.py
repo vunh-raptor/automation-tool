@@ -144,7 +144,6 @@ def reactivate_account(umc_page: umc, hr_code: str) -> bool:
         try:
             umc_page.click_details_button()
             umc_page.click_activate()
-            # umc_page.click_details_button()
             if umc_page.is_table_is_empty() is True:
                 umc_page.click_edit()
                 umc_page.select_role(role="NON_HOSEL_USER")

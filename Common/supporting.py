@@ -269,7 +269,7 @@ def logout_render():
 def request_to_automate_button():
     """This is function to submit Request to automate your work
     """
-    if "autoreg" not in st.session_state:
+    if "autoreq" not in st.session_state:
         st.session_state["autoreq"] = False
     if st.sidebar.button("Request to automate"):
         st.session_state["autoreq"] = True

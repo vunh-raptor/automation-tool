@@ -255,3 +255,13 @@ class page_object:
         if value is None or value == '':
             value = element.text
         return value
+
+    def get_page_text(self):
+        body_element = self.driver.find_element(By.TAG_NAME, "body")
+        return body_element.text.lower()
+
+    def check_login_status(self) -> bool:
+        if "invalid" in self.get_page_text() or "not authorized" in self.get_page_text():
+            return False
+        else:
+            return True
