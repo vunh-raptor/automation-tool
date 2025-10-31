@@ -6,6 +6,7 @@ from Common.supporting import (
     system_env_get_cred,
     login_status_check,
     logout_render,
+    authenticate_swagger,
     request_to_automate_button
 )
 from Activity.umc_actions import (
@@ -25,14 +26,13 @@ from Activity.umc_actions import (
     update_gender,
     update_employed_since,
     update_mail,
-    reactivate_account
+    reactivate_account,
+    umc_start_session,
 )
 import Common.constant.app_message as app_msg
 import pandas as pd
 import streamlit as st
-from Common.supporting import login_status_check, logout_render
 from Common.constant import app_logic_exception
-
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
 logout_render()
@@ -221,11 +221,11 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
 def tab2_exec(ldap_user: str, ldap_pw: str):
 
     st.subheader("Add role for multiple user")
-    left, rigth = st.columns(2, vertical_alignment="top")
+    left, right = st.columns(2, vertical_alignment="top")
     login_name_input_area = left.text_area("Input login name here")
     login_name_input_area_list = login_name_input_area.split(
         "\n")  # This return a list
-    role_umc_input_area = rigth.text_area("Input roles here")
+    role_umc_input_area = right.text_area("Input roles here")
     role_umc_input_area_list = role_umc_input_area.split(
         "\n")  # This return a list
     add_role_umc_btn = st.button("Add roles UMC", type="primary")
@@ -247,11 +247,11 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
 
     st.divider()
     st.subheader("Remove role for multiple user")
-    left, rigth = st.columns(2, vertical_alignment="top")
+    left, right = st.columns(2, vertical_alignment="top")
     login_name_input_area = left.text_area("Input login name to remove here")
     login_name_input_area_list = login_name_input_area.split(
         "\n")  # This return a list
-    role_umc_input_area = rigth.text_area("Input remove roles here")
+    role_umc_input_area = right.text_area("Input remove roles here")
     role_umc_input_area_list = role_umc_input_area.split(
         "\n")  # This return a list
     remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
@@ -284,33 +284,35 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
 
     if check_status_btn:
         with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            request = umc_start_session(token=authenticate_swagger(
+                username=ldap_user, password=ldap_pw))
             data_user_status_list = []
-            # Initial dataframe saving user status
             for hr_code in hr_code_input_area_lines:
                 status = check_account_status(
-                    umc_page=umc_page, hr_code=hr_code)
+                    umc_request=request, hr_code=hr_code)
                 data_user_status_list.append(
-                    {"Hr Code": hr_code, "Status": status})  # Add to the list
-                umc_page.get_umc_url()  # Move outside the loop if it doesn't depend on hr_code
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
+                    {"HR Code": hr_code, "Status": status})
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
         # Create the DataFrame *outside* the loop (only once):
         # <--- DataFrame created here
         data_user_status = pd.DataFrame(data_user_status_list)
 
         # display result
-        left, rigth = st.columns(2, vertical_alignment="top")
+        left, right = st.columns(2, vertical_alignment="top")
+        data_user_status_inactive = data_user_status[
+            data_user_status["Status"] == "INACTIVE"
+        ]
+        right.divider(width="stretch")
+        right.subheader(":red[Inactive user]")
+        right.text(f"Found {len(data_user_status_inactive)} inactive user(s)")
+        right.write(data_user_status_inactive)
         left.subheader(":red[Total result]")
+        left.subheader(":red[Active Users]")
         left.text("Successfully run " +
                   str(len(hr_code_input_area_lines)) + " users")
+        data_user_status = data_user_status[data_user_status["Status"] != "INACTIVE"]
         left.write(data_user_status)
-        data_user_status_inactive = data_user_status[
-            data_user_status["Status"] == "Inactive"
-        ]
-        rigth.subheader(":red[Inactive user]")
-        rigth.write(data_user_status_inactive)
 
 
 def tab4_exec(ldap_user: str, ldap_pw: str):

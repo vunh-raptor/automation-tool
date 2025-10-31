@@ -1,8 +1,9 @@
 import logging
 import time
-from selenium.common.exceptions import NoSuchElementException
 from Common.page_object import page_object as Page
 from Common.constant import app_logic_exception
+from Common.request_object import Session
+from Common.supporting import filter_UMC_json_single_element
 
 # Element Path
 
@@ -325,3 +326,37 @@ class umc(Page):
         xpath = self.owned_role_prefixed + role_suffix
         owned_role = self.search_by_xpath(xpath=xpath)
         return owned_role.click()
+
+
+class umc_request(Session):
+    """A class representing a UMC session
+
+    Args:
+        Session (_type_): A session to use UMC request
+    """
+
+    # DEFAULT cURL for UMC Swagger API
+    UMC_DEFAULT_URL = "https://um.pdcvn1.vn.prod/"
+    _API_USER_MANAGEMENT = "api/accounts"
+    _USER_MANAGEMENT = "user-management/"
+
+    # PARAMs for UMC Request API
+    _EMPLOYEE_NUMBER_PARAM = "?employeeNumber={param}"
+
+    def __init__(self, token: str, url: str = UMC_DEFAULT_URL, auth_type: str = "basic"):
+        super().__init__(token, url, auth_type)
+
+    # def authenticate(username: str, password: str):
+
+    def get_user_info(self, hr_code: str, element: str) -> str:
+        """send GET request to retrieve user info on UMC
+
+        Args:
+            username (str): username of the target account
+
+        Returns:
+            dict: result of the account + element info - type DICT
+        """
+        endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
+        response = self.get_request(endpoint=endpoint)
+        return filter_UMC_json_single_element(response=response, element=element)

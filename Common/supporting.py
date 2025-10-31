@@ -105,6 +105,24 @@ def filter_id_from_response(response: Response) -> dict:
         print(e)
         return {}  # Return an empty dictionary if an exception occurs
 
+
+def filter_UMC_json_single_element(response: Response, element: str) -> str:
+    """This function is to support getting the intended element from the response of the API
+
+    Args:
+        response (Response): Response from the API
+
+    Returns:
+        dict: ID from the response
+    """
+
+    try:
+        json_obj = json.loads(response.text)
+        for fields in json_obj["data"]:
+            return fields[f'{element}']
+    except Exception as e:  # noqa: E722
+        print("File Error, file not found!\n")
+        return ""  # Return an empty dictionary if an exception occurs
 # def filter_linked_tickets_from_response(response: Response) -> dict:
 #     """This function is to support getting the linked ticket ID & it's summary from the response of the API
 
@@ -223,7 +241,7 @@ def verify_OTP(sourceOTP: TOTP, OTP: str) -> bool:
 
 
 def authenticate_ldap(username: str, password: str) -> str:
-    """This function is used to authenticate with Home Credit Credential with LDAP
+    """This function is used to authenticate with Home Credit Credential with AD LDAP
 
     Args:
         username (str): username of the user
@@ -249,6 +267,25 @@ def authenticate_ldap(username: str, password: str) -> str:
     except Exception as e:
         print(f"Error when calling to LDAP server: {e}")
         return ""
+
+
+def authenticate_swagger(username: str, password: str) -> str:
+    """This function is to used to authenticate to HOSEL Swagger APIs
+
+    Args:
+        username (str): username of the user
+        password (str): password of the user
+
+    Returns:
+        str: Base64 encoded token to use in Swagger
+    """
+    from base64 import b64encode
+    credentials = f"{username}:{password}"
+    credentials_encode = f"Basic {b64encode(credentials.encode()).decode()}"
+    print(credentials_encode)
+    return credentials_encode
+
+# Front End Generations
 
 
 def login_status_check():

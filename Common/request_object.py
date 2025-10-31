@@ -1,20 +1,21 @@
-import requests
-import json
 from requests.auth import AuthBase
-from requests.models import Response
+import requests
 
 
 class BearerAuth(AuthBase):
-    """
-    BearerAuth is a class that implements the authentication mechanism using a bearer token.
+    """A class representing Bearer Token Auth object
+
+    Args:
+        AuthBase (_type_): _description_
     """
 
-    def __init__(self, token):
+    def __init__(self, token) -> None:
         self.token = token
 
     def __call__(self, r):
-        r.headers["authorization"] = "Bearer " + self.token
+        r.headers["Authorization"] = "Bearer " + self.token
         return r
+
 
 class Session:
     """
@@ -23,47 +24,37 @@ class Session:
     Attributes:
     - DEFAULT_TOKEN (str): The default authentication token.
     - authen_token (BearerAuth): The authentication token.
-    - url (str): The URL of the JIRA server.
+    - url (str): The URL of the server.
 
     Methods:
     - __init__(self, token:str=DEFAULT_TOKEN, url:str='https://sd.homecredit.vn/rest/api/2/'): Initializes a JIRA session object.
     - get_request(self, endpoint:str): Sends a GET request to the specified endpoint.
-    - parse_ticket(self, result): Parses the result of a ticket request.
-    - browse_ticket(self, ticket_key:str): Retrieves and parses a specific ticket.
     """
-
-    # _DEFAULT_TOKEN = "NzE3ODQ3NDAyMDY2Om6ftk+Eq6PvvpA7brQqQX/ICKnq"
-    # _POC3_TOKEN = "NzgxMTcyMjA5NjA4OhnMqkkjUL4yQJeZimk3LSppxCPB"
-    # poc3_url = "https://jira-servicedesk-poc3.cz.infra/rest/api/2/"  
-    # This DEFAULT_TOKEN is for the HCVN Service Desk account.
-    _DEFAULT_TOKEN = "OTU2NTI5MjM5MDI0Oh/Oz8O8FWVHDH7soBDKRhdWKni8"
-    authen_token = BearerAuth(_DEFAULT_TOKEN)
-    url = ""
-
-    # DEFAULT cURL for JIRA API
-    _DEFAULT_URL = "https://sd.homecredit.vn/rest/api/2/"
-    _BROWSE_TICKET = "issue/"
-    _JQL_SEARCH = "search?jql="
-    _TRANSITION = "issue/{ticket_key}/transitions"
-
 
     # BASIC FUNCTION FOR ONE SESSION
     # This include initiation of the session, base function for get_request and post_request
+
     def __init__(
         self,
-        token: str = _DEFAULT_TOKEN,
-        url: str = _DEFAULT_URL,
+        token: str,
+        url: str,
+        auth_type: str = "bearer"
     ):
         """
-        Initializes a JIRA session object.
+        Initializes a request session object.
 
         Parameters:
         - token (str): The authentication token. Defaults to DEFAULT_TOKEN.
-        - url (str): The URL of the JIRA server. Defaults to 'https://sd.homecredit.vn/rest/api/2/'.
+        - url (str): The URL of the intended server
         """
         self.url = url
         self.token = token
-        self.authen_token = BearerAuth(token)
+        if auth_type.lower() == "bearer":
+            self.authen_token = BearerAuth(token)
+        elif auth_type.lower() == "basic":
+            self.authen_token = f"{token}"
+        else:
+            raise ValueError("Invalid auth_type. Use 'bearer' or 'basic'.")
 
     def get_request(self, endpoint: str) -> requests.models.Response:
         """
@@ -75,9 +66,14 @@ class Session:
         Returns:
         - result: The result of the GET request.
         """
-        result = requests.get(self.url + endpoint, auth=self.authen_token, timeout=10)
+        print(type(self.authen_token))
+        if isinstance(self.authen_token, BearerAuth):
+            result = requests.get(
+                self.url + endpoint, auth=self.authen_token, timeout=10)
+        elif isinstance(self.authen_token, str):
+            result = requests.get(self.url + endpoint,
+                                  headers={"Authorization": f"{self.authen_token}"}, timeout=10, verify=False)
         return result
-
 
     def post_request(self, endpoint: str, payload) -> requests.models.Response:
         """
@@ -90,7 +86,10 @@ class Session:
         Returns:
         - result: The response object received from the server.
         """
-        result = requests.post(self.url + endpoint, auth=self.authen_token, json=payload, timeout=10)
+        if isinstance(self.authen_token, BearerAuth):
+            result = requests.post(
+                self.url + endpoint, auth=self.authen_token, json=payload, timeout=10)
+        elif isinstance(self.authen_token, str):
+            result = requests.post(
+                self.url + endpoint, headers={"Authorization": f"{self.authen_token}"}, json=payload, timeout=10)
         return result
-        
-        

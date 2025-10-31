@@ -1,4 +1,4 @@
-from Sites.umc import umc
+from Sites.umc import umc, umc_request
 from Common.constant.error_message import ErrorMessage
 import time
 
@@ -11,6 +11,19 @@ roles_table = [
 ]
 
 # Basic functions for UMC
+
+
+def umc_start_session(token: str) -> umc_request:
+    """This is a function to authenticate Swagger API with token from user credential
+
+    Args:
+        token (str): token of user credential
+
+    Returns:
+        umc_request: the request session
+    """
+    request = umc_request(token=token)
+    return request
 
 
 def login_to_site(ldap_user: str, ldap_pw: str) -> umc:
@@ -171,24 +184,34 @@ def reactivate_account(umc_page: umc, hr_code: str) -> bool:
         return True
 
 
-def check_account_status(umc_page: umc, hr_code: str) -> str:
+# def check_account_status(umc_page: umc, hr_code: str) -> str:
+#     """This function used to check if account is active or not
+
+#     Args:
+#         umc_page (umc): active UMC session
+#         hr_code (str): target HR code
+
+#     Returns:
+#         str: status result
+#     """
+
+#     umc_page.search_hrid(hrid=hr_code)
+#     # Get account Status before running
+#     account_status = umc_page.get_search_account_status()  # Store the status
+#     if account_status == "Account not found":
+#         return "Not found"
+#     return account_status
+def check_account_status(umc_request: umc_request, hr_code: str) -> str:
     """This function used to check if account is active or not
 
     Args:
-        umc_page (umc): active UMC session
+        umc_request (umc_request): umc request object
         hr_code (str): target HR code
 
     Returns:
-        str: status result
+        str: Current status of the account
     """
-
-    umc_page.search_hrid(hrid=hr_code)
-    # Get account Status before running
-    account_status = umc_page.get_search_account_status()  # Store the status
-    if account_status == "Account not found":
-        return "Not found"
-    return account_status
-
+    return umc_request.get_user_info(hr_code=hr_code, element="status")
 # --------------------------------------------------------------------------------------------------------------
 # Specific-case function
 
