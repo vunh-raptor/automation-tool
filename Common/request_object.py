@@ -66,7 +66,6 @@ class Session:
         Returns:
         - result: The result of the GET request.
         """
-        print(type(self.authen_token))
         if isinstance(self.authen_token, BearerAuth):
             result = requests.get(
                 self.url + endpoint, auth=self.authen_token, timeout=10)
@@ -91,5 +90,43 @@ class Session:
                 self.url + endpoint, auth=self.authen_token, json=payload, timeout=10)
         elif isinstance(self.authen_token, str):
             result = requests.post(
-                self.url + endpoint, headers={"Authorization": f"{self.authen_token}"}, json=payload, timeout=10)
+                self.url + endpoint, headers={"Authorization": f"{self.authen_token}"}, json=payload, timeout=10, verify=False)
+        return result
+
+    def patch_request(self, endpoint: str, payload) -> requests.models.Response:
+        """
+        Sends a POST request to the specified endpoint with the given payload.
+
+        Parameters:
+        - endpoint (str): The endpoint to send the request to.
+        - payload: The payload to include in the request.
+
+        Returns:
+        - result: The response object received from the server.
+        """
+        if isinstance(self.authen_token, BearerAuth):
+            result = requests.patch(
+                self.url + endpoint, auth=self.authen_token, json=payload, timeout=10)
+        elif isinstance(self.authen_token, str):
+            result = requests.patch(
+                self.url + endpoint, headers={"Authorization": f"{self.authen_token}"}, json=payload, timeout=10, verify=False)
+        return result
+
+    def delete_request(self, endpoint: str, payload) -> requests.models.Response:
+        """
+        Sends a DELETE request to the specified endpoint with the given payload.
+
+        Args:
+        - endpoint (str): The endpoint to send the request to.
+        - payload: The payload to include in the request.
+
+        Returns:
+            requests.models.Response: _description_
+        """
+        if isinstance(self.authen_token, BearerAuth):
+            result = requests.delete(
+                self.url + endpoint, auth=self.authen_token, json=payload, timeout=10)
+        elif isinstance(self.authen_token, str):
+            result = requests.delete(
+                self.url + endpoint, headers={"Authorization": f"{self.authen_token}"}, json=payload, timeout=10, verify=False)
         return result
