@@ -1,5 +1,5 @@
 import time
-from Sites.homesis import homesis
+from Sites.homesis import homesis, homesis_request
 from Common.constant.error_message import ErrorMessage
 
 
@@ -289,3 +289,33 @@ def closed_partner(homesis_page: homesis, partner_code: str) -> bool:
 
     if homesis_page.click_specific_info_sales_button():
         return homesis_page.click_on_closed_button()
+
+# These functions is used to manage Supervisor code on Homesis
+
+
+def add_supervisor(homesis_request: homesis_request, hr_code: str, supervisor_code: str) -> bool:
+    """Function to add Supervisor to the account
+
+    Args:
+        homesis_request (homesis_request): _description_
+        hr_code (str): _description_
+        supervisor_code (str): _description_
+
+    Returns:
+        bool: _description_
+    """
+    return homesis_request.manage_supervisor(hr_code=hr_code, supervisor_code=supervisor_code, action="assign")
+
+
+def remove_supervisor(homesis_request: homesis_request, hr_code: str, supervisor_code: str) -> bool:
+    """_summary_
+
+    Args:
+        homesis_request (homesis_request): _description_
+        hr_code (str): _description_
+        supervisor_code (str): _description_
+
+    Returns:
+        bool: _description_
+    """
+    return homesis_request.manage_supervisor(hr_code=hr_code, supervisor_code=supervisor_code, action="remove")

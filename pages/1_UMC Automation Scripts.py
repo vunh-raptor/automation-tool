@@ -12,14 +12,11 @@ from Common.supporting import (
 from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
-    deactivate_user_with_reason,
-    sales_reactivate,
-    remove_single_role,
-    roles_table,
     deactivate_ra,
     check_account_status,
     add_role_umc,
-    remove_multi_roles_umc,
+    add_multi_role_umc,
+    remove_multi_role_umc,
     update_phone_number,
     update_name,
     update_dob,
@@ -82,23 +79,6 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
             password (str): str value of password
     """
 
-    # Radio button options
-    options = [
-        "Resignation",
-        "Mistake 30 Days",
-        "Hard trigger",
-        "Deactivation Temporarily",
-        "Antifraud Decision",
-    ]
-
-    captions = [
-        "Remove all roles + Add NON_HOSEL_USER",
-        "Remove all roles + Add SALES_AGENT_MISTAKE_30DAYS",
-        "Remove all roles + Add SALES_AGENT_HARD_TRIGGER",
-        "Remove all roles + Add SALES_AGENT_TEMP_DEACTIVE",
-        "Remove all roles + Add SALES_AGENT_AF_DEACTIVE",
-    ]
-
     # List HR Code/Login Name Input
     csv_upload = st.file_uploader(
         label="HR Code/Log In Name List",
@@ -106,100 +86,11 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         accept_multiple_files=False,
     )
 
-    # Create two columns for Active & Reactive
-
-    active_col, _, reactive_col = st.columns(3)
-
-    # Activate Button on the left Column
-    active_account_button = active_col.button("Activate Accounts")
-    # Reactivate Button on the right Column
-    reactivate_account_button = reactive_col.button("Reactivate Accounts")
-
-    # Create two columns for Deactivation Reason & Deactivate Button
-    reason_col, button_col = st.columns([4, 2])
-
-    # Reason Selection in the left column:
-    deact_reason = reason_col.radio(
-        label="What is the reason for Deactivation",
-        options=options,
-        index=0,
-        captions=captions,
-        key="reason_selection",
-    )
-
-    # Deactivate Button in the right column
-    remove_roles_button = button_col.button(
-        "Deactivate Accounts", key="deactivate_button"
-    )
-
-    # Deactivate Button in the right column
-    remove_dismissal_button = button_col.button(
-        "Remove Dismissal Role", key="remove_dismissal_button"
-    )
-
     # Read CSV Data
     if csv_upload is not None:
         csv_data = pd.read_csv(csv_upload, converters={"HR Code": str})
         st.write(csv_data)
 
-    # Activate Account
-
-    if active_account_button:
-        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-            # Loop through CSV & Search for HR Code
-            for index, row in csv_data.iterrows():
-                hr_code = row["HR Code"]
-                add_homesis_homesis_user(umc_page=umc_page, hr_code=hr_code)
-                umc_page.get_umc_url()
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
-
-    # Deactivate Account
-    if remove_roles_button:
-        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
-            # Loop through CSV & Search for HR Code
-            for index, row in csv_data.iterrows():
-                hr_code = row["HR Code"]
-                reason = roles_table[options.index(deact_reason)]
-                deactivate_user_with_reason(
-                    umc_page=umc_page, hr_code=hr_code, reason=reason
-                )
-                umc_page.get_umc_url()
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
-
-    # Reactivate Account
-    if reactivate_account_button:
-        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
-            # Loop through CSV & Search for HR Code
-            for index, row in csv_data.iterrows():
-                hr_code = row["HR Code"]
-                reason = options[options.index(deact_reason)]
-                sales_reactivate(umc_page=umc_page, hr_code=hr_code)
-                umc_page.get_umc_url()
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
-
-    if remove_dismissal_button:
-        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
-            # Loop through CSV & Search for HR Code
-            for index, row in csv_data.iterrows():
-                hr_code = row["HR Code"]
-                role = roles_table[options.index(deact_reason)]
-                remove_single_role(umc_page=umc_page,
-                                   hr_code=hr_code, role=role)
-                umc_page.get_umc_url()
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
-
-    st.divider()
     st.text("Deactive RA")
     deactive_ra_button = st.button(
         "Deactive RA", type="primary")
@@ -207,14 +98,14 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
     # deactive account
     if deactive_ra_button:
         with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            request = umc_start_session(authenticate_swagger(
+                username=ldap_user, password=ldap_pw))
 
             # Loop through CSV & Search for HR Code
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
-                deactivate_ra(umc_page=umc_page, hr_code=hr_code)
-                umc_page.get_umc_url()
+                if not deactivate_ra(umc_request=request, hr_code=hr_code):
+                    st.write(f"Deactivation failed for account {hr_code}")
         st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
@@ -228,22 +119,20 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
     role_umc_input_area = right.text_area("Input roles here")
     role_umc_input_area_list = role_umc_input_area.split(
         "\n")  # This return a list
-    add_role_umc_btn = st.button("Add roles UMC", type="primary")
-
-    if add_role_umc_btn:
-        # Start Selenium
-        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
-            for index in range(len(login_name_input_area_list)):
-                login_name = login_name_input_area_list[index]
-                add_role_umc(
-                    umc_page=umc_page,
-                    hr_code=login_name,
-                    role_list=role_umc_input_area_list,
-                )
-                umc_page.get_umc_url()
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
+    if login_name_input_area.strip() != '' and role_umc_input_area.strip() != '':
+        add_role_umc_btn = st.button("Add roles UMC", type="primary")
+        if add_role_umc_btn:
+            # Start Selenium
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+                request = umc_start_session(authenticate_swagger(
+                    username=ldap_user, password=ldap_pw))
+                for index in range(len(login_name_input_area_list)):
+                    login_name = login_name_input_area_list[index]
+                    status = add_multi_role_umc(
+                        umc_request=request, hr_code=login_name, role_list=role_umc_input_area_list)
+                    if status:
+                        st.write(f"{login_name} - Add role successful")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     st.divider()
     st.subheader("Remove role for multiple user")
@@ -254,23 +143,20 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
     role_umc_input_area = right.text_area("Input remove roles here")
     role_umc_input_area_list = role_umc_input_area.split(
         "\n")  # This return a list
-    remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
 
-    if remove_role_umc_btn:
-        with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-            # Start Selenium
-            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
-
-            for index in range(len(login_name_input_area_list)):
-                login_name = login_name_input_area_list[index]
-                remove_multi_roles_umc(
-                    umc_page=umc_page,
-                    hr_code=login_name,
-                    role_list=role_umc_input_area_list,
-                )
-
-                umc_page.get_umc_url()
-        st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
+    if login_name_input_area.strip() != '' and role_umc_input_area.strip() != '':
+        remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
+        if remove_role_umc_btn:
+            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+                request = umc_start_session(authenticate_swagger(
+                    username=ldap_user, password=ldap_pw))
+                for index in range(len(login_name_input_area_list)):
+                    login_name = login_name_input_area_list[index]
+                    status = remove_multi_role_umc(
+                        umc_request=request, hr_code=login_name, role_list=role_umc_input_area_list)
+                    if status:
+                        st.write(f"{login_name} - Remove role successful")
+            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 
 def tab3_exec(ldap_user: str, ldap_pw: str):
@@ -287,7 +173,7 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
             request = umc_start_session(token=authenticate_swagger(
                 username=ldap_user, password=ldap_pw))
             data_user_status_list = []
-            for hr_code in hr_code_input_area_lines:
+            for hr_code in filter(None, hr_code_input_area_lines):
                 status = check_account_status(
                     umc_request=request, hr_code=hr_code)
                 data_user_status_list.append(
@@ -310,7 +196,7 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
         left.subheader(":red[Total result]")
         left.subheader(":red[Active Users]")
         left.text("Successfully run " +
-                  str(len(hr_code_input_area_lines)) + " users")
+                  str(len(data_user_status)) + " users")
         data_user_status = data_user_status[data_user_status["Status"] != "INACTIVE"]
         left.write(data_user_status)
 
@@ -368,6 +254,7 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
                     table_of_error.loc[len(table_of_error)] = [
                         hr_code, list_error[i].split("-", 1)[1]]
                 umc_page.get_umc_url()
+
         st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
     if update_name_button:
@@ -501,12 +388,6 @@ def tab5_exec():
         "\n")  # This return a list
 
     if login_name_input_area != '':
-
-        # Show 5 rows of data on screen
-        # data = pd.read_csv(reactivate_upload, converters={"HRcode": str})
-        # st.subheader(
-        #     "First 5 rows", help="Please check the HR Code to make sure you are running the correct file")
-        # st.write(data.head(5))
         # Initialize Session State to properly perform nested button
         if 'getOTP_clicked' not in st.session_state:
             st.session_state['getOTP_clicked'] = False
@@ -546,20 +427,18 @@ def tab5_exec():
 
             # Run Reactivate Scripts if the verification returns valid
             if st.session_state['confirmOTP_clicked'] and result is True:
-                with st.spinner('Processing...'):
+                with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                     from time import sleep
                     # Trigger request to CBA Vault to get UMC password
                     cred = system_env_get_cred()
                     sleep(5)
-                    umc_page = login_to_site(
-                        ldap_user="umc_admin1", ldap_pw=cred)
-                    # table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
-                    # log_left, log_right = st.columns([0.4, 0.6], vertical_alignment="top", gap="large")
+                    request = umc_start_session(token=authenticate_swagger(
+                        username="umc_admin1", password=cred))
                     for index, hr_code in enumerate(login_name_input_area_list):
-                        reactivation_status = reactivate_account(
-                            umc_page=umc_page, hr_code=hr_code)
-                        umc_page.get_umc_url()
-                    # Reset session state after function complete
+                        status = reactivate_account(
+                            umc_request=request, hr_code=hr_code) and add_homesis_homesis_user(umc_request=request, hr_code=hr_code)
+                        if status:
+                            st.write(f"{hr_code}: Reactivation Successful!")
                     st.session_state['getOTP_clicked'] = False
                     st.session_state['confirmOTP_clicked'] = False
                     st.rerun()
@@ -577,13 +456,13 @@ def tab6_exec():
         if emergency:
             with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
                 cred = system_env_get_cred()
-                umc_page = login_to_site(ldap_user="umc_admin1", ldap_pw=cred)
+                request = umc_start_session(authenticate_swagger(
+                    username="umc_admin1", password=cred))
                 for code in hr_code_input_area_lines:
                     add_role_status = add_role_umc(
-                        umc_page=umc_page, hr_code=code, role_list=["NON_HOSEL_USER"])
-                    if add_role_status is False:
-                        st.write(code + ": Emergency add role Failed")
-                    umc_page.get_umc_url()
+                        umc_request=request, hr_code=code, role="NON_HOSEL_USER")
+                    if add_role_status:
+                        st.write(code + ": Emergency add role successful!")
             st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
 
 

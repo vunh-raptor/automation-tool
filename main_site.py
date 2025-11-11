@@ -22,7 +22,7 @@ if "authenticated" not in st.session_state:
 
 
 def login_page():
-    st.write("# Welcome to SD Automation Hub!👋")
+    st.write("# Welcome to SD Automation Hub ver2.0-beta!👋")
     # Login function
     st.title("Please login with your HCG credential")
     with st.form("loginForm"):
