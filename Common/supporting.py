@@ -7,7 +7,7 @@ from pyotp import TOTP
 from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
 from ldap3 import Server, Connection, ALL, SUBTREE
 
-REACTIVATE_WEBHOOK_URL = "https://prod-102.westeurope.logic.azure.com:443/workflows/622b616dc2a9428e9dfa90b97df7a5c2/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7J64W7hby4vALfHoRosepx0voq-jJd-KB0Nzepfgu0Y"
+REACTIVATE_WEBHOOK_URL = "https://default5675d32119d14c9596842c28ac8f80.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/622b616dc2a9428e9dfa90b97df7a5c2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L3Q43N_ADwO3dZ6OiQxFRvl14njkvUvajwawq-kvzos"
 ERROR_WEBHOOK_URL = "https://default5675d32119d14c9596842c28ac8f80.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2441849b00aa40dfbfd4badcc9f748d3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ypI1uwC9FCskpObxzJxKqzZD85tSs2lTYV5QfrDcdWs"
 
 
@@ -105,6 +105,25 @@ def filter_id_from_response(response: Response) -> dict:
         print(e)
         return {}  # Return an empty dictionary if an exception occurs
 
+
+def filter_UMC_json_single_element(response: Response, element: str) -> str:
+    """This function is to support getting the intended element from the response of the API
+
+    Args:
+        response (Response): Response from the API
+
+    Returns:
+        dict: ID from the response
+    """
+
+    try:
+        json_obj = json.loads(response.text)
+        for fields in json_obj["data"]:
+            return str(fields[f"{element}"])
+    except Exception as e:  # noqa: E722
+        print("File Error, file not found!\n")
+        return ""
+    return ""  # Return an empty dictionary if an exception occurs
 # def filter_linked_tickets_from_response(response: Response) -> dict:
 #     """This function is to support getting the linked ticket ID & it's summary from the response of the API
 
@@ -223,7 +242,7 @@ def verify_OTP(sourceOTP: TOTP, OTP: str) -> bool:
 
 
 def authenticate_ldap(username: str, password: str) -> str:
-    """This function is used to authenticate with Home Credit Credential with LDAP
+    """This function is used to authenticate with Home Credit Credential with AD LDAP
 
     Args:
         username (str): username of the user
@@ -249,6 +268,24 @@ def authenticate_ldap(username: str, password: str) -> str:
     except Exception as e:
         print(f"Error when calling to LDAP server: {e}")
         return ""
+
+
+def authenticate_swagger(username: str, password: str) -> str:
+    """This function is to used to authenticate to HOSEL Swagger APIs
+
+    Args:
+        username (str): username of the user
+        password (str): password of the user
+
+    Returns:
+        str: Base64 encoded token to use in Swagger
+    """
+    from base64 import b64encode
+    credentials = f"{username}:{password}"
+    credentials_encode = f"Basic {b64encode(credentials.encode()).decode()}"
+    return credentials_encode
+
+# Front End Generations
 
 
 def login_status_check():

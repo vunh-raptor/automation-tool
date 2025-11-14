@@ -1,7 +1,7 @@
 from requests import Response
 from string import Template
 import json
-from Common.Jira.session_request import Session
+from Common.request_object import Session
 from Common.constant.jira_constant import JiraConst
 from Common.supporting import filter_id_from_response
 
