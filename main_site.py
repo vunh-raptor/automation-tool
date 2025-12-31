@@ -1,5 +1,6 @@
 import streamlit as st
-from Common.supporting import authenticate_ldap, logout_render, request_to_automate_button
+from Common.supporting import logout_render, request_to_automate_button
+from Common.user_object import login, AuthenticationError, ValidationError
 
 # Pages setup
 # homepage = st.Page("main_site.py", title="Home")
@@ -22,22 +23,29 @@ if "authenticated" not in st.session_state:
 
 
 def login_page():
-    st.write("# Welcome to SD Automation Hub ver2.0-beta!👋")
-    # Login function
+    st.write("# Welcome to SD Automation Hub ver2.0-beta! 👋")
     st.title("Please login with your HCG credential")
+
     with st.form("loginForm"):
         st.warning(
             "Please request role VN.SD.SD_AUTOMATION_HUB.USER on IDM if you need access")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
+
         if st.form_submit_button("Login"):
-            displayName = authenticate_ldap(username, password)
-            if len(displayName) > 0:
+            try:
+                user = login(username, password)  # Returns User object
                 st.session_state["authenticated"] = True
-                st.session_state["userDisplayName"] = displayName
+                # Optional
+                st.session_state["userDisplayName"] = user.display_name
+                st.success(f"Welcome, {user.display_name}!")
                 st.rerun()
-            else:
-                st.error("Invalid credentials or lack of permission")
+            except ValidationError as ve:
+                st.error(f"Validation Error: {ve}")
+            except AuthenticationError as ae:
+                st.error(f"Authentication Failed: {ae}")
+            except Exception as e:
+                st.error(f"Unexpected Error: {e}")
 
 
 if st.session_state["authenticated"]:

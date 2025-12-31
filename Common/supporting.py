@@ -241,33 +241,33 @@ def verify_OTP(sourceOTP: TOTP, OTP: str) -> bool:
 # Authentication functions
 
 
-def authenticate_ldap(username: str, password: str) -> str:
-    """This function is used to authenticate with Home Credit Credential with AD LDAP
+# def authenticate_ldap(username: str, password: str) -> str:
+#     """This function is used to authenticate with Home Credit Credential with AD LDAP
 
-    Args:
-        username (str): username of the user
-        password (str): password of the user
+#     Args:
+#         username (str): username of the user
+#         password (str): password of the user
 
-    Returns:
-        bool: the status of the login request, True if success login and False if failed login
-    """
-    try:
-        userDN = ""
-        server = Server("ldap://vn-ldaps.hcg.homecredit.net", get_info=ALL)
-        conn = Connection(
-            server, f"CN={username},OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net", f"{password}", auto_bind=True)
-        if conn.bound:
-            conn.search(search_base="OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net",
-                        search_filter=f"(&(samAccountName={username})(memberOf=CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net))", search_scope=SUBTREE, attributes="displayName")
-            userDN = conn.entries[0].displayName
-            conn.unbind()
-            return userDN
-        else:
-            conn.unbind()
-            return ""
-    except Exception as e:
-        print(f"Error when calling to LDAP server: {e}")
-        return ""
+#     Returns:
+#         bool: the status of the login request, True if success login and False if failed login
+#     """
+#     try:
+#         userDN = ""
+#         server = Server("ldap://vn-ldaps.hcg.homecredit.net", get_info=ALL)
+#         conn = Connection(
+#             server, f"CN={username},OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net", f"{password}", auto_bind=True)
+#         if conn.bound:
+#             conn.search(search_base="OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net",
+#                         search_filter=f"(&(samAccountName={username})(memberOf=CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net))", search_scope=SUBTREE, attributes="displayName")
+#             userDN = conn.entries[0].displayName
+#             conn.unbind()
+#             return userDN
+#         else:
+#             conn.unbind()
+#             return ""
+#     except Exception as e:
+#         print(f"Error when calling to LDAP server: {e}")
+#         return ""
 
 
 def authenticate_HOSELSSO(username: str, password: str) -> bool:

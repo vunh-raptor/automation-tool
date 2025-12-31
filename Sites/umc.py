@@ -565,3 +565,16 @@ class umc_request(Session):
             return False
         else:
             return True
+
+    def get_account_deactivation_date(self, hr_code: str) -> str:
+        """This function is to get account deactivation date
+
+        Args:
+            hr_code (str): hr code of the account
+
+        Returns:
+            str: deactivation date of the account
+        """
+        endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
+        response = self.get_request(endpoint=endpoint)
+        return f"Deactivation Time: {filter_UMC_json_single_element(response=response, element='lastDeactivationTime').split('T')[0]}"

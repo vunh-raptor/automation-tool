@@ -26,6 +26,7 @@ from Activity.umc_actions import (
     update_mail,
     reactivate_account,
     umc_start_session,
+    get_deactivation_date
 )
 from Common.constant.app_message import APP_MESSAGE as app_msg
 import pandas as pd
@@ -66,7 +67,7 @@ def main():
     st.subheader("Choose your action on UMC", divider="red")
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-        ["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts", "Emergency Role Add"])
+        ["Deactivate/Reactive", "Add/Remove Role", "Check status", "Update Info", "Reactivate Accounts", "Get account deactivation date"])
 
     with tab1:
         tab1_exec(ldap_user, ldap_pw)
@@ -441,7 +442,7 @@ def tab5_exec():
 
 
 def tab6_exec():
-    st.subheader("Emergency add role on UMC")
+    st.subheader("Get account Deactivation date")
 
     hr_code_text_area = st.text_area("Input Hr codes or HCGs")
     if hr_code_text_area is not None:
@@ -455,10 +456,12 @@ def tab6_exec():
                 passcred = system_env_get_cred("UMCAdminCred")
                 request = umc_start_session(authenticate_swagger(
                     username=usercred, password=passcred))
-                add_role_status = add_role_umc(
-                    umc_request=request, hr_codes=hr_code_input_area_lines, role="NON_HOSEL_USER")
-                if add_role_status:
-                    st.write("Emergency add role successful!")
+                # add_role_status = add_role_umc(
+                #     umc_request=request, hr_codes=hr_code_input_area_lines, role="NON_HOSEL_USER")
+                for hr_code in hr_code_input_area_lines:
+                    deactivation_date = get_deactivation_date(
+                        umc_request=request, hr_code=hr_code)
+                    st.write(deactivation_date)
             st.write(app_msg.APP_FINISH_MSG)
 
 

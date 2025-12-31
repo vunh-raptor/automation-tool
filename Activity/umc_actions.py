@@ -372,3 +372,17 @@ def update_mail(umc_page: umc, hr_code: str, mail: str) -> list:
 
 def create_RA_account(umc_request: umc_request):
     pass
+
+
+def get_deactivation_date(umc_request: umc_request, hr_code: str) -> str:
+    """This fuction is used to get deactivation date
+
+    Args:
+        umc_request (umc_request): request session of the UMC
+        hr_code (str): hr_code of the user
+
+    Returns:
+        str: status
+    """
+
+    return umc_request.get_account_deactivation_date(hr_code=hr_code)
