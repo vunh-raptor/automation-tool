@@ -148,6 +148,19 @@ def check_account_status(umc_request: umc_request, hr_code: str) -> str:
         str: Current status of the account
     """
     return umc_request.get_user_info(hr_code=hr_code, element="status")
+
+def get_account_username(umc_request: umc_request, hr_code: str) -> str:
+    """This function used to get account username
+
+    Args:
+        umc_request (umc_request): umc request object
+        hr_code (str): hr code of the intended account
+
+    Returns:
+        str: account username of the hrcode
+    """
+    return umc_request.get_user_info(hr_code=hr_code, element="login")
+
 # --------------------------------------------------------------------------------------------------------------
 # Specific-case function
 
@@ -225,19 +238,39 @@ def deactivate_ra(umc_request: umc_request, hr_code: str) -> bool:
     return umc_request.patch_user_single_info(hr_code=hr_code, element="active", value=False)
 
 
-def update_phone_number(umc_request: umc_request, hr_code: str, phone_number: str) -> bool:
+def update_phone_number(umc_page: umc, hr_code: str, phone_number: str) -> list:
     """This function used to update phone number for target account
 
     Args:
-        umc_request (umc_request): The UMC request object
+        umc_page (umc): The UMC selenium object
         hr_code (str): target HR code
         phone_number (str): new phone number
 
     Returns:
         list: list of error
     """
-    return umc_request.patch_user_single_info(hr_code=hr_code, element="phone", value=phone_number)
-
+    list_of_error = []
+    umc_page.search_hrid(hrid=hr_code)
+    # Get account Status before running
+    account_status = umc_page.get_search_account_status()
+    # Check if account is Inactive
+    if account_status == "Inactive":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_INACTIVE)
+    if account_status == "Account not found":
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_NOT_FOUND)
+    if account_status == "Active":
+        # Account found, start update date of birth actions
+        umc_page.click_details_button()
+        umc_page.click_edit()
+        umc_page.update_info(data=phone_number, field=umc_page.detail_mobile)
+        umc_page.update_info(data=phone_number, field=umc_page.detail_phone)
+        umc_page.click_save()
+        # Check if Update successfully
+        list_of_error.append(
+            hr_code + " - " + ErrorMessage.umc_message.USER_UPDATED)
+    return list_of_error
 
 def update_name(umc_request: umc_request, hr_code: str, first_name: str, last_name: str) -> bool:
     """This function is to update first name and last name of the user
@@ -248,10 +281,23 @@ def update_name(umc_request: umc_request, hr_code: str, first_name: str, last_na
         first_name (str): value to change - First Name
         last_name (str): value to change - Last Name
 
+    Retry Mechanism:
+    If the update using the HRcode is failed by not found (response 404), then the code will try to use username to do the update
+
     Returns:
         bool: status of the action
     """
-    return umc_request.patch_user_firstname_lastname(hr_code=hr_code, first_name=first_name, last_name=last_name)
+    print(first_name + last_name)
+    retry = False
+    result = umc_request.patch_user_firstname_lastname(hr_code=hr_code, first_name=first_name, last_name=last_name)
+    if result is False:
+        username = get_account_username(umc_request=umc_request, hr_code=hr_code)
+        retry = True
+        result = umc_request.patch_user_firstname_lastname(hr_code=username, first_name=first_name, last_name=last_name)
+    if result is False and retry is True:
+        return False
+    return True
+
 def update_dob(umc_page: umc, hr_code: str, date_of_birth: str) -> list:
     """ Update date of birth for account LDAP
 

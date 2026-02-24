@@ -253,18 +253,17 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
     # Update info account UMC
     if update_phone_button:
         with st.spinner(app_msg.APP_RUNNING_MSG):
-            request = authen_get_UMC_session(
-                username=ldap_user, password=ldap_pw)
-            if request is None:
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            if umc_page is None:
                 return
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
                 phone_number = row["Phone"]
-                status = update_phone_number(
-                    umc_request=request, hr_code=hr_code, phone_number=phone_number)
-                if not status:
-                    st.write(
-                        f"{hr_code} - Failed - Change information unsuccessful!")
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
             st.write(app_msg.APP_FINISH_MSG)
 
     if update_name_button:

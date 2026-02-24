@@ -403,15 +403,6 @@ class umc_request(Session):
         ]
         """
     )
-    # API Body to patch First name & last name
-    _PATCH_NAME_PARAM_BODY = Template(
-        """
-        "name": {
-            "familyName": "${lastName}",
-            "givenName": "${firstName}"
-        }
-        """
-    )
 
     # API Body to create new account
     _POST_NEW_ACCOUNT_BODY = Template(
@@ -553,9 +544,15 @@ class umc_request(Session):
             bool: status of the request
         """
         endpoint = f"{self._USER_MANAGEMENT}{self._API_SCIM_USER_MANAGEMENT}{hr_code}"
-        payload = json.loads(self._PATCH_NAME_PARAM_BODY.substitute(lastName=last_name, firstName=first_name))
+        payload = {
+            "name": {
+                "givenName": first_name,
+                "familyName": last_name
+            }
+        }
+        # payload_dump = json.dumps(payload)
         response = self.patch_request(endpoint=endpoint, payload=payload)
-
+        print(response.content)
         # Verify the status of the request call
         if response.status_code >= 400:
             return False
