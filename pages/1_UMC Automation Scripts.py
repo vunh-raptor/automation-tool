@@ -254,11 +254,15 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
     if update_phone_button:
         with st.spinner(app_msg.APP_RUNNING_MSG):
             umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
             if umc_page is None:
                 return
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
                 phone_number = row["Phone"]
+                list_error = update_phone_number(umc_page=umc_page, hr_code=hr_code, phone_number=phone_number)
                 left.write(list_error)
                 for i in range(len(list_error)):
                     table_of_error.loc[len(table_of_error)] = [
