@@ -151,14 +151,14 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
     st.divider()
     st.subheader("Remove role for multiple user")
     left, right = st.columns(2, vertical_alignment="top")
-    login_name_input_area = left.text_area("Input login name to remove here")
-    login_name_input_area_list = login_name_input_area.split(
+    login_name_input_area1 = left.text_area("Input login name to remove here")
+    login_name_input_area_list1 = login_name_input_area1.split(
         "\n")  # This return a list
-    role_umc_input_area = right.text_area("Input remove roles here")
-    role_umc_input_area_list = role_umc_input_area.split(
+    role_umc_input_area1 = right.text_area("Input remove roles here")
+    role_umc_input_area_list1 = role_umc_input_area1.split(
         "\n")  # This return a list
 
-    if login_name_input_area.strip() != '' and role_umc_input_area.strip() != '':
+    if login_name_input_area1.strip() != '' and role_umc_input_area1.strip() != '':
         remove_role_umc_btn = st.button("Remove roles UMC", type="primary")
         if remove_role_umc_btn:
             with st.spinner(app_msg.APP_RUNNING_MSG):
@@ -166,14 +166,10 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
                     username=ldap_user, password=ldap_pw)
                 if request is None:
                     return
-                for index in range(len(login_name_input_area_list)):
-                    login_name = login_name_input_area_list[index]
-                    status = remove_multi_role_umc(
-                        umc_request=request, hr_code=login_name.strip(), role_list=role_umc_input_area_list)
-                    if status:
-                        st.write(f"{login_name} - Remove role successful")
+                status = remove_multi_role_umc(umc_request=request, hr_codes=login_name_input_area_list1, role_list=role_umc_input_area_list1)
+                if status:
+                    st.write(" All accounts - Remove role successful")
                 st.write(app_msg.APP_FINISH_MSG)
-
 
 def tab3_exec(ldap_user: str, ldap_pw: str):
     # check active account UMC
@@ -253,18 +249,21 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
     # Update info account UMC
     if update_phone_button:
         with st.spinner(app_msg.APP_RUNNING_MSG):
-            request = authen_get_UMC_session(
-                username=ldap_user, password=ldap_pw)
-            if request is None:
+            umc_page = login_to_site(ldap_user=ldap_user, ldap_pw=ldap_pw)
+            table_of_error = pd.DataFrame(columns=["Hr Code", "Steps"])
+            left, right = st.columns(
+                [0.4, 0.6], vertical_alignment="top", gap="large")
+            if umc_page is None:
                 return
             for index, row in csv_data.iterrows():
                 hr_code = row["HR Code"]
                 phone_number = row["Phone"]
-                status = update_phone_number(
-                    umc_request=request, hr_code=hr_code, phone_number=phone_number)
-                if not status:
-                    st.write(
-                        f"{hr_code} - Failed - Change information unsuccessful!")
+                list_error = update_phone_number(umc_page=umc_page, hr_code=hr_code, phone_number=phone_number)
+                left.write(list_error)
+                for i in range(len(list_error)):
+                    table_of_error.loc[len(table_of_error)] = [
+                        hr_code, list_error[i].split("-", 1)[1]]
+                umc_page.get_umc_url()
             st.write(app_msg.APP_FINISH_MSG)
 
     if update_name_button:

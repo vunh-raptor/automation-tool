@@ -69,6 +69,7 @@ class homesis(Page):
     homesis_supervisors_tab = (
         '//table[@onmouseover = "showTooltip(\'Supervisors\');"]//a[@class = "abtn"]'
     )
+    homesis_supervisors_data_tab = '//tr[@class="tdrow2"]'
     homesis_supervisor_choose_button = '//table[@onmouseover = "showTooltip(\'Attach supervisor\');"]//a[@class = "abtn"]'
     homesis_supervisors_code_text = '//*[@id="code"]'
     homesis_supervisors_search_btn = (
@@ -344,6 +345,8 @@ class homesis(Page):
             bool: True if the operation is successful, False otherwise.
         """
         self.search_by_xpath(self.homesis_supervisors_tab, delay=0.5).click()
+        if(self.search_by_xpath(self.homesis_supervisors_data_tab, delay=0.5).flag):
+            return False
         self.search_by_xpath(
             self.homesis_supervisor_choose_button, delay=0.5).click()
         self.search_by_xpath(
