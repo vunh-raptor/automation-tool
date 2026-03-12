@@ -346,6 +346,7 @@ class umc_request(Session):
 
     # PARAMs for UMC Request API
     _EMPLOYEE_NUMBER_PARAM = "employeeNumber={param}"
+    _UID_PARAM = "uid={param}"
 
     # Body Template for UMC Request API
     _PATCH_SINGLE_PARAM_BODY = Template("""
@@ -449,8 +450,8 @@ class umc_request(Session):
     def __init__(self, token: str, url: str = UMC_DEFAULT_URL, auth_type: str = "basic"):
         super().__init__(token, url, auth_type)
 
-    def get_user_info(self, hr_code: str, element: str) -> str:
-        """send GET request to retrieve user info on UMC
+    def get_user_info_with_hrcode(self, hr_code: str, element: str) -> str:
+        """send GET request to retrieve user info on UMC with hrcode placeholder
 
         Args:
             hr_code (str): hr code of the target account
@@ -460,6 +461,20 @@ class umc_request(Session):
             dict: result of the account + element info - type DICT
         """
         endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
+        response = self.get_request(endpoint=endpoint)
+        return filter_UMC_json_single_element(response=response, element=element)
+
+    def get_user_info_with_username(self, username: str, element: str) -> str:
+        """send GET request to retrieve user info on UMC with username placeholder
+
+        Args:
+            username (str): _description_
+            element (str): _description_
+
+        Returns:
+            str: _description_
+        """
+        endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._UID_PARAM.format(param=username)}"
         response = self.get_request(endpoint=endpoint)
         return filter_UMC_json_single_element(response=response, element=element)
 
