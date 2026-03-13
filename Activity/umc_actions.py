@@ -147,7 +147,14 @@ def check_account_status(umc_request: umc_request, hr_code: str) -> str:
     Returns:
         str: Current status of the account
     """
-    return umc_request.get_user_info(hr_code=hr_code, element="status")
+    retry = False
+    result = umc_request.get_user_info_with_hrcode(hr_code=hr_code, element="status")
+    if result == "":
+        retry = True
+        result = umc_request.get_user_info_with_username(username=hr_code, element="status")
+    if result == "" and retry is True:
+        return "NOT FOUND"
+    return result
 
 def get_account_username(umc_request: umc_request, hr_code: str) -> str:
     """This function used to get account username
@@ -159,7 +166,7 @@ def get_account_username(umc_request: umc_request, hr_code: str) -> str:
     Returns:
         str: account username of the hrcode
     """
-    return umc_request.get_user_info(hr_code=hr_code, element="login")
+    return umc_request.get_user_info_with_hrcode(hr_code=hr_code, element="login")
 
 # --------------------------------------------------------------------------------------------------------------
 # Specific-case function
@@ -287,7 +294,6 @@ def update_name(umc_request: umc_request, hr_code: str, first_name: str, last_na
     Returns:
         bool: status of the action
     """
-    print(first_name + last_name)
     retry = False
     result = umc_request.patch_user_firstname_lastname(hr_code=hr_code, first_name=first_name, last_name=last_name)
     if result is False:
