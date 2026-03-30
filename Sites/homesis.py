@@ -243,6 +243,7 @@ class homesis(Page):
         """
         try:
             if self.wait_element_to_visible(self.homesis_note_text_field):
+                self.search_by_xpath(self.homesis_note_text_field).clearText()
                 self.search_by_xpath(
                     self.homesis_note_text_field).send_keys(note)
                 return True
@@ -302,8 +303,7 @@ class homesis(Page):
         """
         try:
             if self.wait_element_to_visible(self.homesis_role_bank_selector):
-                self.search_by_xpath(
-                    self.homesis_role_bank_selector).send_keys(role)
+                self.select_dropdown_value(self.homesis_role_bank_selector, role)
                 return True
         except TimeoutException:
             print("Timeout while waiting for elements.")
