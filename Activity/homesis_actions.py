@@ -1,5 +1,6 @@
 import time
-from Sites.homesis import homesis, homesis_request
+from Sites.homesis import homesis
+from Request.homesis import homesis_request
 from Common.constant.error_message import ErrorMessage
 
 
@@ -17,6 +18,35 @@ def login_to_site(ldap_user: str, ldap_pw: str) -> homesis:
     homesis_page.get_homesis_url()
     homesis_page.login_with_data(ldap_user=ldap_user, ldap_pw=ldap_pw)
     return homesis_page
+
+
+def homesis_start_session(token: str) -> homesis_request:
+    """Create a Homesis API request session from a Basic auth token."""
+    return homesis_request(token=token)
+
+
+def get_supervisor_employee_list(request: homesis_request, supervisor_code: str) -> list:
+    """Retrieve the list of employees under a given supervisor code.
+
+    Args:
+        request (homesis_request): active Homesis request session
+        supervisor_code (str): HR code of the supervisor
+
+    Returns:
+        list: employee records returned by the API, or [] on failure
+    """
+    response = request.manage_supervisor(
+        hr_code="", supervisor_code=supervisor_code, action="get")
+
+    try:
+        body = response.json()
+        if isinstance(body, list):
+            return body
+        if isinstance(body, dict):
+            return body.get("data", [body])
+        return []
+    except Exception:
+        return []
 
 
 # This funtion is to add role in bank for SA
@@ -203,11 +233,11 @@ def change_role_in_bank(homesis_page: homesis, hr_code: str, role: str) -> bool:
 
 
 # This funtion is to add sup code
-def add_sup_code(homesis_page: homesis, hr_code: str, supervisor_code: str) -> list:
-    """Function to add supervisor code for user
+def add_sup_code(request: homesis_request, hr_code: str, supervisor_code: str) -> list:
+    """Function to add supervisor code for user via API
 
     Args:
-        homesis_page (homesis): the object represent the Homesis Page in Selenium
+        request (homesis_request): active Homesis API request session
         hr_code (str): hr code of user, take from given excel file
         supervisor_code (str): supervisor code of user, take from given excel file
 
@@ -216,18 +246,40 @@ def add_sup_code(homesis_page: homesis, hr_code: str, supervisor_code: str) -> l
     """
 
     list_of_error = []
-    homesis_page.search_hrid(hrid=hr_code)
-
-    if homesis_page.click_details_button():
-        if homesis_page.chose_supervisor(supervisor_code) is False:
+    try:
+        result = request.manage_supervisor(
+            hr_code=hr_code, supervisor_code=supervisor_code, action="assign")
+        if not result:
             list_of_error.append(
                 hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FIND_SUP_CODE)
-        if homesis_page.click_save_button():
-            list_of_error.append(
-                hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)
-    else:
+    except Exception as e:
         list_of_error.append(
-            hr_code + "-" + ErrorMessage.homesis_message.CAN_NOT_FIND_USER)
+            hr_code + " - " + str(e))
+    return list_of_error
+
+
+def remove_sup_code(request: homesis_request, hr_code: str, supervisor_code: str) -> list:
+    """Function to remove supervisor code for user via API
+
+    Args:
+        request (homesis_request): active Homesis API request session
+        hr_code (str): hr code of user, take from given excel file
+        supervisor_code (str): supervisor code of user, take from given excel file
+
+    Returns:
+        list:  this list contain a success/error messages of the action remove sup code for user
+    """
+
+    list_of_error = []
+    try:
+        result = request.manage_supervisor(
+            hr_code=hr_code, supervisor_code=supervisor_code, action="delete")
+        if not result:
+            list_of_error.append(
+                hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FIND_SUP_CODE)
+    except Exception as e:
+        list_of_error.append(
+            hr_code + " - " + str(e))
     return list_of_error
 
 # This funtion is to update note

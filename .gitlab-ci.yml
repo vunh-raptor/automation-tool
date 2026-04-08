@@ -1,23 +1,92 @@
-build-job:
-  stage: build
-  script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
+stages:
+  - verify
 
-test-job1:
-  stage: test
-  script:
-    - echo "This job tests something"
+variables:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
 
-test-job2:
-  stage: test
-  script:
-    - echo "This job tests something, but takes more time than test-job1."
-    - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
-    - echo "which simulates a test that runs 20 seconds longer than test-job1"
-    - sleep 20
+default:
+  image: python:3.11
+  before_script:
+    - python --version
+    - python -m pip install --upgrade pip
+    - |
+      python - <<'PY'
+      from pathlib import Path
+      import subprocess
+      import sys
 
-deploy-prod:
-  stage: deploy
+      requirements = []
+      for raw in Path("requirements.txt").read_text(encoding="utf-8").splitlines():
+          line = raw.strip()
+          if not line or line.startswith("#"):
+              continue
+          if sys.platform != "win32" and line.lower().startswith("pywin32"):
+              continue
+          requirements.append(line)
+
+      if requirements:
+          subprocess.check_call([sys.executable, "-m", "pip", "install", *requirements])
+      PY
+
+service_startup_check:
+  stage: verify
   script:
-    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-  environment: production
+    - |
+      python - <<'PY'
+      import subprocess
+      import sys
+      import time
+      from pathlib import Path
+
+      log_path = Path("streamlit.log")
+      command = [
+          sys.executable,
+          "-m",
+          "streamlit",
+          "run",
+          "main_site.py",
+          "--server.headless",
+          "true",
+          "--server.address",
+          "127.0.0.1",
+          "--server.port",
+          "8501",
+      ]
+
+      with log_path.open("w", encoding="utf-8") as log_file:
+          process = subprocess.Popen(
+              command,
+              stdout=log_file,
+              stderr=subprocess.STDOUT,
+          )
+
+      started = False
+
+      try:
+          time.sleep(8)
+          started = process.poll() is None
+      finally:
+          if process.poll() is None:
+              process.terminate()
+              try:
+                  process.wait(timeout=10)
+              except subprocess.TimeoutExpired:
+                  process.kill()
+
+      if not started:
+          print("Streamlit process failed to start.")
+          if log_path.exists():
+              print("\n--- streamlit.log (tail) ---")
+              lines = log_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+              for line in lines[-80:]:
+                  print(line)
+          raise SystemExit(1)
+
+      print("Streamlit startup check passed.")
+      PY
+  artifacts:
+    when: always
+    paths:
+      - streamlit.log
+    expire_in: 7 days

@@ -13,18 +13,23 @@ from Common.constant import app_logic_exception
 
 from Activity.homesis_actions import (
     login_to_site,
+    homesis_start_session,
     add_role_in_bank_RA_MW,
     add_role_in_bank_SA,
     add_role_in_bank_RA_FPT,
     add_role_in_bank_RA_New_Segment,
     change_role_in_bank,
     add_sup_code,
+    remove_sup_code,
+    get_supervisor_employee_list,
     update_note,
     update_id_number,
     closed_partner,
 )
 
 from Common.supporting import (
+    authenticate_HOSELSSO,
+    authenticate_swagger,
     login_status_check,
     logout_render
 )
@@ -32,6 +37,13 @@ from Common.supporting import (
 # This is to jump the user back to login if their are not authenticated
 login_status_check()
 logout_render()
+
+
+def authen_get_homesis_session(username: str, password: str):
+    if not authenticate_HOSELSSO(username=username, password=password):
+        st.error(app_msg.APP_MESSAGE.APP_LOGIN_FAILED_MSG)
+        return None
+    return homesis_start_session(authenticate_swagger(username=username, password=password))
 
 
 @app_logic_exception.app_logic_exception_handler
@@ -373,45 +385,110 @@ def main():
 
     with add_sup_code_tab:
         st.text(
-            ":red[Please make sure these user are not assign any sup code before]")
+            "Please make sure these user are not assign any sup code before]")
+        st.download_button(label="Download template", data="test")
+        left, right = st.columns(2, vertical_alignment="top")
+        subordinate_code_txt = left.text_area(label="Please input HR-codes that need assign sup code")
+        supervisor_code_txt = right.text_input(label="Input Supervisor HR code")
         # Insert excel file for add sup code
-        csv_upload_homesis_add_sup_code = st.file_uploader(
-            label="Please input list user and their sup code",
+
+        csv_upload_homesis_add_sup_code = left.file_uploader(
+            label="Or input list user and their sup code",
             type=["csv", "txt"],
             accept_multiple_files=False,
         )
-
         # Read CSV Data
         if csv_upload_homesis_add_sup_code is not None:
             csv_data_add_sup_code = pd.read_csv(
                 csv_upload_homesis_add_sup_code,
                 converters={"HR Code": str, "Supervisor code": str},
+                delimiter=";"
             )
             result_table = st.write(csv_data_add_sup_code)
 
-        # nhét chức năng thêm dô ở đây
-        add_sup_code_btn = st.button("Add Sup Code", type="primary")
-        if add_sup_code_btn:
-            with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
-                # Start Selenium
-                homesis_page = login_to_site(
-                    ldap_user=ldap_user, ldap_pw=ldap_pw)
-                homesis_page.access_user_managerment()
+        # Build unified data source: file takes priority, otherwise use text inputs
+        use_file = csv_upload_homesis_add_sup_code is not None
+        use_text = (
+            subordinate_code_txt.strip() != ''
+            and supervisor_code_txt.strip() != ''
+        )
 
-                # Loop through CSV & Search for HR Code and take data from CSV
-                for index, row in csv_data_add_sup_code.iterrows():
-                    hr_code = row["HR Code"]
-                    supervisor = row["Supervisor code"]
-                    list_error = add_sup_code(
-                        homesis_page=homesis_page,
-                        hr_code=hr_code,
-                        supervisor_code=supervisor,
-                    )
-                    st.write(list_error)
-                    homesis_page.get_homesis_url()
-                    homesis_page.access_user_managerment()
-            st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
+        if use_file or use_text:
+            add_btn_col, delete_btn_col = st.columns(2)
+            add_sup_code_btn = add_btn_col.button("Add Sup Code", type="primary")
+            delete_sup_code_btn = delete_btn_col.button("Delete Sup Code", type="secondary")
+            if add_sup_code_btn or delete_sup_code_btn:
+                # Resolve the list of (hr_code, supervisor) pairs to process
+                if use_file:
+                    pairs = [
+                        (str(row["HR Code"]), str(row["Supervisor code"]))
+                        for _, row in csv_data_add_sup_code.iterrows()
+                    ]
+                else:
+                    # Each line in the text area is one subordinate HR code,
+                    # all sharing the single supervisor entered above
+                    hr_codes = [
+                        code.strip()
+                        for code in subordinate_code_txt.strip().splitlines()
+                        if code.strip()
+                    ]
+                    pairs = [(hr, supervisor_code_txt.strip()) for hr in hr_codes]
 
+                with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+                    # Start API session
+                    request = authen_get_homesis_session(
+                        username=ldap_user, password=ldap_pw)
+                    if request is not None:
+                        action_fn = add_sup_code if add_sup_code_btn else remove_sup_code
+                        success_message = (
+                            "All supervisor codes assigned successfully!"
+                            if add_sup_code_btn
+                            else "All employee codes unassigned from supervisor successfully!"
+                        )
+                        errors_list = []
+                        for hr_code, supervisor in pairs:
+                            list_error = action_fn(
+                                request=request,
+                                hr_code=hr_code,
+                                supervisor_code=supervisor,
+                            )
+                            errors_list.extend(list_error)
+                        
+                        if errors_list:
+                            st.error("Errors encountered:")
+                            for error in errors_list:
+                                st.write(error)
+                        else:
+                            st.success(success_message)
+                st.write(app_msg.APP_MESSAGE.APP_FINISH_MSG)
+
+        st.divider()
+        st.subheader("Get supervisor employee list")
+        supervisor_lookup_code = st.text_input(
+            label="Input Supervisor HR code to get employee list",
+            key="homesis_sup_lookup_code",
+        )
+        get_sup_employee_list_btn = st.button(
+            "Get employee list", type="secondary")
+
+        if get_sup_employee_list_btn:
+            if supervisor_lookup_code.strip() == "":
+                st.error("Please input Supervisor HR code")
+            else:
+                with st.spinner(app_msg.APP_MESSAGE.APP_RUNNING_MSG):
+                    request = authen_get_homesis_session(
+                        username=ldap_user, password=ldap_pw)
+                    if request is not None:
+                        employees = get_supervisor_employee_list(
+                            request=request,
+                            supervisor_code=supervisor_lookup_code.strip(),
+                        )
+                        if len(employees) == 0:
+                            st.warning("No employee found under this supervisor code")
+                        else:
+                            employee_df = pd.DataFrame(employees)
+                            st.write("Found " + str(len(employee_df)) + " employee(s)")
+                            st.dataframe(employee_df, width='stretch')
     with update_note_tab:
         # Insert excel file for create Homesis account
         csv_upload_homesis_update_note = st.file_uploader(

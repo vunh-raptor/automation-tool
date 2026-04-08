@@ -1,5 +1,8 @@
 from requests.auth import AuthBase
 import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class BearerAuth(AuthBase):

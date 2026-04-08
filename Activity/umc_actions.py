@@ -1,4 +1,5 @@
-from Sites.umc import umc, umc_request
+from Sites.umc import umc
+from Request.umc import umc_request
 from Common.constant.error_message import ErrorMessage
 
 roles_table = [
