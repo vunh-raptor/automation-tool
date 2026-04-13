@@ -13,7 +13,7 @@ st.set_page_config(
     layout="wide",  # Optional: makes better use of screen space
     initial_sidebar_state="collapsed",  # This hides the sidebar by default
     menu_items={"Get help": None,
-                "About": "Developed and maintained by: **Service Desk Team** with Tech Leader: **Nhu.HuynhNY**"}
+                "About": "Developed and maintained by: **Service Desk Team** with Tech Leader: **Duc.LeM1**"}
 )
 # nav = st.navigation([homepage], position="hidden")
 if "authenticated" not in st.session_state:
@@ -23,7 +23,7 @@ if "authenticated" not in st.session_state:
 
 
 def login_page():
-    st.write("# Welcome to SD Automation Hub ver2.0-beta! 👋")
+    st.write("# Welcome to SD Automation Hub ver2.1-beta! 👋")
     st.title("Please login with your HCG credential")
 
     with st.form("loginForm"):

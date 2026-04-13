@@ -13,6 +13,7 @@ from Common.supporting import (
 from Activity.umc_actions import (
     login_to_site,
     add_homesis_homesis_user,
+    roles_table,
     deactivate_ra,
     check_account_status,
     add_role_umc,
@@ -27,7 +28,8 @@ from Activity.umc_actions import (
     reactivate_account,
     umc_start_session,
     get_deactivation_date,
-    get_account_username
+    get_account_username,
+    get_employedsince_date
 )
 from Common.constant.app_message import APP_MESSAGE as app_msg
 import pandas as pd
@@ -67,21 +69,19 @@ def main():
     # Choose action to take on UMC
     st.subheader("Choose your action on UMC", divider="red")
 
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-        ["Deactivate/Reactive", "Add/Remove Role", "Check account info", "Update Info", "Reactivate Accounts", "Get account deactivation date"])
+    tab1, tab2, tab3, tab4 = st.tabs(
+        ["Deactivate/Reactive", "Add/Remove Role", "Check account info", "Update Info"])
 
     with tab1:
         tab1_exec(ldap_user, ldap_pw)
+        st.divider()
+        reactivate_accounts_section()
     with tab2:
         tab2_exec(ldap_user, ldap_pw)
     with tab3:
         tab3_exec(ldap_user, ldap_pw)
     with tab4:
         tab4_exec(ldap_user, ldap_pw)
-    with tab5:
-        tab5_exec()
-    with tab6:
-        tab6_exec()
     pass
 
 
@@ -93,35 +93,104 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
             password (str): str value of password
     """
 
-    # List HR Code/Login Name Input
-    csv_upload = st.file_uploader(
-        label="HR Code/Log In Name List",
+    
+    st.subheader("Deactivate accounts on UMC")
+    left, right = st.columns(2)
+
+    # Input precedence rule:
+    # if text area has content, disable file upload to avoid mixed sources.
+    existing_text = st.session_state.get("tab1_deactive_text_input", "")
+    disable_file_upload = isinstance(existing_text, str) and existing_text.strip() != ""
+
+    csv_upload = left.file_uploader(
+        label="HR Code/Log In Name List. Label: HR Code",
         type=["csv", "txt"],
         accept_multiple_files=False,
+        disabled=disable_file_upload,
     )
+    use_file = csv_upload is not None
 
-    # Read CSV Data
-    if csv_upload is not None:
+    hr_code_input = left.text_area(
+        "Input HR code or HCG here",
+        key="tab1_deactive_text_input",
+        disabled=use_file,
+    )
+    use_text = hr_code_input.strip() != '' and not use_file
+
+    # Build one unified account list from the active source only.
+    account_candidates = []
+    if use_file:
         csv_data = pd.read_csv(csv_upload, converters={"HR Code": str})
         st.write(csv_data)
+        account_candidates = [str(row["HR Code"]).strip() for _, row in csv_data.iterrows()]
+    elif use_text:
+        account_candidates = [
+            code.strip()
+            for code in hr_code_input.strip().splitlines()
+            if code.strip()
+        ]
 
-    st.text("Deactive RA")
-    deactive_ra_button = st.button(
-        "Deactive RA", type="primary")
+    # Business rule:
+    # SA account = HR code does NOT start with FPT, R00, or MWG.
+    has_sa_account = any(
+        not code.upper().startswith(("FPT", "R00", "MWG"))
+        for code in account_candidates
+    )
 
-    # deactive account
-    if deactive_ra_button:
-        with st.spinner(app_msg.APP_RUNNING_MSG):
-            request = authen_get_UMC_session(
-                username=ldap_user, password=ldap_pw)
-            if request is None:
-                return
-            # Loop through CSV & Search for HR Code
-            for index, row in csv_data.iterrows():
-                hr_code = row["HR Code"]
-                if not deactivate_ra(umc_request=request, hr_code=hr_code):
-                    st.write(f"Deactivation failed for account {hr_code}")
-            st.write(app_msg.APP_FINISH_MSG)
+    right.space(size="small")
+    reason_for_deactivation = right.selectbox(
+        "Select reason for deactivation",
+        ["Mistake 30 days", "AF Deactivate", "Hard Trigger", "Temp Deactivate"],
+        disabled=not has_sa_account,
+    )
+
+    if use_file or use_text:
+        deactive_accounts_button = st.button(
+            "Deactive accounts", type="primary")
+
+        # Deactivation execution:
+        # SA -> remove current roles then assign selected reason role.
+        # RA -> run deactivate_ra as-is.
+        if deactive_accounts_button:
+            hr_codes_to_process = account_candidates
+            # UI reason label -> UMC role mapping for SA flow.
+            reason_role_map = {
+                "Mistake 30 days": "SALES_AGENT_MISTAKE_30DAYS",
+                "AF Deactivate": "SALES_AGENT_AF_DEACTIVE",
+                "Hard Trigger": "SALES_AGENT_HARD_TRIGGER",
+                "Temp Deactivate": "SALES_AGENT_TEMP_DEACTIVE",
+            }
+            selected_reason_role = reason_role_map.get(reason_for_deactivation)
+
+            with st.spinner(app_msg.APP_RUNNING_MSG):
+                request = authen_get_UMC_session(
+                    username=ldap_user, password=ldap_pw)
+                if request is None:
+                    return
+                for hr_code in hr_codes_to_process:
+                    account_id = hr_code.strip()
+                    is_sa_account = not account_id.upper().startswith(("FPT", "R00", "MWG"))
+
+                    if is_sa_account:
+                        remove_status = remove_multi_role_umc(
+                            umc_request=request,
+                            login_codes=[account_id],
+                            role_list=["HOMESIS", "HOMESIS_USER"],
+                        )
+                        add_status = False
+                        if selected_reason_role is not None:
+                            add_status = add_multi_role_umc(
+                                umc_request=request,
+                                login_codes=[account_id],
+                                role_list=[selected_reason_role],
+                            )
+
+                        if not (remove_status and add_status):
+                            st.write(f"Deactivation failed for SA account {account_id}")
+                    else:
+                        if not deactivate_ra(umc_request=request, hr_code=account_id):
+                            st.write(f"Deactivation failed for RA account {account_id}")
+                st.write(app_msg.APP_FINISH_MSG)
 
 
 def tab2_exec(ldap_user: str, ldap_pw: str):
@@ -144,9 +213,11 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
                 if request is None:
                     return
                 status = add_multi_role_umc(
-                    umc_request=request, hr_codes=login_name_input_area_list, role_list=role_umc_input_area_list)
+                    umc_request=request, login_codes=login_name_input_area_list, role_list=role_umc_input_area_list)
                 if status:
                     st.write(" All accounts - Add role successful")
+                else:
+                    st.write(" All accounts - Add role failed")
                 st.write(app_msg.APP_FINISH_MSG)
 
     st.divider()
@@ -167,68 +238,98 @@ def tab2_exec(ldap_user: str, ldap_pw: str):
                     username=ldap_user, password=ldap_pw)
                 if request is None:
                     return
-                status = remove_multi_role_umc(umc_request=request, hr_codes=login_name_input_area_list1, role_list=role_umc_input_area_list1)
+                status = remove_multi_role_umc(umc_request=request, login_codes=login_name_input_area_list1, role_list=role_umc_input_area_list1)
                 if status:
                     st.write(" All accounts - Remove role successful")
+                else: 
+                    st.write(" All accounts - Remove role failed")
                 st.write(app_msg.APP_FINISH_MSG)
 
 def tab3_exec(ldap_user: str, ldap_pw: str):
-    # check active account UMC
-    st.text("Check status account UMC")
-    hr_code_input_area = st.text_area("Input Hr code or HCG here")
-    hr_code_input_area_lines = hr_code_input_area.split(
-        "\n"
-    )  # This return a list of text area value
-    check_status_btn = st.button("Check status account", type="primary")
-    get_username_btn = st.button("Get Username Login")
+    left_col, right_col = st.columns(2, vertical_alignment="top")
 
-    if check_status_btn:
-        with st.spinner(app_msg.APP_RUNNING_MSG):
-            request = authen_get_UMC_session(
-                username=ldap_user, password=ldap_pw)
-            if request is None:
-                return
-            data_user_status_list = []
-            for hr_code in filter(None, hr_code_input_area_lines):
-                status = check_account_status(
-                    umc_request=request, hr_code=hr_code)
-                data_user_status_list.append(
-                    {"HR Code": hr_code, "Status": status})
+    with left_col:
+        st.subheader("Check status account UMC")
+        hr_code_input_area = st.text_area("Input Hr code or HCG here", key="tab3_status_input")
+        hr_code_input_area_lines = hr_code_input_area.split("\n")
+        check_status_btn = st.button("Check status account", type="primary", key="tab3_check_status_btn")
+        get_username_btn = st.button("Get Username Login", key="tab3_get_username_btn")
+
+        if check_status_btn:
+            with st.spinner(app_msg.APP_RUNNING_MSG):
+                request = authen_get_UMC_session(
+                    username=ldap_user, password=ldap_pw)
+                if request is None:
+                    return
+                data_user_status_list = []
+                for hr_code in filter(None, hr_code_input_area_lines):
+                    status = check_account_status(
+                        umc_request=request, hr_code=hr_code)
+                    data_user_status_list.append(
+                        {"HR Code": hr_code, "Status": status})
+                st.write(app_msg.APP_FINISH_MSG)
+
+                data_user_status = pd.DataFrame(data_user_status_list)
+                inactive_users = data_user_status[
+                    data_user_status["Status"] == "INACTIVE"
+                ]
+                active_users = data_user_status[
+                    data_user_status["Status"] != "INACTIVE"
+                ]
+
+                st.subheader(":red[Active Users]")
+                st.text("Successfully run " + str(len(data_user_status)) + " users")
+                st.write(active_users)
+
+                st.subheader(":red[Inactive user]")
+                st.text(f"Found {len(inactive_users)} inactive user(s)")
+                st.write(inactive_users)
+
+        if get_username_btn:
+            with st.spinner(app_msg.APP_RUNNING_MSG):
+                request = authen_get_UMC_session(
+                    username=ldap_user, password=ldap_pw)
+                if request is None:
+                    return
+                data_user_status_list = []
+                for hr_code in filter(None, hr_code_input_area_lines):
+                    username = get_account_username(umc_request=request, hr_code=hr_code)
+                    data_user_status_list.append({"HR Code": hr_code, "Username": username})
+                data_user_login = pd.DataFrame(data_user_status_list)
+                st.write(data_user_login)
+                st.write(app_msg.APP_FINISH_MSG)
+
+    with right_col:
+        st.subheader("Get account Deactivation date")
+        deactivation_input = st.text_area("Input Hr codes or HCGs", key="tab3_deactivation_input")
+        deactivation_btn = st.button("Get account deactivation date", type="primary", key="tab3_deactivation_btn")
+
+        if deactivation_btn:
+            with st.spinner(app_msg.APP_RUNNING_MSG):
+                usercred = system_env_get_cred("UMCAdminUser")
+                passcred = system_env_get_cred("UMCAdminCred")
+                request = umc_start_session(authenticate_swagger(
+                    username=usercred, password=passcred))
+                for hr_code in filter(None, deactivation_input.split("\n")):
+                    deactivation_date = get_deactivation_date(
+                        umc_request=request, hr_code=hr_code)
+                    st.write(deactivation_date)
             st.write(app_msg.APP_FINISH_MSG)
 
-            # Create the DataFrame *outside* the loop (only once):
-            # <--- DataFrame created here
-            data_user_status = pd.DataFrame(data_user_status_list)
+        st.subheader("Get account Employed Since date")
+        employedsince_input = st.text_area("Input Hr codes or HCGs", key="tab3_employedsince_input")
+        employedsince_btn = st.button("Get account employed since date", type="primary", key="tab3_employedsince_btn")
 
-            # display result
-            left, right = st.columns(2, vertical_alignment="top")
-            data_user_status_inactive = data_user_status[
-                data_user_status["Status"] == "INACTIVE"
-            ]
-            right.divider(width="stretch")
-            right.subheader(":red[Inactive user]")
-            right.text(
-                f"Found {len(data_user_status_inactive)} inactive user(s)")
-            right.write(data_user_status_inactive)
-            left.subheader(":red[Total result]")
-            left.subheader(":red[Active Users]")
-            left.text("Successfully run " +
-                      str(len(data_user_status)) + " users")
-            data_user_status = data_user_status[data_user_status["Status"] != "INACTIVE"]
-            left.write(data_user_status)
-
-    if get_username_btn:
-        with st.spinner(app_msg.APP_RUNNING_MSG):
-            request = authen_get_UMC_session(
-                username=ldap_user, password=ldap_pw)
-            if request is None:
-                return
-            data_user_status_list = []
-            for hr_code in filter(None, hr_code_input_area_lines):
-                username = get_account_username(umc_request=request, hr_code=hr_code)
-                data_user_status_list.append({"HR Code": hr_code, "Username": username})
-            data_user_login = pd.DataFrame(data_user_status_list)
-            st.write(data_user_login)
+        if employedsince_btn:
+            with st.spinner(app_msg.APP_RUNNING_MSG):
+                usercred = system_env_get_cred("UMCAdminUser")
+                passcred = system_env_get_cred("UMCAdminCred")
+                request = umc_start_session(authenticate_swagger(
+                    username=usercred, password=passcred))
+                for hr_code in filter(None, employedsince_input.split("\n")):
+                    employedsince_date = get_employedsince_date(
+                        umc_request=request, hr_code=hr_code)
+                    st.write(employedsince_date)
             st.write(app_msg.APP_FINISH_MSG)
 
 
@@ -386,7 +487,7 @@ def tab4_exec(ldap_user: str, ldap_pw: str):
         st.write(app_msg.APP_FINISH_MSG)
 
 
-def tab5_exec():
+def reactivate_accounts_section():
     st.subheader("Reactivate accounts on UMC")
 
     login_name_input_area = st.text_area("Please insert reactive account here")
@@ -454,30 +555,6 @@ def tab5_exec():
                     st.session_state['getOTP_clicked'] = False
                     st.session_state['confirmOTP_clicked'] = False
                     st.rerun()
-
-
-def tab6_exec():
-    st.subheader("Get account Deactivation date")
-
-    hr_code_text_area = st.text_area("Input Hr codes or HCGs")
-    if hr_code_text_area is not None:
-        hr_code_input_area_lines = hr_code_text_area.split(
-            "\n"
-        )
-        emergency = st.button("Perform emergency add role", type="primary")
-        if emergency:
-            with st.spinner(app_msg.APP_RUNNING_MSG):
-                usercred = system_env_get_cred("UMCAdminUser")
-                passcred = system_env_get_cred("UMCAdminCred")
-                request = umc_start_session(authenticate_swagger(
-                    username=usercred, password=passcred))
-                # add_role_status = add_role_umc(
-                #     umc_request=request, hr_codes=hr_code_input_area_lines, role="NON_HOSEL_USER")
-                for hr_code in hr_code_input_area_lines:
-                    deactivation_date = get_deactivation_date(
-                        umc_request=request, hr_code=hr_code)
-                    st.write(deactivation_date)
-            st.write(app_msg.APP_FINISH_MSG)
 
 
 if __name__ == "__main__":

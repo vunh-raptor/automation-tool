@@ -191,11 +191,11 @@ class umc_request(Session):
         else:
             return True
 
-    def patch_user_single_role(self, hr_codes: list, role: str, action: str) -> bool:
+    def patch_user_single_role(self, login_codes: list, role: str, action: str) -> bool:
         """send PATCH request to update user role on UMC
 
         Args:
-            hr_codes (list): list of HR code of the target accounts
+            login_codes (list): list of login codes of the target accounts
             role (str): the role that need to take action
             action (str): the action that the PATCH will send (add / delete)
 
@@ -204,7 +204,7 @@ class umc_request(Session):
         """
         endpoint = f"{self._USER_MANAGEMENT}{self._API_SCIM_GROUP_MANAGEMENT}{role}"
         json_data = ""
-        for code in hr_codes:
+        for code in login_codes:
             json_data = json_data + \
                 self._PATCH_ROLE_INFO.substitute(
                     action=action, login=code) + ",\n"
@@ -264,8 +264,8 @@ class umc_request(Session):
         else:
             return True
 
-    def get_account_deactivation_date(self, hr_code: str) -> str:
-        """This function is to get account deactivation date
+    def get_account_raw_data(self, hr_code: str) -> str:
+        """This function is to get account raw data with hr code as placeholder
 
         Args:
             hr_code (str): hr code of the account
@@ -275,4 +275,5 @@ class umc_request(Session):
         """
         endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
         response = self.get_request(endpoint=endpoint)
-        return f"Deactivation Time: {filter_UMC_json_single_element(response=response, element='lastDeactivationTime').split('T')[0]}"
+        #return f"Deactivation Time: {filter_UMC_json_single_element(response=response, element='lastDeactivationTime').split('T')[0]}"
+        return response.text

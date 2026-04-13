@@ -1,6 +1,7 @@
 from Sites.umc import umc
 from Request.umc import umc_request
 from Common.constant.error_message import ErrorMessage
+from Common.supporting import filter_UMC_json_single_element
 
 roles_table = [
     "NON_HOSEL_USER",
@@ -57,13 +58,14 @@ def add_role_umc(umc_request: umc_request, hr_codes: list, role: str) -> bool:
         hr_codes=hr_codes, role=role.strip(), action="add")
 
 
-def add_multi_role_umc(umc_request: umc_request, hr_codes: list, role_list: list[str]) -> bool:
-    """This function is used to perform add role by list on UMC system 
+def add_multi_role_umc(umc_request: umc_request, login_codes: list, role_list: list[str]) -> bool:
+    """This function is used to perform add role by list on UMC system with fallback resolution.
+    Resolves each account identifier (HR code or login name) using the check_account_status pattern.
 
     Args:
         umc_request (umc_request): UMC request object
-        hr_code (str): HR code to apply change
-        role_list (list[str]): list of the role need to take action
+        login_codes (list): list of account identifiers (HR codes or login names)
+        role_list (list[str]): list of roles to add
 
     Returns:
         bool: status of the action
@@ -71,17 +73,40 @@ def add_multi_role_umc(umc_request: umc_request, hr_codes: list, role_list: list
     if not role_list:
         return False
 
+    resolved_accounts = []
+    for account in login_codes:
+        account_id = account.strip() if isinstance(account, str) else str(account).strip()
+        if account_id == "":
+            continue
+
+        username_by_hr = umc_request.get_user_info_with_hrcode(
+            hr_code=account_id, element="login")
+        if isinstance(username_by_hr, str) and username_by_hr.strip() != "":
+            resolved_accounts.append(username_by_hr.strip())
+            continue
+
+        username_by_username = umc_request.get_user_info_with_username(
+            username=account_id, element="login")
+        if isinstance(username_by_username, str) and username_by_username.strip() != "":
+            resolved_accounts.append(username_by_username.strip())
+            continue
+
+        resolved_accounts.append(account_id)
+
+    if not resolved_accounts:
+        return False
+
     success = True
     for role in role_list:
         result = umc_request.patch_user_single_role(
-            hr_codes=hr_codes, role=role.strip(), action="add")
+            login_codes=resolved_accounts, role=role.strip(), action="add")
         if not result:
             success = False
 
     return success
 
 
-def remove_role_umc(umc_request: umc_request, hr_codes: list, role: str) -> bool:
+def remove_role_umc(umc_request: umc_request, login_codes: list, role: str) -> bool:
     """
     Removes a specified role from a user in the UMC page.
 
@@ -100,14 +125,14 @@ def remove_role_umc(umc_request: umc_request, hr_codes: list, role: str) -> bool
     return umc_request.patch_user_single_role(hr_codes=hr_codes, role=role.strip(), action="delete")
 
 
-def remove_multi_role_umc(umc_request: umc_request, hr_codes: list, role_list: list[str]) -> bool:
-    """
-    This function removes all roles within a specified role list
+def remove_multi_role_umc(umc_request: umc_request, login_codes: list, role_list: list[str]) -> bool:
+    """This function removes all roles within a specified role list with fallback resolution.
+    Resolves each account identifier (HR code or login name) using the check_account_status pattern.
 
     Args:
         umc_request (umc_request): The UMC request object
-        hr_code (list): The HR code list of the user
-        role_list (list[str]): the role list need to be removed
+        login_codes (list): List of account identifiers (HR codes or login names)
+        role_list (list[str]): the role list to remove
 
     Returns:
         bool: status of the action
@@ -115,10 +140,33 @@ def remove_multi_role_umc(umc_request: umc_request, hr_codes: list, role_list: l
     if not role_list:
         return False
 
+    resolved_accounts = []
+    for account in login_codes:
+        account_id = account.strip() if isinstance(account, str) else str(account).strip()
+        if account_id == "":
+            continue
+
+        username_by_hr = umc_request.get_user_info_with_hrcode(
+            hr_code=account_id, element="login")
+        if isinstance(username_by_hr, str) and username_by_hr.strip() != "":
+            resolved_accounts.append(username_by_hr.strip())
+            continue
+
+        username_by_username = umc_request.get_user_info_with_username(
+            username=account_id, element="login")
+        if isinstance(username_by_username, str) and username_by_username.strip() != "":
+            resolved_accounts.append(username_by_username.strip())
+            continue
+
+        resolved_accounts.append(account_id)
+
+    if not resolved_accounts:
+        return False
+
     success = True
     for role in role_list:
         result = umc_request.patch_user_single_role(
-            hr_codes=hr_codes, role=role.strip(), action="delete")
+            login_codes=resolved_accounts, role=role.strip(), action="delete")
         if not result:
             success = False
 
@@ -148,14 +196,21 @@ def check_account_status(umc_request: umc_request, hr_code: str) -> str:
     Returns:
         str: Current status of the account
     """
-    retry = False
-    result = umc_request.get_user_info_with_hrcode(hr_code=hr_code, element="status")
-    if result == "":
-        retry = True
-        result = umc_request.get_user_info_with_username(username=hr_code, element="status")
-    if result == "" and retry is True:
+    account_id = hr_code.strip()
+    if account_id == "":
         return "NOT FOUND"
-    return result
+
+    status_by_hr_code = umc_request.get_user_info_with_hrcode(
+        hr_code=account_id, element="status")
+    if isinstance(status_by_hr_code, str) and status_by_hr_code.strip() != "":
+        return status_by_hr_code.strip()
+
+    status_by_username = umc_request.get_user_info_with_username(
+        username=account_id, element="status")
+    if isinstance(status_by_username, str) and status_by_username.strip() != "":
+        return status_by_username.strip()
+
+    return "NOT FOUND"
 
 def get_account_username(umc_request: umc_request, hr_code: str) -> str:
     """This function used to get account username
@@ -436,4 +491,17 @@ def get_deactivation_date(umc_request: umc_request, hr_code: str) -> str:
         str: status
     """
 
-    return umc_request.get_account_deactivation_date(hr_code=hr_code)
+    return f"Deactivation Time: {filter_UMC_json_single_element(response=umc_request.get_account_raw_data(hr_code=hr_code), element='lastDeactivationTime').split('T')[0]}"
+
+def get_employedsince_date(umc_request: umc_request, hr_code: str) -> str:
+    """This function is used to get employed since date
+
+    Args:
+        umc_request (umc_request): request session of the UMC
+        hr_code (str): hr_code of the user
+
+    Returns:
+        str: status
+    """
+
+    return f"Employed Since: {filter_UMC_json_single_element(response=umc_request.get_account_raw_data(hr_code=hr_code), element='employedSince').split('T')[0]}"
