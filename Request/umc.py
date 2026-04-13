@@ -276,4 +276,4 @@ class umc_request(Session):
         endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
         response = self.get_request(endpoint=endpoint)
         #return f"Deactivation Time: {filter_UMC_json_single_element(response=response, element='lastDeactivationTime').split('T')[0]}"
-        return response.text
+        return response

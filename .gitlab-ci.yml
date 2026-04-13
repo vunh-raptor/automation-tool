@@ -31,6 +31,8 @@ default:
 
 service_startup_check:
   stage: verify
+  tags:
+    - master-deployment  
   script:
     - |
       python - <<'PY'
