@@ -238,7 +238,6 @@ class umc_request(Session):
             }
         }
         response = self.patch_request(endpoint=endpoint, payload=payload)
-        print(response.content)
         # Verify the status of the request call
         if response.status_code >= 400:
             return False
@@ -275,5 +274,4 @@ class umc_request(Session):
         """
         endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
         response = self.get_request(endpoint=endpoint)
-        #return f"Deactivation Time: {filter_UMC_json_single_element(response=response, element='lastDeactivationTime').split('T')[0]}"
         return response

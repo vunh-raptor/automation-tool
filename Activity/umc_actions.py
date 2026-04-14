@@ -238,7 +238,7 @@ def add_homesis_homesis_user(umc_request: umc_request, hr_codes: list) -> bool:
     Returns:
         bool: status of the role adding action
     """
-    return add_multi_role_umc(umc_request=umc_request, hr_codes=hr_codes, role_list=["HOMESIS", "HOMESIS_USER"])
+    return add_multi_role_umc(umc_request=umc_request, login_codes=hr_codes, role_list=["HOMESIS", "HOMESIS_USER"])
 
 
 def deactivate_user_with_reason(umc_page: umc, hr_code: str, reason: str) -> bool:
