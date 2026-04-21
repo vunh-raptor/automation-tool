@@ -1,0 +1,9 @@
+https://esign2-api.homecredit.vn/esupplement-service/api/actuator/health
+https://esign2-api.homecredit.vn/eappendix-service/api/actuator/health
+https://esign2-api.homecredit.vn/esignature-service/api/actuator/health
+https://esign2-api.homecredit.vn/eevidence-service/api/actuator/health
+https://esign2-api.homecredit.vn/econtract3-service/api/actuator/health
+https://esign2-api.homecredit.vn/esigning-internal-service/api/actuator/health
+https://esign2-api.homecredit.vn/elending-decision-service/api/actuator/health
+https://esign2-api.homecredit.vn/coe-service/api/actuator/health
+https://esign2-api.homecredit.vn/eauthorization-service/api/actuator/health

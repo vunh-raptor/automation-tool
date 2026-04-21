@@ -63,10 +63,27 @@ class web_element:
             int: Number of the child element. Return 0 if there's no element found
         """
 
+    def clear(self) -> bool:
+        """Clear the contained element value.
+
+        Returns:
+            bool: True if clear is successful, False if no element exists.
+        """
+        if self.flag:
+            self.value.clear()
+            return True
+        logging.critical("There is no element to clear.")
+        return False
+
     def clearText(self) -> bool:
+        if not self.flag:
+            logging.critical("There is no element to clear text.")
+            return False
         self.send_keys(Keys.CONTROL + "a")
         self.send_keys(Keys.DELETE)
-        return self.value.text == ''
+        self.value.clear()
+        return True
+
 
     def get_value(self):
         """get value of web element field

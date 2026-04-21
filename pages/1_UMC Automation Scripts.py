@@ -133,7 +133,7 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
     # Business rule:
     # SA account = HR code does NOT start with FPT, R00, or MWG.
     has_sa_account = any(
-        not code.upper().startswith(("FPT", "R00", "MWG"))
+        not code.upper().startswith(("FPT", "R0", "MW"))
         for code in account_candidates
     )
 
