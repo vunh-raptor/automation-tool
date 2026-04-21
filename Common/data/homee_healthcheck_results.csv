@@ -1,0 +1,10 @@
+api,status,status_code,response_ms,error,checked_at
+https://esign2-api.homecredit.vn/esupplement-service/api/actuator/health,OK,200,77,,2026-04-21 15:43:05
+https://esign2-api.homecredit.vn/eappendix-service/api/actuator/health,OK,200,195,,2026-04-21 15:43:05
+https://esign2-api.homecredit.vn/esignature-service/api/actuator/health,OK,200,104,,2026-04-21 15:43:05
+https://esign2-api.homecredit.vn/eevidence-service/api/actuator/health,OK,200,95,,2026-04-21 15:43:05
+https://esign2-api.homecredit.vn/econtract3-service/api/actuator/health,OK,200,105,,2026-04-21 15:43:06
+https://esign2-api.homecredit.vn/esigning-internal-service/api/actuator/health,OK,200,106,,2026-04-21 15:43:06
+https://esign2-api.homecredit.vn/elending-decision-service/api/actuator/health,OK,200,88,,2026-04-21 15:43:06
+https://esign2-api.homecredit.vn/coe-service/api/actuator/health,OK,200,110,,2026-04-21 15:43:06
+https://esign2-api.homecredit.vn/eauthorization-service/api/actuator/health,OK,200,91,,2026-04-21 15:43:06
