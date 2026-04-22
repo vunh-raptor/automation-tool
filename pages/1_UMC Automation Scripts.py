@@ -131,9 +131,9 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
         ]
 
     # Business rule:
-    # SA account = HR code does NOT start with FPT, R00, or MWG.
+    # SA account = HR code does NOT start with FPT, R0, or MW.
     has_sa_account = any(
-        not code.upper().startswith(("FPT", "R0", "MW"))
+        not code.upper().startswith(("FPT", "R0", "MW", "MWG"))
         for code in account_candidates
     )
 
@@ -169,7 +169,7 @@ def tab1_exec(ldap_user: str, ldap_pw: str):
                     return
                 for hr_code in hr_codes_to_process:
                     account_id = hr_code.strip()
-                    is_sa_account = not account_id.upper().startswith(("FPT", "R00", "MWG"))
+                    is_sa_account = not account_id.upper().startswith(("FPT", "R0", "MW", "MWG"))
 
                     if is_sa_account:
                         remove_status = remove_multi_role_umc(
