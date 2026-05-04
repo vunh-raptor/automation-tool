@@ -5,7 +5,7 @@ jira
 jira-insight
 streamlit_quill
 streamlit_ace
-pywin32
+pywin32; sys_platform == 'win32'
 openpyxl
 pyotp
 msteamsapi
