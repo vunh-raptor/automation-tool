@@ -120,10 +120,13 @@ def filter_UMC_json_single_element(response: Response, element: str) -> str:
         json_obj = json.loads(response.text)
         for fields in json_obj["data"]:
             return str(fields[f"{element}"])
-    except Exception as e:  # noqa: E722
-        print("File Error, file not found!\n")
+    except KeyError:
+        # element does not exist in the response payload for this account
         return ""
-    return ""  # Return an empty dictionary if an exception occurs
+    except Exception as e:  # noqa: E722
+        print(f"filter_UMC_json_single_element error (element='{element}'): {e}")
+        return ""
+    return ""
 # def filter_linked_tickets_from_response(response: Response) -> dict:
 #     """This function is to support getting the linked ticket ID & it's summary from the response of the API
 
