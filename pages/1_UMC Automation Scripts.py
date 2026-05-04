@@ -306,10 +306,8 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
 
         if deactivation_btn:
             with st.spinner(app_msg.APP_RUNNING_MSG):
-                usercred = system_env_get_cred("UMCAdminUser")
-                passcred = system_env_get_cred("UMCAdminCred")
                 request = umc_start_session(authenticate_swagger(
-                    username=usercred, password=passcred))
+                    username=ldap_user, password=ldap_pw))
                 for hr_code in filter(None, deactivation_input.split("\n")):
                     deactivation_date = get_deactivation_date(
                         umc_request=request, hr_code=hr_code)
@@ -322,10 +320,8 @@ def tab3_exec(ldap_user: str, ldap_pw: str):
 
         if employedsince_btn:
             with st.spinner(app_msg.APP_RUNNING_MSG):
-                usercred = system_env_get_cred("UMCAdminUser")
-                passcred = system_env_get_cred("UMCAdminCred")
                 request = umc_start_session(authenticate_swagger(
-                    username=usercred, password=passcred))
+                    username=ldap_user, password=ldap_pw))
                 for hr_code in filter(None, employedsince_input.split("\n")):
                     employedsince_date = get_employedsince_date(
                         umc_request=request, hr_code=hr_code)

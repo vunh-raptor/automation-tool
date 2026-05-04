@@ -491,7 +491,12 @@ def get_deactivation_date(umc_request: umc_request, hr_code: str) -> str:
         str: status
     """
 
-    return f"Deactivation Time: {filter_UMC_json_single_element(response=umc_request.get_account_raw_data(hr_code=hr_code), element='lastDeactivationTime').split('T')[0]}"
+    raw = filter_UMC_json_single_element(
+        response=umc_request.get_account_raw_data(hr_code=hr_code),
+        element="lastDeactivationTime",
+    )
+    date_part = raw.split("T")[0] if raw else "N/A"
+    return f"Deactivation Time ({hr_code}): {date_part}"
 
 def get_employedsince_date(umc_request: umc_request, hr_code: str) -> str:
     """This function is used to get employed since date
@@ -504,4 +509,9 @@ def get_employedsince_date(umc_request: umc_request, hr_code: str) -> str:
         str: status
     """
 
-    return f"Employed Since: {filter_UMC_json_single_element(response=umc_request.get_account_raw_data(hr_code=hr_code), element='employedSince').split('T')[0]}"
+    raw = filter_UMC_json_single_element(
+        response=umc_request.get_account_raw_data(hr_code=hr_code),
+        element="employedSince",
+    )
+    date_part = raw.split("T")[0] if raw else "N/A"
+    return f"Employed Since ({hr_code}): {date_part}"

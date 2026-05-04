@@ -213,4 +213,5 @@ class umc_request(Session):
         """
         endpoint = f"{self._USER_MANAGEMENT}{self._API_USER_MANAGEMENT}?{self._EMPLOYEE_NUMBER_PARAM.format(param=hr_code)}"
         response = self.get_request(endpoint=endpoint)
+        print(response)
         return response

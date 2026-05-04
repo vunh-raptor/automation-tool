@@ -131,8 +131,15 @@ class umc(Page):
             bool: status of the action
         """
         update_field = self.search_by_xpath(xpath=field)
+        if not update_field.flag:
+            return False
+
         update_field.click()
-        update_field.clearText()
+
+        target_element = update_field.return_element()
+        if target_element is not None and target_element.tag_name.lower() != "select":
+            update_field.clearText()
+
         return update_field.send_keys(data)
 
     def click_details_button(self) -> None:
