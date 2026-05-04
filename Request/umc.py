@@ -79,48 +79,6 @@ class umc_request(Session):
         """
     )
 
-    # API Body to create new account
-    _POST_NEW_ACCOUNT_BODY = Template(
-        """
-        {
-        "active": true,
-        "displayName": "${displayName}",
-        "emails": [
-            {
-            "primary": true,
-            "type": "work",
-            "value": "${email}"
-            }
-        ],
-        "externalId": "${hrcode}",
-        "managedExternally": false,
-        "name": {
-            "familyName": "${lastName}",
-            "givenName": "${firstName}"
-        },
-        "phoneNumbers": [
-            {
-            "primary": false,
-            "type": "mobile",
-            "value": "${phone}"
-            },
-            {
-            "primary": true,
-            "type": "work",
-            "value": "${phone}"
-            }
-        ],
-        "schemas": [
-            "urn:scim:schemas:core:1.0"
-        ],
-        "startDate": "${startDate}",
-        "title": "RA",
-        "userName": "${login}"
-        }
-        """
-        # Format startDate dd.mm.yy
-    )
-
     def __init__(self, token: str, url: str = UMC_DEFAULT_URL, auth_type: str = "basic"):
         super().__init__(token, url, auth_type)
 
@@ -239,25 +197,6 @@ class umc_request(Session):
         }
         response = self.patch_request(endpoint=endpoint, payload=payload)
         # Verify the status of the request call
-        if response.status_code >= 400:
-            return False
-        else:
-            return True
-
-    def create_new_account(self, new_accounts_data: dict) -> bool:
-        """This is create new account request
-
-        Args:
-            new_accounts_data (dict): dictionary of data that the creating account contains
-
-        Returns:
-            bool: status of the action
-        """
-        endpoint = f"{self._USER_MANAGEMENT}{self._API_SCIM_USER_MANAGEMENT}"
-        payload = json.loads(self._POST_NEW_ACCOUNT_BODY.substitute(
-            hr_code=hr_code, displayName=displayName, email=email, lastName=lastName, firstName=firstName, phone=phone, startDate=startDate, login=login))
-        response = self.post_request(endpoint=endpoint, payload=payload, )
-
         if response.status_code >= 400:
             return False
         else:
