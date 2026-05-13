@@ -303,7 +303,7 @@ class homesis(Page):
         """
         try:
             if self.wait_element_to_visible(self.homesis_role_bank_selector):
-                self.select_dropdown_value(self.homesis_role_bank_selector, role)
+                self.select_dropdown_by_visible_text(self.homesis_role_bank_selector, role)
                 return True
         except TimeoutException:
             print("Timeout while waiting for elements.")

@@ -97,6 +97,31 @@ def add_role_in_bank_SA(homesis_page: homesis, hr_code: str, id_number: str, not
             hr_code + "-" + ErrorMessage.homesis_message.CAN_NOT_FIND_USER)
     return list_of_error
 
+
+def remove_role_in_bank_SA(homesis_page: homesis, hr_code: str) -> list:
+    """Remove SA role-in-bank for users by setting Role in Bank to default option.
+
+    Args:
+        homesis_page (homesis): active Homesis selenium session
+        hr_code (str): target user HR code
+
+    Returns:
+        list: this list contain success/error messages of the action
+    """
+    list_of_error = []
+    homesis_page.search_hrid(hrid=hr_code)
+
+    if homesis_page.click_details_button():
+        if homesis_page.fill_role_in_bank("** choose **") is False:
+            list_of_error.append(hr_code + " - " + ErrorMessage.homesis_message.CAN_NOT_FILL_ROLE)
+        if homesis_page.click_save_button():
+            list_of_error.append(
+                hr_code + " - " + ErrorMessage.homesis_message.CLICK_SAVE_BUTTON)
+    else:
+        list_of_error.append(
+            hr_code + "-" + ErrorMessage.homesis_message.CAN_NOT_FIND_USER)
+    return list_of_error
+
 # This funtion is to add role in bank for RA MW
 
 
@@ -225,8 +250,6 @@ def change_role_in_bank(homesis_page: homesis, hr_code: str, role: str) -> bool:
     homesis_page.search_hrid(hrid=hr_code)
 
     if homesis_page.click_details_button():
-        homesis_page.fill_role_in_bank("** choose **")
-        time.sleep(2)
         homesis_page.fill_role_in_bank(role)
         time.sleep(2)
         return homesis_page.click_save_button()
