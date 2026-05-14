@@ -148,7 +148,7 @@ class Session:
             self.url + endpoint,
             auth=self.authen_token,
             json=payload,
-            timeout=10,
+            timeout=20,
             verify=self.verify_ssl
         )
 
@@ -167,7 +167,7 @@ class Session:
             self.url + endpoint,
             auth=self.authen_token,
             json=payload,
-            timeout=10,
+            timeout=20,
             verify=self.verify_ssl
         )
 
@@ -186,6 +186,6 @@ class Session:
             self.url + endpoint,
             auth=self.authen_token,
             json=payload,
-            timeout=10,
+            timeout=20,
             verify=self.verify_ssl
         )
