@@ -2,19 +2,9 @@ import streamlit as st
 import requests
 
 from Common.constant import app_logic_exception
-from Common.supporting import (
-    login_status_check,
-    logout_render,
-    request_to_automate_button,
-)
 
+API_URL_DEFAULT = "http://sd-auto.homecredit.vn:1234/ask"
 
-API_URL_DEFAULT = "http://10.19.203.121:1234/api/v1/chat"
-
-
-login_status_check()
-logout_render()
-request_to_automate_button()
 
 
 def _extract_answer(payload: object) -> str:
@@ -55,9 +45,7 @@ def _extract_answer(payload: object) -> str:
 
 def _call_chat_api(api_url: str, user_prompt: str, history: list[dict]) -> tuple[bool, str]:
     request_payload = {
-        "model": "uncategorized",
-        "system_prompt": "You smart caveman. Use short sentences. No filler words. No small talk. Only give answer I ask.",
-        "input": user_prompt,
+        "question": user_prompt
     }
 
     try:
