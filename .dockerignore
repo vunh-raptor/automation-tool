@@ -1,0 +1,47 @@
+# Version control
+.git
+.gitignore
+.gitlab-ci.yml
+
+# Python caches / build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Local secrets / drivers (provided at runtime instead)
+.env
+chromedriver.exe
+LICENSE.chromedriver
+Common/data/CBAAccess.ps1
+
+# Editor / OS / CI tooling not needed in the image
+.vscode/
+.idea/
+.github/
+*.ps1
+
+# Docs & local DBs
+*.db
+*.sqlite3
+*.log
+
+# Kubernetes / Docker assets (not needed inside the image)
+k8s/
+docker-compose.yml
+Dockerfile
+.dockerignore

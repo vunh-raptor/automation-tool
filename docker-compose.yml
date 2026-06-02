@@ -1,0 +1,25 @@
+# Local build & run helper for the SD Automation Hub container.
+#   docker compose up --build
+# then open http://localhost:8501
+services:
+  automation-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sd-automation-hub:latest
+    container_name: sd-automation-hub
+    ports:
+      - "8501:8501"
+    environment:
+      CHROME_BINARY: /usr/bin/chromium
+      CHROMEDRIVER_PATH: /usr/bin/chromedriver
+      CHROME_HEADLESS: "true"
+    # Selenium/Chromium can exhaust the default 64MB /dev/shm; give it more.
+    shm_size: "1gb"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

@@ -1,4 +1,5 @@
 import logging
+import os
 from time import sleep
 
 from selenium import webdriver
@@ -13,21 +14,41 @@ from Common.web_element import web_element
 class page_object:
     def __init__(
         self,
-        path: str = "chromedriver.exe",
+        path: str = None,
     ):
         """This is the init function for the base page_object. Please be reminded that we only use ChromeDriver.
 
         Args:
-            path (str, optional): Path to the ChromeDriver execution file. Defaults to "chromedriver.exe".
+            path (str, optional): Path to the ChromeDriver executable. When not
+                provided, it is read from the ``CHROMEDRIVER_PATH`` environment
+                variable and falls back to ``"chromedriver.exe"`` (the historical
+                Windows default). This lets the same code run unchanged on Windows
+                and inside Linux containers (e.g. ``/usr/bin/chromedriver``).
         """
 
         self.default_delay = 0.2
         self.default_timeout = 10
 
+        # Resolve the chromedriver location, keeping the original Windows default.
+        if path is None:
+            path = os.environ.get("CHROMEDRIVER_PATH", "chromedriver.exe")
         self.path = path
 
+        options = webdriver.ChromeOptions()
+        # Allow pointing at a specific Chrome/Chromium binary (needed in containers).
+        chrome_binary = os.environ.get("CHROME_BINARY")
+        if chrome_binary:
+            options.binary_location = chrome_binary
+        # Run headless automatically when there is no display (e.g. Kubernetes).
+        if os.environ.get("CHROME_HEADLESS", "").strip().lower() in ("1", "true", "yes"):
+            options.add_argument("--headless=new")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--window-size=1920,1080")
+
         self.profile = webdriver.ChromeService(executable_path=self.path)
-        self.driver = webdriver.Chrome(service=self.profile)
+        self.driver = webdriver.Chrome(service=self.profile, options=options)
         self.wait = WebDriverWait(
             self.driver, self.default_timeout)
 

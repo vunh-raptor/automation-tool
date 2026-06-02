@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: automation-hub
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+# Override the image tag per environment, e.g.:
+#   kustomize edit set image ghcr.io/vunh-raptor/automation-tool=myregistry/app:v1.2.3
+images:
+  - name: ghcr.io/vunh-raptor/automation-tool
+    newTag: latest
+
+commonLabels:
+  app.kubernetes.io/name: sd-automation-hub
+  app.kubernetes.io/part-of: sd-automation-hub

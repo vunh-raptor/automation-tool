@@ -39,3 +39,47 @@ The installation will take a while. Please patiently wait until it is completed.
 To Run the script, run the `.run_script.ps1`. You can either run it from the Terminal or the ps1 file. Once it is done running, you will see the message below on the Terminal/Powershell.
 
 Usually, it will automatically open a webpage with the mentioned Local URL. If it doesn't appear, you can always access the URL written on the Terminal/PowerShell
+
+# Running with Docker
+
+The repository ships with a `Dockerfile` that bundles Python 3.12, the Streamlit
+front-end and a headless Chromium + chromedriver for the Selenium engine.
+
+Build and run locally:
+
+```bash
+docker build -t sd-automation-hub:latest .
+docker run --rm -p 8501:8501 --shm-size=1g sd-automation-hub:latest
+```
+
+Or with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Then open http://localhost:8501.
+
+The container is configured through environment variables (already set with sane
+defaults in the image):
+
+| Variable            | Default                  | Purpose                                  |
+|---------------------|--------------------------|------------------------------------------|
+| `CHROME_BINARY`     | `/usr/bin/chromium`      | Chrome/Chromium binary used by Selenium  |
+| `CHROMEDRIVER_PATH` | `/usr/bin/chromedriver`  | chromedriver executable used by Selenium |
+| `CHROME_HEADLESS`   | `true`                   | Run Chrome headless (no display)         |
+
+> On Windows the defaults are unchanged: `CHROMEDRIVER_PATH` falls back to
+> `chromedriver.exe` and Chrome runs with a visible window, so the existing
+> `setup.ps1` / `run_script.ps1` workflow keeps working.
+
+# Hosting on Kubernetes
+
+Ready-to-use manifests live in the [`k8s/`](k8s/) directory (namespace, configmap,
+deployment, service and ingress). After pushing the image to a registry:
+
+```bash
+kubectl apply -k k8s/
+```
+
+See [`k8s/README.md`](k8s/README.md) for full deployment instructions.
