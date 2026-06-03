@@ -1,22 +1,15 @@
 # Dùng Python 3.12 làm nền tảng, bản slim để image nhỏ gọn hơn
 FROM python:3.12-slim AS base
 
-# Cấu hình Python và pip
+# Log hiện ra ngay (không bị giữ lại), không tạo file .pyc rác
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+    PYTHONDONTWRITEBYTECODE=1
 
 # Đường dẫn tới Chrome bên trong container, chạy ở chế độ không cần màn hình
+# (các biến này được code Python đọc trong Common/page_object.py)
 ENV CHROME_BINARY=/usr/bin/chromium \
     CHROMEDRIVER_PATH=/usr/bin/chromedriver \
     CHROME_HEADLESS=true
-
-# Cấu hình Streamlit: chạy ở port 8501, lắng nghe mọi kết nối, tắt telemetry
-ENV STREAMLIT_SERVER_PORT=8501 \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
-    STREAMLIT_SERVER_HEADLESS=true \
-    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
 # Cài Chrome và các gói hệ thống cần thiết
 RUN apt-get update \
