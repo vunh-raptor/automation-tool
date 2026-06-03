@@ -72,14 +72,3 @@ defaults in the image):
 > On Windows the defaults are unchanged: `CHROMEDRIVER_PATH` falls back to
 > `chromedriver.exe` and Chrome runs with a visible window, so the existing
 > `setup.ps1` / `run_script.ps1` workflow keeps working.
-
-# Hosting on Kubernetes
-
-Ready-to-use manifests live in the [`k8s/`](k8s/) directory (namespace, configmap,
-deployment, service and ingress). After pushing the image to a registry:
-
-```bash
-kubectl apply -k k8s/
-```
-
-See [`k8s/README.md`](k8s/README.md) for full deployment instructions.
