@@ -33,7 +33,7 @@ class page_object:
         chrome_binary = os.environ.get("CHROME_BINARY")
         if chrome_binary:
             options.binary_location = chrome_binary
-        if os.environ.get("CHROME_HEADLESS", "").strip().lower() in ("1", "true", "yes"):
+        if os.environ.get("CHROME_HEADLESS", "false").lower() == "true":
             options.add_argument("--headless=new")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")

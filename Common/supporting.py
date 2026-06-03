@@ -9,8 +9,8 @@ from pyotp import TOTP
 from msteamsapi import AdaptiveCard, Container, TeamsWebhook, ContainerStyle
 from ldap3 import Server, Connection, ALL, SUBTREE
 
-REACTIVATE_WEBHOOK_URL = os.environ.get("REACTIVATE_WEBHOOK_URL", "")
-ERROR_WEBHOOK_URL = os.environ.get("ERROR_WEBHOOK_URL", "")
+REACTIVATE_WEBHOOK_URL = os.environ.get("REACTIVATE_WEBHOOK_URL")
+ERROR_WEBHOOK_URL = os.environ.get("ERROR_WEBHOOK_URL")
 _SSO_URL = os.environ.get("SSO_URL")
 
 
@@ -215,7 +215,7 @@ def generate_OTP():
     """
     try:
         # Generate OTP fucntion
-        timeOTP = TOTP(os.environ.get("OTP_SECRET", ""), interval=600)
+        timeOTP = TOTP(os.environ.get("OTP_SECRET"), interval=600)
         # Build & send the message card
         card = adaptive_card_build_MSteams(msg_title="Reactivate OTP", param1="Generated OTP: " +
                                            timeOTP.now(), param2="Requestor: " + str(st.session_state["userDisplayName"]))
