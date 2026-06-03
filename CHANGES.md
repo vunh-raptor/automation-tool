@@ -21,10 +21,8 @@ Anyone who could read the code — or download the app package — could see the
 | File | Purpose |
 |---|---|
 | `Dockerfile` | Packages the app so it can run anywhere Docker is installed |
-| `docker-compose.yml` | Describes how to run the container |
+| `docker-compose.yml` | Describes how to build and run the container |
 | `.env.example` | Template listing all required configuration values |
-| `deploy.sh` | One-click script to build and start the app (Linux) |
-| `deploy.ps1` | One-click script to build and start the app (Windows) |
 
 ## Why this way
 

@@ -61,11 +61,13 @@ Open `.env` and fill in the required values.
 **2. Start the app**
 
 ```bash
-# Linux
-./deploy.sh
-
-# Windows
-.\deploy.ps1
+docker compose up --build -d
 ```
 
 Then open http://localhost:8501.
+
+To stop the app:
+
+```bash
+docker compose down
+```
