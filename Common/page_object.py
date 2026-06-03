@@ -19,27 +19,20 @@ class page_object:
         """This is the init function for the base page_object. Please be reminded that we only use ChromeDriver.
 
         Args:
-            path (str, optional): Path to the ChromeDriver executable. When not
-                provided, it is read from the ``CHROMEDRIVER_PATH`` environment
-                variable and falls back to ``"chromedriver.exe"`` (the historical
-                Windows default). This lets the same code run unchanged on Windows
-                and inside Linux containers (e.g. ``/usr/bin/chromedriver``).
+            path (str, optional): Path to the ChromeDriver execution file. Defaults to "chromedriver.exe".
         """
 
         self.default_delay = 0.2
         self.default_timeout = 10
 
-        # Resolve the chromedriver location, keeping the original Windows default.
         if path is None:
             path = os.environ.get("CHROMEDRIVER_PATH", "chromedriver.exe")
         self.path = path
 
         options = webdriver.ChromeOptions()
-        # Allow pointing at a specific Chrome/Chromium binary (needed in containers).
         chrome_binary = os.environ.get("CHROME_BINARY")
         if chrome_binary:
             options.binary_location = chrome_binary
-        # Run headless automatically when there is no display (e.g. Kubernetes).
         if os.environ.get("CHROME_HEADLESS", "").strip().lower() in ("1", "true", "yes"):
             options.add_argument("--headless=new")
             options.add_argument("--no-sandbox")
