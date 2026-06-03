@@ -33,7 +33,7 @@ Common/data/CBAAccess.ps1
 .vscode/
 .idea/
 .github/
-*.ps1
+deploy.sh
 
 # Docs & local DBs
 *.db

@@ -46,7 +46,7 @@ Usually, it will automatically open a webpage with the mentioned Local URL. If i
 
 **1. Create your environment file**
 
-```powershell
+```bash
 cp .env.example .env
 ```
 
@@ -54,8 +54,8 @@ Open `.env` and fill in the required values.
 
 **2. Start the app**
 
-```powershell
-.\deploy.ps1
+```bash
+./deploy.sh
 ```
 
 Then open http://localhost:8501.
