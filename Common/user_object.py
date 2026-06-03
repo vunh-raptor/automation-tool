@@ -1,7 +1,12 @@
+import os
 from datetime import datetime
 import hashlib
 from ldap3 import Server, Connection, ALL, SUBTREE
 import streamlit as st
+
+_LDAP_URL = os.environ.get("LDAP_URL", "ldap://vn-ldaps.hcg.homecredit.net")
+_LDAP_USER_OU = os.environ.get("LDAP_USER_OU", "OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net")
+_LDAP_USER_GROUP_DN = os.environ.get("LDAP_USER_GROUP_DN", "CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net")
 
 
 class ValidationError(Exception):
@@ -69,10 +74,10 @@ class User:
 
 def authenticate_ldap(username: str, password: str) -> dict:
     try:
-        server = Server("ldap://vn-ldaps.hcg.homecredit.net", get_info=ALL)
+        server = Server(_LDAP_URL, get_info=ALL)
         conn = Connection(
             server,
-            f"CN={username},OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net",
+            f"CN={username},{_LDAP_USER_OU}",
             password,
             auto_bind=True
         )
@@ -81,8 +86,8 @@ def authenticate_ldap(username: str, password: str) -> dict:
             raise AuthenticationError("LDAP bind failed.")
 
         conn.search(
-            search_base="OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net",
-            search_filter=f"(&(samAccountName={username})(memberOf=CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net))",
+            search_base=_LDAP_USER_OU,
+            search_filter=f"(&(samAccountName={username})(memberOf={_LDAP_USER_GROUP_DN}))",
             search_scope=SUBTREE,
             attributes=["displayName", "employeeID", "title"]
         )

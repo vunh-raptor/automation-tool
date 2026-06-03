@@ -1,3 +1,4 @@
+import os
 from requests import Response
 from string import Template
 import json
@@ -22,7 +23,7 @@ class JiraSession(Session):
     """
 
     # DEFAULT cURL for JIRA API
-    _DEFAULT_URL = "https://sd.homecredit.vn/rest/api/2/"
+    _DEFAULT_URL = os.environ.get("JIRA_URL", "https://sd.homecredit.vn/rest/api/2/")
     _BROWSE_TICKET = "issue/{ticket_key}"
     _JQL_SEARCH = "search?jql="
     _TRANSITION = "issue/{ticket_key}/transitions"

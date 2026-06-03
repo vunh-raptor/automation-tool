@@ -40,8 +40,8 @@ Common/data/CBAAccess.ps1
 *.sqlite3
 *.log
 
-# Kubernetes / Docker assets (not needed inside the image)
-k8s/
+# Docker assets (not needed inside the image)
 docker-compose.yml
 Dockerfile
 .dockerignore
+# .env.example is intentionally NOT excluded so it serves as docs inside the image

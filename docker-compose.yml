@@ -1,6 +1,11 @@
 # Local build & run helper for the SD Automation Hub container.
-#   docker compose up --build
-# then open http://localhost:8501
+#
+# Setup:
+#   1. cp .env.example .env
+#   2. Fill in the secret values in .env
+#   3. docker compose up --build
+#
+# Then open http://localhost:8501
 services:
   automation-hub:
     build:
@@ -10,10 +15,20 @@ services:
     container_name: sd-automation-hub
     ports:
       - "8501:8501"
+    env_file:
+      - .env
     environment:
+      # --- Chrome / Selenium (baked into image, no need to change) ---
       CHROME_BINARY: /usr/bin/chromium
       CHROMEDRIVER_PATH: /usr/bin/chromedriver
       CHROME_HEADLESS: "true"
+      # --- Internal service URLs (override here if your environment differs) ---
+      LDAP_URL: ${LDAP_URL:-ldap://vn-ldaps.hcg.homecredit.net}
+      LDAP_USER_OU: ${LDAP_USER_OU:-OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net}
+      LDAP_USER_GROUP_DN: ${LDAP_USER_GROUP_DN:-CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net}
+      JIRA_URL: ${JIRA_URL:-https://sd.homecredit.vn/rest/api/2/}
+      AI_CHAT_API_URL: ${AI_CHAT_API_URL:-http://sd-auto.homecredit.vn:1234/ask}
+      SSO_URL: ${SSO_URL:-https://sso.homecredit.vn/opensso/identity/json/authenticate}
     # Selenium/Chromium can exhaust the default 64MB /dev/shm; give it more.
     shm_size: "1gb"
     restart: unless-stopped

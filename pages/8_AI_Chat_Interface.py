@@ -1,9 +1,11 @@
+import os
+
 import streamlit as st
 import requests
 
 from Common.constant import app_logic_exception
 
-API_URL_DEFAULT = "http://sd-auto.homecredit.vn:1234/ask"
+API_URL_DEFAULT = os.environ.get("AI_CHAT_API_URL", "http://sd-auto.homecredit.vn:1234/ask")
 
 
 
