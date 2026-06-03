@@ -34,6 +34,7 @@ Common/data/CBAAccess.ps1
 .idea/
 .github/
 deploy.sh
+deploy.ps1
 
 # Docs & local DBs
 *.db
