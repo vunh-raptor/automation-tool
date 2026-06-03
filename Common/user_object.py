@@ -4,9 +4,9 @@ import hashlib
 from ldap3 import Server, Connection, ALL, SUBTREE
 import streamlit as st
 
-_LDAP_URL = os.environ.get("LDAP_URL", "ldap://vn-ldaps.hcg.homecredit.net")
-_LDAP_USER_OU = os.environ.get("LDAP_USER_OU", "OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net")
-_LDAP_USER_GROUP_DN = os.environ.get("LDAP_USER_GROUP_DN", "CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net")
+_LDAP_URL = os.environ.get("LDAP_URL")
+_LDAP_USER_OU = os.environ.get("LDAP_USER_OU")
+_LDAP_USER_GROUP_DN = os.environ.get("LDAP_USER_GROUP_DN")
 
 
 class ValidationError(Exception):

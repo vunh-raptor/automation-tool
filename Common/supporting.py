@@ -11,7 +11,7 @@ from ldap3 import Server, Connection, ALL, SUBTREE
 
 REACTIVATE_WEBHOOK_URL = os.environ.get("REACTIVATE_WEBHOOK_URL", "")
 ERROR_WEBHOOK_URL = os.environ.get("ERROR_WEBHOOK_URL", "")
-_SSO_URL = os.environ.get("SSO_URL", "https://sso.homecredit.vn/opensso/identity/json/authenticate")
+_SSO_URL = os.environ.get("SSO_URL")
 
 
 def support_Excel_read(read_path: str, sheet_name: str = "Sheet1") -> DataFrame:

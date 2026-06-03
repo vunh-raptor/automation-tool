@@ -26,7 +26,7 @@ class page_object:
         self.default_timeout = 10
 
         if path is None:
-            path = os.environ.get("CHROMEDRIVER_PATH", "chromedriver.exe")
+            path = os.environ.get("CHROMEDRIVER_PATH")
         self.path = path
 
         options = webdriver.ChromeOptions()
