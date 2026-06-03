@@ -42,12 +42,18 @@ Usually, it will automatically open a webpage with the mentioned Local URL. If i
 
 # Running with Docker
 
+The app has been packaged with Docker so it can run on any machine without manual installation of Python, Chrome, or dependencies. All sensitive configuration (server addresses, secret keys) has been moved out of the source code into a local `.env` file that is never committed to the repository.
+
 **Prerequisites:** Docker Desktop installed and running.
 
 **1. Create your environment file**
 
 ```bash
+# Linux
 cp .env.example .env
+
+# Windows
+copy .env.example .env
 ```
 
 Open `.env` and fill in the required values.
@@ -55,11 +61,11 @@ Open `.env` and fill in the required values.
 **2. Start the app**
 
 ```bash
+# Linux
 ./deploy.sh
+
+# Windows
+.\deploy.ps1
 ```
 
 Then open http://localhost:8501.
-
----
-
-`.env` is listed in `.gitignore` and will never be committed to the repository.

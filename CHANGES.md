@@ -23,7 +23,8 @@ Anyone who could read the code — or download the app package — could see the
 | `Dockerfile` | Packages the app so it can run anywhere Docker is installed |
 | `docker-compose.yml` | Describes how to run the container |
 | `.env.example` | Template listing all required configuration values |
-| `deploy.ps1` | One-click script to build and start the app |
+| `deploy.sh` | One-click script to build and start the app (Linux) |
+| `deploy.ps1` | One-click script to build and start the app (Windows) |
 
 ## Why this way
 
@@ -32,3 +33,25 @@ It is listed in `.gitignore`, so it is never uploaded to the repository.
 
 The source code now contains no addresses or secrets — it only reads them
 from the environment at startup.
+
+---
+
+## Known limitations on Docker Linux
+
+### Send Email page
+
+The page uses Microsoft Outlook (win32com) to send emails, which is a Windows-only component and does not exist on Linux.
+
+**Fix:** Replace with Python's built-in `smtplib` using the company's SMTP server.
+
+### CyberArk credential retrieval
+
+The code runs a PowerShell script to fetch passwords from CyberArk. PowerShell is not available on Linux.
+
+**Fix:** CyberArk provides a REST API that can be called directly from Python without PowerShell.
+
+### Database logging
+
+The code points to a database file at a Windows network path (`\\vn-vwl5050\group2\...`). Linux containers cannot mount Windows network shares this way.
+
+**Fix:** Store the database file inside the container, or migrate to a proper database server (PostgreSQL, MySQL) that both Linux and Windows can connect to.
