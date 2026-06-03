@@ -46,28 +46,18 @@ The app has been packaged with Docker so it can run on any machine without manua
 
 **Prerequisites:** Docker Desktop installed and running.
 
-**1. Create your environment file**
-
 ```bash
-# Linux
-cp .env.example .env
+# 1. Create the .env file
+cp .env.example .env        # Linux
+copy .env.example .env      # Windows
 
-# Windows
-copy .env.example .env
-```
+# Open .env and fill in the values
 
-Open `.env` and fill in the required values.
-
-**2. Start the app**
-
-```bash
+# 2. Start the app
 docker compose up --build -d
+
+# Stop the app
+docker compose down
 ```
 
 Then open http://localhost:8501.
-
-To stop the app:
-
-```bash
-docker compose down
-```
