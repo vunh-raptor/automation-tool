@@ -9,16 +9,6 @@ services:
       - "8501:8501"
     env_file:
       - .env
-    environment:
-      CHROME_BINARY: /usr/bin/chromium
-      CHROMEDRIVER_PATH: /usr/bin/chromedriver
-      CHROME_HEADLESS: "true"
-      LDAP_URL: ${LDAP_URL:-ldap://vn-ldaps.hcg.homecredit.net}
-      LDAP_USER_OU: ${LDAP_USER_OU:-OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net}
-      LDAP_USER_GROUP_DN: ${LDAP_USER_GROUP_DN:-CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net}
-      JIRA_URL: ${JIRA_URL:-https://sd.homecredit.vn/rest/api/2/}
-      AI_CHAT_API_URL: ${AI_CHAT_API_URL:-http://sd-auto.homecredit.vn:1234/ask}
-      SSO_URL: ${SSO_URL:-https://sso.homecredit.vn/opensso/identity/json/authenticate}
     shm_size: "1gb"
     restart: unless-stopped
     healthcheck:
