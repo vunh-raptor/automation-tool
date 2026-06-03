@@ -9,12 +9,6 @@ ENV CHROME_BINARY=/usr/bin/chromium \
     CHROMEDRIVER_PATH=/usr/bin/chromedriver \
     CHROME_HEADLESS=true
 
-ENV LDAP_URL=ldap://vn-ldaps.hcg.homecredit.net \
-    LDAP_USER_OU="OU=Users,OU=VN,DC=hcg,DC=homecredit,DC=net" \
-    LDAP_USER_GROUP_DN="CN=VN.SD.SD_AUTOMATION_HUB.USER,OU=Groups,OU=VN,DC=hcg,DC=homecredit,DC=net" \
-    JIRA_URL=https://sd.homecredit.vn/rest/api/2/ \
-    AI_CHAT_API_URL=http://sd-auto.homecredit.vn:1234/ask \
-    SSO_URL=https://sso.homecredit.vn/opensso/identity/json/authenticate
 
 ENV STREAMLIT_SERVER_PORT=8501 \
     STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
