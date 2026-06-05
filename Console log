@@ -42,3 +42,62 @@ Just set COMPOSE_BAKE=true
 38.53 E: Unable to locate package curl
 ------
 failed to solve: process "/bin/sh -c apt-get update     && apt-get install -y --no-install-recommends         chromium         chromium-driver         fonts-liberation         ca-certificates         curl     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+
+
+Mới 
+
+[+] Building 38.4s (6/11)                                                                                                                                                                                                                                                docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                                                               0.0s
+ => => transferring dockerfile: 1.87kB                                                                                                                                                                                                                                             0.0s
+ => [internal] load metadata for docker.io/library/python:3.12-slim                                                                                                                                                                                                                0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                                                                  0.0s
+ => => transferring context: 641B                                                                                                                                                                                                                                                  0.0s
+ => CACHED [1/7] FROM docker.io/library/python:3.12-slim                                                                                                                                                                                                                           0.0s
+ => [internal] load build context                                                                                                                                                                                                                                                  0.0s
+ => => transferring context: 3.06kB                                                                                                                                                                                                                                                0.0s
+ => ERROR [2/7] RUN apt-get update     && apt-get install -y --no-install-recommends         chromium         chromium-driver         fonts-liberation         ca-certificates         curl     && rm -rf /var/lib/apt/lists/*                                                    38.4s
+------
+ > [2/7] RUN apt-get update     && apt-get install -y --no-install-recommends         chromium         chromium-driver         fonts-liberation         ca-certificates         curl     && rm -rf /var/lib/apt/lists/*:
+31.29 Ign:1 http://deb.debian.org/debian trixie InRelease
+31.29 Ign:2 http://deb.debian.org/debian trixie-updates InRelease
+31.29 Ign:3 http://deb.debian.org/debian-security trixie-security InRelease
+32.29 Ign:3 http://deb.debian.org/debian-security trixie-security InRelease
+32.29 Ign:2 http://deb.debian.org/debian trixie-updates InRelease
+32.29 Ign:1 http://deb.debian.org/debian trixie InRelease
+34.29 Ign:1 http://deb.debian.org/debian trixie InRelease
+34.29 Ign:2 http://deb.debian.org/debian trixie-updates InRelease
+34.29 Ign:3 http://deb.debian.org/debian-security trixie-security InRelease
+38.29 Err:3 http://deb.debian.org/debian-security trixie-security InRelease
+38.29   Unable to connect to deb.debian.org:http:
+38.29 Err:2 http://deb.debian.org/debian trixie-updates InRelease
+38.29   Unable to connect to deb.debian.org:http:
+38.29 Err:1 http://deb.debian.org/debian trixie InRelease
+38.29   Could not connect to debian.map.fastlydns.net:80 (151.101.194.132), connection timed out Could not connect to debian.map.fastlydns.net:80 (151.101.2.132), connection timed out Could not connect to debian.map.fastlydns.net:80 (151.101.130.132), connection timed out Could not connect to debian.map.fastlydns.net:80 (151.101.66.132), connection timed out Unable to connect to deb.debian.org:http:
+38.29   Unable to connect to deb.debian.org:http:
+38.30 Reading package lists...
+38.31 W: Failed to fetch http://deb.debian.org/debian/dists/trixie/InRelease  Unable to connect to deb.debian.org:http:
+38.31 W: Failed to fetch http://deb.debian.org/debian/dists/trixie-updates/InRelease  Unable to connect to deb.debian.org:http:
+38.31 W: Failed to fetch http://deb.debian.org/debian-security/dists/trixie-security/InRelease  Unable to connect to deb.debian.org:http:
+38.31 W: Some index files failed to download. They have been ignored, or old ones used instead.
+38.32 Reading package lists...
+38.33 Building dependency tree...
+38.33 Reading state information...
+38.33 E: Unable to locate package chromium
+38.33 E: Unable to locate package chromium-driver
+38.33 E: Unable to locate package fonts-liberation
+38.33 E: Unable to locate package curl
+------
+Dockerfile:22
+--------------------
+  21 |     # Cài Chrome và các gói hệ thống cần thiết
+  22 | >>> RUN apt-get update \
+  23 | >>>     && apt-get install -y --no-install-recommends \
+  24 | >>>         chromium \
+  25 | >>>         chromium-driver \
+  26 | >>>         fonts-liberation \
+  27 | >>>         ca-certificates \
+  28 | >>>         curl \
+  29 | >>>     && rm -rf /var/lib/apt/lists/*
+  30 |
+--------------------
+ERROR: failed to solve: process "/bin/sh -c apt-get update     && apt-get install -y --no-install-recommends         chromium         chromium-driver         fonts-liberation         ca-certificates         curl     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
