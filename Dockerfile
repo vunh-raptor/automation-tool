@@ -1,6 +1,11 @@
 # Use Python 3.12 as the base, slim variant to keep the image small
 FROM python:3.12-slim AS base
 
+# Proxy settings for build time (apt-get and pip) — not baked into the final image
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+
 # Show logs immediately (no buffering), don't create .pyc clutter
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
