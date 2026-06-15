@@ -1,0 +1,18 @@
+# Local Kubernetes cluster that stands in for the `nprod-green` cluster.
+# Create with:  kind create cluster --name sdah --config kind/kind-cluster.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: sdah
+nodes:
+  - role: control-plane
+    # expose the app's NodePort (30085) on the host as localhost:8501
+    extraPortMappings:
+      - containerPort: 30085
+        hostPort: 8501
+        protocol: TCP
+# Optional (advanced): let the cluster pull from the lab registry directly.
+# The basic flow uses `kind load docker-image`, so this is NOT required.
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.local:5000"]
+      endpoint = ["http://registry.local:5000"]
