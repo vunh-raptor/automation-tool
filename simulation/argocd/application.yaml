@@ -1,0 +1,26 @@
+# ArgoCD Application = the local stand-in for the prod GitOps controller.
+# It watches the env repo's release branch and reconciles it into the cluster.
+#
+# IMPORTANT: repoURL must be reachable FROM INSIDE the cluster. A /tmp git repo
+# on your WSL2 host is NOT reachable. Use a git host the cluster can reach, e.g. a
+# GitHub repo or the Track B GitLab (http://gitlab.local:8080/root/sd-automation-hub-env.git).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sd-automation-hub
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<your-org>/sd-automation-hub-env.git   # <-- EDIT ME
+    targetRevision: sd-automation-hub-release
+    path: sd-automation-hub
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
