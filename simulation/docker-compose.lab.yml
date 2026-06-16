@@ -1,0 +1,72 @@
+# Track B lab: self-hosted GitLab + runner + standalone registry.
+# Mirrors the production "GitLab server + self-managed runner + external registry"
+# topology. Bring it up INSIDE WSL2 and give WSL2 ~8 GB (see ../wsl/.wslconfig.example).
+# See ../docs/local-ci-cd-simulation.md
+#
+# Compose project name is "sdah-lab", so the network is "sdah-lab_lab"
+# (used as --docker-network-mode when registering the runner).
+name: sdah-lab
+
+networks:
+  lab:
+    driver: bridge
+
+volumes:
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:
+  registry-data:
+  runner-config:
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:17.5.1-ee.0   # pin close to your production GitLab
+    container_name: lab-gitlab
+    hostname: gitlab.local
+    restart: unless-stopped
+    networks:
+      lab:
+        aliases: [gitlab.local]
+    ports:
+      - "8080:8080"   # UI + HTTP git -> http://gitlab.local:8080
+      - "2222:22"     # SSH git (optional)
+    shm_size: "256m"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.local:8080'
+        nginx['listen_port'] = 8080
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        # trim resource use for a laptop / small WSL2
+        puma['worker_processes'] = 2
+        sidekiq['max_concurrency'] = 5
+        prometheus_monitoring['enable'] = false
+        # use the STANDALONE registry below (mimics the external prod registry)
+        registry['enable'] = false
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
+
+  registry:
+    image: registry:2
+    container_name: lab-registry
+    restart: unless-stopped
+    networks:
+      lab:
+        aliases: [registry.local]
+    ports:
+      - "5000:5000"   # reachable as registry.local:5000 on host (via hosts file) and in-network
+    volumes:
+      - registry-data:/var/lib/registry
+
+  runner:
+    image: gitlab/gitlab-runner:v17.5.0
+    container_name: lab-runner
+    restart: unless-stopped
+    networks:
+      lab:
+    depends_on: [gitlab]
+    volumes:
+      - runner-config:/etc/gitlab-runner
+      # the docker executor spawns job + DinD service containers on the host daemon
+      - /var/run/docker.sock:/var/run/docker.sock

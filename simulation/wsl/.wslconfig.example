@@ -1,0 +1,19 @@
+# WSL2 resource limits — Track B only.
+#
+# Self-hosted GitLab (the gitlab-ee container) wants ~4 GB RAM on its own; with
+# the runner, a DinD build, and the registry it's easy to starve a default WSL2.
+#
+# HOW TO USE (Windows side):
+#   1. Copy this file to:  C:\Users\<you>\.wslconfig   (note the leading dot, no extension)
+#   2. From an elevated PowerShell:  wsl --shutdown
+#   3. Restart Docker Desktop.
+#
+# Tune the numbers to your laptop. These suit a 16 GB machine; on 8 GB, Track B
+# will be tight — prefer Track A there.
+
+[wsl2]
+memory=8GB
+processors=4
+swap=2GB
+# localhostForwarding is on by default; keep it so localhost:5000/8080/8501 reach WSL2.
+localhostForwarding=true

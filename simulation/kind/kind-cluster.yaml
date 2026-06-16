@@ -1,0 +1,16 @@
+# Local Kubernetes cluster that stands in for the `nprod-green` cluster.
+# Runs on the Docker Desktop (WSL2 backend) engine.
+# Create with:  kind create cluster --name sdah --config simulation/kind/kind-cluster.yaml
+#
+# The extraPortMappings publishes the app's NodePort (30085) on the kind node as
+# host port 8501. Docker Desktop then forwards that to Windows `localhost:8501`,
+# so the app is reachable from both WSL2 and your Windows browser.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: sdah
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30085
+        hostPort: 8501
+        protocol: TCP
